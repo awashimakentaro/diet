@@ -189,22 +189,31 @@ export default function RecordScreen() {
       ))}
 
       <Modal visible={libraryModalVisible} animationType="slide" onRequestClose={() => setLibraryModalVisible(false)}>
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>ライブラリから選択</Text>
-          <FlatList
-            data={libraryEntries}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <Pressable style={styles.libraryItem} onPress={() => handleSelectLibraryEntry(item.id)}>
-                <Text style={styles.libraryLabel}>{item.name}</Text>
-                <Text style={styles.libraryMeta}>{item.items.length > 1 ? 'メニュー' : '単品'} / {item.items.length} 品</Text>
-              </Pressable>
-            )}
-          />
-          <Pressable style={styles.secondaryButton} onPress={() => setLibraryModalVisible(false)}>
-            <Text style={styles.secondaryLabel}>閉じる</Text>
-          </Pressable>
-        </View>
+        <SafeAreaView style={styles.libraryModalSafeArea}>
+          <View style={styles.libraryModalContainer}>
+            <Text style={styles.modalTitle}>ライブラリから選択</Text>
+            <View style={styles.librarySearchRow}>
+              <Text style={styles.libraryHint}>保存した食品・メニューから選択できます</Text>
+            </View>
+            <FlatList
+              data={libraryEntries}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={styles.libraryList}
+              renderItem={({ item }) => (
+                <Pressable style={styles.libraryItem} onPress={() => handleSelectLibraryEntry(item.id)}>
+                  <View>
+                    <Text style={styles.libraryLabel}>{item.name}</Text>
+                    <Text style={styles.libraryMeta}>{item.items.length > 1 ? 'メニュー' : '単品'} / {item.items.length} 品</Text>
+                  </View>
+                  <Text style={styles.libraryMeta}>追加</Text>
+                </Pressable>
+              )}
+            />
+            <Pressable style={styles.secondaryOutlineButton} onPress={() => setLibraryModalVisible(false)}>
+              <Text style={styles.secondaryLabel}>閉じる</Text>
+            </Pressable>
+          </View>
+        </SafeAreaView>
       </Modal>
       </ScrollView>
     </SafeAreaView>
@@ -303,6 +312,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
   },
+  secondaryOutlineButton: {
+    borderWidth: 1,
+    borderColor: '#0a7ea4',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 12,
+  },
   secondaryLabel: {
     color: '#0a7ea4',
     fontWeight: '600',
@@ -356,15 +373,36 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#fff',
   },
+  libraryModalSafeArea: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  libraryModalContainer: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#fff',
+  },
   modalTitle: {
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 12,
   },
+  librarySearchRow: {
+    marginBottom: 8,
+  },
+  libraryHint: {
+    color: '#666',
+  },
   libraryItem: {
-    paddingVertical: 12,
+    paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  libraryList: {
+    flexGrow: 1,
   },
   libraryLabel: {
     fontSize: 16,

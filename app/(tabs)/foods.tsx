@@ -22,10 +22,13 @@ import {
   FlatList,
   Modal,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -225,24 +228,48 @@ export default function FoodsScreen() {
       />
 
       <Modal visible={editorVisible} animationType="slide" onRequestClose={() => setEditorVisible(false)}>
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>{editingEntry ? '食品を編集' : '食品を追加'}</Text>
-          <TextInput style={styles.input} value={name} onChangeText={setName} placeholder="表示名" />
-          <TextInput style={styles.input} value={amount} onChangeText={setAmount} placeholder="量 (例: 1人前)" />
-          <View style={styles.row}>
-            <MacroField label="kcal" value={calories} onChange={setCalories} />
-            <MacroField label="P" value={protein} onChange={setProtein} />
-            <MacroField label="F" value={fat} onChange={setFat} />
-            <MacroField label="C" value={carbs} onChange={setCarbs} />
-          </View>
-          <FoodItemEditor items={formItems} onChange={setFormItems} />
-          <Pressable style={styles.primaryButton} onPress={handleSaveEntry}>
-            <Text style={styles.primaryLabel}>保存</Text>
-          </Pressable>
-          <Pressable style={styles.secondaryButton} onPress={() => setEditorVisible(false)}>
-            <Text style={styles.secondaryLabel}>閉じる</Text>
-          </Pressable>
-        </View>
+        <SafeAreaView style={styles.modalSafeArea}>
+          <KeyboardAvoidingView
+            style={styles.modalContainer}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
+            <ScrollView
+              style={styles.modalScroll}
+              contentContainerStyle={styles.modalScrollContent}
+              keyboardShouldPersistTaps="handled">
+              <Text style={styles.modalTitle}>{editingEntry ? '食品を編集' : '食品を追加'}</Text>
+
+              <View style={styles.sectionCard}>
+                <Text style={styles.sectionTitle}>基本情報</Text>
+                <TextInput style={styles.input} value={name} onChangeText={setName} placeholder="表示名" />
+                <TextInput style={styles.input} value={amount} onChangeText={setAmount} placeholder="量 (例: 1人前)" />
+              </View>
+
+              <View style={styles.sectionCard}>
+                <Text style={styles.sectionTitle}>栄養成分</Text>
+                <View style={styles.row}>
+                  <MacroField label="kcal" value={calories} onChange={setCalories} />
+                  <MacroField label="P" value={protein} onChange={setProtein} />
+                  <MacroField label="F" value={fat} onChange={setFat} />
+                  <MacroField label="C" value={carbs} onChange={setCarbs} />
+                </View>
+              </View>
+
+              <View style={styles.sectionCard}>
+                <Text style={styles.sectionTitle}>食品カード</Text>
+                <FoodItemEditor items={formItems} onChange={setFormItems} />
+              </View>
+            </ScrollView>
+            <View style={styles.modalFooter}>
+              <Pressable style={styles.primaryButton} onPress={handleSaveEntry}>
+                <Text style={styles.primaryLabel}>保存</Text>
+              </Pressable>
+              <Pressable style={styles.secondaryOutlineButton} onPress={() => setEditorVisible(false)}>
+                <Text style={styles.secondaryLabel}>閉じる</Text>
+              </Pressable>
+            </View>
+          </KeyboardAvoidingView>
+        </SafeAreaView>
       </Modal>
       </View>
     </SafeAreaView>
@@ -363,10 +390,45 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 40,
   },
+  modalSafeArea: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
   modalContainer: {
     flex: 1,
     padding: 16,
     backgroundColor: '#fff',
+  },
+  modalScroll: {
+    flex: 1,
+  },
+  modalScrollContent: {
+    paddingBottom: 32,
+    gap: 16,
+  },
+  modalFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
+    marginTop: 12,
+  },
+  sectionCard: {
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    borderRadius: 12,
+    padding: 12,
+    backgroundColor: '#fff',
+  },
+  sectionTitle: {
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  secondaryOutlineButton: {
+    borderWidth: 1,
+    borderColor: '#0a7ea4',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    justifyContent: 'center',
   },
   modalTitle: {
     fontSize: 18,

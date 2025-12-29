@@ -26,6 +26,8 @@ import {
   Text,
   TextInput,
   View,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -166,24 +168,33 @@ export default function HistoryScreen() {
       </Pressable>
 
       <Modal visible={Boolean(editingMeal)} animationType="slide" onRequestClose={() => setEditingMeal(null)}>
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>記録を編集</Text>
-          <TextInput style={styles.input} value={editingMenuName} onChangeText={setEditingMenuName} placeholder="メニュー名" />
-          <TextInput
-            style={[styles.input, styles.textArea]}
-            value={editingOriginal}
-            onChangeText={setEditingOriginal}
-            placeholder="元テキスト"
-            multiline
-          />
-          <FoodItemEditor items={editingItems} onChange={setEditingItems} />
-          <Pressable style={styles.primaryButton} onPress={handleSaveEdit}>
-            <Text style={styles.primaryLabel}>保存</Text>
-          </Pressable>
-          <Pressable style={styles.secondaryButton} onPress={() => setEditingMeal(null)}>
-            <Text style={styles.secondaryLabel}>閉じる</Text>
-          </Pressable>
-        </View>
+        <SafeAreaView style={styles.modalSafeArea}>
+          <KeyboardAvoidingView
+            style={styles.modalContainer}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
+            <ScrollView contentContainerStyle={styles.modalScroll} keyboardShouldPersistTaps="handled">
+              <Text style={styles.modalTitle}>記録を編集</Text>
+              <TextInput style={styles.input} value={editingMenuName} onChangeText={setEditingMenuName} placeholder="メニュー名" />
+              <TextInput
+                style={[styles.input, styles.textArea]}
+                value={editingOriginal}
+                onChangeText={setEditingOriginal}
+                placeholder="元テキスト"
+                multiline
+              />
+              <FoodItemEditor items={editingItems} onChange={setEditingItems} />
+              <View style={styles.modalFooter}>
+                <Pressable style={styles.primaryButton} onPress={handleSaveEdit}>
+                  <Text style={styles.primaryLabel}>保存</Text>
+                </Pressable>
+                <Pressable style={styles.secondaryButton} onPress={() => setEditingMeal(null)}>
+                  <Text style={styles.secondaryLabel}>閉じる</Text>
+                </Pressable>
+              </View>
+            </ScrollView>
+          </KeyboardAvoidingView>
+        </SafeAreaView>
       </Modal>
       </ScrollView>
     </SafeAreaView>
@@ -231,10 +242,22 @@ const styles = StyleSheet.create({
     color: '#f06292',
     fontWeight: '600',
   },
+  modalSafeArea: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
   modalContainer: {
     flex: 1,
     padding: 16,
     backgroundColor: '#fff',
+  },
+  modalScroll: {
+    paddingBottom: 32,
+  },
+  modalFooter: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 12,
   },
   modalTitle: {
     fontSize: 18,
