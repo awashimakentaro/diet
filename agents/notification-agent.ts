@@ -14,7 +14,7 @@
  * - lib/diet-store.ts の notification 設定を更新する。
  */
 
-import { NotificationSetting } from '@/constants/schema';
+import { NotificationSetting, NotificationTime } from '@/constants/schema';
 import { DailySummary } from '@/agents/summary-agent';
 import { setNotification, getDietState } from '@/lib/diet-store';
 import { supabase, requireUserId } from '@/lib/supabase';
@@ -45,8 +45,8 @@ export async function updateSchedule(setting: NotificationSetting): Promise<void
     .from('notification_preferences')
     .upsert({
       user_id: userId,
-      notify_at_midnight: setting.enabled,
-      push_token: setting.pushToken ?? null,
+      notify_at_midnight: setting.times.includes('midnight'),
+      push_token: encodeMeta(setting),
     });
   if (error) {
     throw new Error(error.message);
@@ -62,7 +62,11 @@ export async function cancelAll(): Promise<void> {
   const userId = await requireUserId();
   const { error } = await supabase
     .from('notification_preferences')
-    .upsert({ user_id: userId, notify_at_midnight: false });
+    .upsert({
+      user_id: userId,
+      notify_at_midnight: false,
+      push_token: encodeMeta({ ...getDietState().notification, enabled: false }),
+    });
   if (error) {
     throw new Error(error.message);
   }
@@ -81,7 +85,9 @@ export function buildPayload(dateKey: string, summary: DailySummary): Notificati
   const status = Math.abs(diffKcal) < 50 ? '目標通り' : diffKcal > 0 ? `+${Math.round(diffKcal)} kcal` : `${Math.round(diffKcal)} kcal`;
   return {
     title: `${dateKey} の摂取結果`,
-    body: `摂取 ${summary.totals.kcal} kcal / P${summary.totals.protein} F${summary.totals.fat} C${summary.totals.carbs} (${status})`,
+    body: `摂取 ${Math.round(summary.totals.kcal)} kcal / P${Math.round(summary.totals.protein)} F${Math.round(
+      summary.totals.fat,
+    )} C${Math.round(summary.totals.carbs)} (${status})`,
   };
 }
 
@@ -110,7 +116,46 @@ export async function fetchNotificationSetting(): Promise<NotificationSetting> {
   if (!data) {
     return getNotificationSetting();
   }
-  const setting = mapNotificationRow(data);
+  const setting = deriveSettingFromRow(data);
   setNotification(setting);
   return setting;
+}
+
+function deriveSettingFromRow(row: any): NotificationSetting {
+  const base = mapNotificationRow(row);
+  const meta = decodeMeta(row.push_token);
+  return {
+    ...base,
+    pushToken: meta.token ?? base.pushToken,
+    times: meta.times ?? ['midnight'],
+  };
+}
+
+type NotificationMeta = {
+  times?: NotificationTime[];
+  token?: string | null;
+};
+
+function encodeMeta(setting: NotificationSetting): string {
+  const meta: NotificationMeta = {
+    times: setting.times,
+    token: setting.pushToken ?? null,
+  };
+  return JSON.stringify(meta);
+}
+
+function decodeMeta(value?: string | null): NotificationMeta {
+  if (!value) {
+    return { times: ['midnight'] };
+  }
+  try {
+    const parsed = JSON.parse(value) as NotificationMeta;
+    return {
+      times: Array.isArray(parsed.times) && parsed.times.length > 0 ? (parsed.times as NotificationTime[]) : ['midnight'],
+      token: parsed.token ?? null,
+    };
+  } catch (error) {
+    console.warn('Failed to parse notification meta', error);
+    return { times: ['midnight'] };
+  }
 }

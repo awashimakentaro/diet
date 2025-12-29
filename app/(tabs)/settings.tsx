@@ -31,7 +31,7 @@ import { SummaryCard } from '@/components/summary-card';
 import { useDailySummary } from '@/hooks/use-daily-summary';
 import { getTodayKey } from '@/lib/date';
 import { useDietState } from '@/hooks/use-diet-state';
-import { Goal, Profile } from '@/constants/schema';
+import { Goal, NotificationTime, Profile } from '@/constants/schema';
 import { applyCalculatedGoal, calculateGoalFromProfile, fetchGoal, setManualGoal } from '@/agents/goal-agent';
 import { ProfileInput, saveProfile, toSnapshot } from '@/agents/profile-agent';
 import { buildPayload, cancelAll, fetchNotificationSetting, getNotificationSetting, requestPermission, updateSchedule } from '@/agents/notification-agent';
@@ -56,6 +56,13 @@ const defaultAutoForm: AutoProfileForm = {
   activityLevel: 'moderate',
 };
 
+const notificationTimeOptions: Array<{ value: NotificationTime; label: string; time: string }> = [
+  { value: 'morning', label: '朝', time: '09:00' },
+  { value: 'noon', label: '昼', time: '14:00' },
+  { value: 'evening', label: '夜', time: '20:00' },
+  { value: 'midnight', label: '深夜', time: '00:00' },
+];
+
 /**
  * 設定タブのメインコンポーネント。
  * @returns JSX.Element
@@ -71,6 +78,7 @@ export default function SettingsScreen() {
   const [profileForm, setProfileForm] = useState<AutoProfileForm>(() => toAutoForm(profile));
   const [calcPreview, setCalcPreview] = useState<string>('未計算');
   const [notificationsEnabled, setNotificationsEnabled] = useState(notification.enabled);
+  const [selectedTimes, setSelectedTimes] = useState<NotificationTime[]>(notification.times ?? ['midnight']);
 
   useEffect(() => {
     fetchGoal().catch((error) => console.warn(error));
@@ -92,6 +100,7 @@ export default function SettingsScreen() {
 
   useEffect(() => {
     setNotificationsEnabled(notification.enabled);
+    setSelectedTimes(notification.times ?? ['midnight']);
   }, [notification]);
 
   const notificationPreview = useMemo(() => buildPayload(todayKey, summary), [summary, todayKey]);
@@ -143,9 +152,44 @@ export default function SettingsScreen() {
         setNotificationsEnabled(false);
         return;
       }
-      await updateSchedule({ ...getNotificationSetting(), enabled: true });
-    } else {
-      await cancelAll();
+      if (selectedTimes.length === 0) {
+        setSelectedTimes(['midnight']);
+      }
+    }
+  };
+
+  const toggleNotificationTime = (time: NotificationTime) => {
+    setSelectedTimes((prev) => {
+      if (prev.includes(time)) {
+        if (prev.length === 1) {
+          return prev;
+        }
+        return prev.filter((value) => value !== time);
+      }
+      return [...prev, time];
+    });
+  };
+
+  const handleSaveNotification = async () => {
+    try {
+      if (!notificationsEnabled) {
+        await cancelAll();
+        Alert.alert('通知を停止しました');
+        return;
+      }
+      if (selectedTimes.length === 0) {
+        Alert.alert('通知時間を選択してください');
+        return;
+      }
+      await updateSchedule({
+        ...notification,
+        enabled: true,
+        times: selectedTimes,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      });
+      Alert.alert('通知設定を更新しました');
+    } catch (error) {
+      Alert.alert('通知設定を保存できません', String((error as Error).message));
     }
   };
 
@@ -177,9 +221,27 @@ export default function SettingsScreen() {
 
       <Section title="通知設定">
         <View style={styles.switchRow}>
-          <Text style={styles.switchLabel}>0時の過不足通知</Text>
+          <Text style={styles.switchLabel}>過不足通知を受け取る</Text>
           <Switch value={notificationsEnabled} onValueChange={handleToggleNotification} />
         </View>
+        <View style={styles.timeToggleRow}>
+          {notificationTimeOptions.map((option) => (
+            <Pressable
+              key={option.value}
+              style={[
+                styles.timeChip,
+                selectedTimes.includes(option.value) && styles.timeChipSelected,
+                !notificationsEnabled && styles.timeChipDisabled,
+              ]}
+              disabled={!notificationsEnabled}
+              onPress={() => toggleNotificationTime(option.value)}>
+              <Text style={styles.timeChipLabel}>{option.label}</Text>
+              <Text style={styles.timeChipTime}>{option.time}</Text>
+            </Pressable>
+          ))}
+        </View>
+        <Text style={styles.preview}>選択: {formatSelectedTimes(selectedTimes)}</Text>
+        <PrimaryButton label="通知設定を保存" onPress={handleSaveNotification} />
         <Text style={styles.preview}>{notificationPreview.body}</Text>
       </Section>
       </ScrollView>
@@ -323,6 +385,14 @@ function PrimaryButton({ label, onPress }: PrimaryButtonProps) {
   );
 }
 
+function formatSelectedTimes(times: NotificationTime[]): string {
+  const labels = notificationTimeOptions
+    .filter((option) => times.includes(option.value))
+    .map((option) => option.label)
+    .join(' / ');
+  return labels || '未選択';
+}
+
 function toAutoForm(profile: Profile | null): AutoProfileForm {
   if (!profile) {
     return defaultAutoForm;
@@ -451,5 +521,32 @@ const styles = StyleSheet.create({
   },
   switchLabel: {
     fontWeight: '600',
+  },
+  timeToggleRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginTop: 12,
+  },
+  timeChip: {
+    flexBasis: '48%',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+  },
+  timeChipSelected: {
+    borderColor: '#0a7ea4',
+    backgroundColor: '#e2f3f9',
+  },
+  timeChipDisabled: {
+    opacity: 0.4,
+  },
+  timeChipLabel: {
+    fontWeight: '600',
+  },
+  timeChipTime: {
+    color: '#666',
   },
 });

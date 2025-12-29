@@ -33,6 +33,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { deleteMeal, deleteMealsByDate, updateMeal, syncMealsByDate } from '@/agents/history-agent';
 import { useDailySummary } from '@/hooks/use-daily-summary';
+import { fetchGoal } from '@/agents/goal-agent';
 import { MealCard, MealCardAction } from '@/components/meal-card';
 import { SummaryCard } from '@/components/summary-card';
 import { FoodItemEditor } from '@/components/food-item-editor';
@@ -55,6 +56,7 @@ export default function HistoryScreen() {
 
   useFocusEffect(
     useCallback(() => {
+      fetchGoal().catch((error) => console.warn(error));
       syncMealsByDate(dateKey)
         .then(setMeals)
         .catch((error) => console.warn(error));

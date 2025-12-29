@@ -14,7 +14,7 @@
  * - agents で定義された各 Agent を呼び出す。
  */
 
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
@@ -28,11 +28,14 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { analyze } from '@/agents/analyze-agent';
 import { saveMeal } from '@/agents/save-meal-agent';
 import { useDailySummary } from '@/hooks/use-daily-summary';
+import { fetchGoal } from '@/agents/goal-agent';
+import { fetchNotificationSetting } from '@/agents/notification-agent';
 import { SummaryCard } from '@/components/summary-card';
 import { FoodItemEditor } from '@/components/food-item-editor';
 import { AnalyzeDraft, FoodItem } from '@/constants/schema';
@@ -51,6 +54,7 @@ const locale = 'ja-JP';
  */
 export default function RecordScreen() {
   const todayKey = getTodayKey();
+  const navigation = useNavigation();
   const summary = useDailySummary(todayKey);
   const [inputText, setInputText] = useState('');
   const [drafts, setDrafts] = useState<AnalyzeDraft[]>(() => consumeDraftInbox());
@@ -61,6 +65,8 @@ export default function RecordScreen() {
 
   useFocusEffect(
     useCallback(() => {
+      fetchGoal().catch((error) => console.warn(error));
+      fetchNotificationSetting().catch((error) => console.warn(error));
       refreshFoodLibrary().catch((error) => console.warn(error));
       syncMealsByDate(todayKey).catch((error) => console.warn(error));
       const queued = consumeDraftInbox();
@@ -89,8 +95,28 @@ export default function RecordScreen() {
 
   const handleAnalyzeImage = useCallback(async () => {
     try {
+      const permission = await ImagePicker.requestCameraPermissionsAsync();
+      if (permission.status !== 'granted') {
+        Alert.alert('カメラの許可が必要です');
+        return;
+      }
+      const result = await ImagePicker.launchCameraAsync({
+        allowsEditing: false,
+        quality: 0.7,
+        base64: true,
+      });
+      if (result.canceled || !result.assets?.[0]?.uri) {
+        return;
+      }
+      const asset = result.assets[0];
       setIsAnalyzing(true);
-      const draft = await analyze({ type: 'image', uri: 'demo://image', locale, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone });
+      const draft = await analyze({
+        type: 'image',
+        uri: asset.uri,
+        base64: asset.base64,
+        locale,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      });
       setDrafts((prev) => [draft, ...prev]);
     } catch (error) {
       Alert.alert('画像解析に失敗しました', String((error as Error).message));
@@ -148,7 +174,11 @@ export default function RecordScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
-      <SummaryCard summary={summary} actionLabel="目標設定" onPressAction={() => Alert.alert('設定タブで変更してください')} />
+      <SummaryCard
+        summary={summary}
+        actionLabel="目標設定"
+        onPressAction={() => navigation.navigate('settings' as never)}
+      />
 
       <View style={styles.inputCard}>
         <Text style={styles.sectionTitle}>テキスト入力</Text>

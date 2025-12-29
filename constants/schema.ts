@@ -95,16 +95,19 @@ export interface Goal {
   updatedAt: string;
 }
 
+export type NotificationTime = 'morning' | 'noon' | 'evening' | 'midnight';
+
 export interface NotificationSetting {
   enabled: boolean;
   lastScheduledAt?: string;
   timezone: string;
   pushToken?: string;
+  times: NotificationTime[];
 }
 
 export type AnalyzeRequest =
   | { type: 'text'; prompt: string; locale: string; timezone: string }
-  | { type: 'image'; uri: string; locale: string; timezone: string };
+  | { type: 'image'; uri: string; base64?: string | null; locale: string; timezone: string };
 
 export interface AnalyzeDraft {
   draftId: string;

@@ -118,5 +118,6 @@ export function mapNotificationRow(row: NotificationPreferenceRow): Notification
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     pushToken: row.push_token ?? undefined,
     lastScheduledAt: row.updated_at,
+    times: ['midnight'],
   };
 }

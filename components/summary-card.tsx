@@ -74,7 +74,7 @@ function MacroRow({ label, value, goal, diff }: MacroRowProps) {
     <View style={styles.row}>
       <Text style={styles.label}>{label}</Text>
       <AnimatedProgress ratio={ratio} />
-      <Text style={styles.value}>{value.toFixed(0)} / {goal || 0}</Text>
+      <Text style={styles.value}>{Math.round(value)} / {Math.round(goal) || 0}</Text>
       <Text style={[styles.diff, diff > 0 ? styles.diffPositive : diff < 0 ? styles.diffNegative : null]}>{diffText}</Text>
     </View>
   );

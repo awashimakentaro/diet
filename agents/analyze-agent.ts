@@ -17,6 +17,7 @@
 
 import { AnalyzeDraft, AnalyzeRequest, FoodItem, FoodCategory, calculateMacroFromItems } from '@/constants/schema';
 import { createId } from '@/lib/id';
+import { requestMealAnalysis, requestMealImageAnalysis } from '@/lib/openai';
 
 /**
  * 入力を解析し、最小限の Draft を返す。
@@ -29,7 +30,7 @@ export async function analyze(request: AnalyzeRequest): Promise<AnalyzeDraft> {
   if (request.type === 'text') {
     return buildTextDraft(request.prompt);
   }
-  return buildImageDraft(request.uri);
+  return buildImageDraft(request);
 }
 
 /**
@@ -39,19 +40,23 @@ export async function analyze(request: AnalyzeRequest): Promise<AnalyzeDraft> {
  * @returns Draft JSON
  * @remarks 副作用は無い。
  */
-function buildTextDraft(prompt: string): AnalyzeDraft {
+async function buildTextDraft(prompt: string): Promise<AnalyzeDraft> {
   const normalized = prompt.trim();
-  const items = normalized.length === 0 ? [] : createItemsFromText(normalized);
-  const warnings = normalized.length === 0 ? ['テキストが空のため、項目を生成できませんでした。'] : [];
-  return {
-    draftId: createId('draft'),
-    menuName: guessMenuNameFromText(normalized),
-    originalText: normalized,
-    items,
-    totals: calculateMacroFromItems(items),
-    source: 'text',
-    warnings,
-  };
+  if (normalized.length === 0) {
+    return createFallbackDraft('入力が空です', [], normalized);
+  }
+
+  try {
+    const aiDraft = await requestMealAnalysis(normalized);
+    if (aiDraft) {
+      return aiDraft;
+    }
+  } catch (error) {
+    console.warn('AnalyzeAgent: OpenAI 解析に失敗', error);
+  }
+
+  const items = createItemsFromText(normalized);
+  return createFallbackDraft('AI解析に失敗したため、簡易推定で生成しました。', items, normalized);
 }
 
 /**
@@ -61,7 +66,15 @@ function buildTextDraft(prompt: string): AnalyzeDraft {
  * @returns Draft JSON
  * @remarks 実際の画像解析は行わず、プレースホルダーを生成する。
  */
-function buildImageDraft(uri: string): AnalyzeDraft {
+async function buildImageDraft(request: Extract<AnalyzeRequest, { type: 'image' }>): Promise<AnalyzeDraft> {
+  try {
+    const aiDraft = await requestMealImageAnalysis(request.uri, request.base64);
+    if (aiDraft) {
+      return aiDraft;
+    }
+  } catch (error) {
+    console.warn('AnalyzeAgent: 画像解析に失敗', error);
+  }
   const items: FoodItem[] = [
     {
       id: createId('item'),
@@ -77,11 +90,11 @@ function buildImageDraft(uri: string): AnalyzeDraft {
   return {
     draftId: createId('draft'),
     menuName: '画像の食事',
-    originalText: `画像URI: ${uri}`,
+    originalText: '画像解析結果',
     items,
     totals: calculateMacroFromItems(items),
     source: 'image',
-    warnings: ['画像解析はダミー値です。必要に応じて編集してください。'],
+    warnings: ['画像解析に失敗したため、簡易推定で生成しました。'],
   };
 }
 
@@ -171,4 +184,16 @@ function guessMenuNameFromText(text: string): string {
   }
   const firstLine = text.split('\n')[0] ?? 'メニュー';
   return firstLine.length > 15 ? `${firstLine.slice(0, 15)}...` : firstLine;
+}
+
+function createFallbackDraft(warning: string, items: FoodItem[], originalText = ''): AnalyzeDraft {
+  return {
+    draftId: createId('draft'),
+    menuName: guessMenuNameFromText(originalText) || '新しいメニュー',
+    originalText,
+    items,
+    totals: calculateMacroFromItems(items),
+    source: 'text',
+    warnings: warning ? [warning] : [],
+  };
 }

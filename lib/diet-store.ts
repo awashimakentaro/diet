@@ -50,6 +50,7 @@ let state: DietState = {
   notification: {
     enabled: false,
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    times: ['midnight'],
   },
   draftInbox: [],
 };
