@@ -16,7 +16,7 @@
  */
 
 import { useFocusEffect } from '@react-navigation/native';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   Alert,
   Modal,
@@ -40,11 +40,14 @@ import { FoodItemEditor } from '@/components/food-item-editor';
 import { FoodItem, Meal } from '@/constants/schema';
 import { createEntry } from '@/agents/food-library-agent';
 import { getTodayKey, shiftDateKey } from '@/lib/date';
+import { useAiFoodAppend } from '@/hooks/use-ai-food-append';
 
 /**
  * 履歴タブのメインコンポーネント。
  * @returns JSX.Element
  */
+const locale = 'ja-JP';
+
 export default function HistoryScreen() {
   const [dateKey, setDateKey] = useState(getTodayKey());
   const summary = useDailySummary(dateKey);
@@ -53,6 +56,8 @@ export default function HistoryScreen() {
   const [editingItems, setEditingItems] = useState<FoodItem[]>([]);
   const [editingMenuName, setEditingMenuName] = useState('');
   const [editingOriginal, setEditingOriginal] = useState('');
+  const timezone = useMemo(() => Intl.DateTimeFormat().resolvedOptions().timeZone, []);
+  const { open: openAiAppendModal, modal: aiAppendModal } = useAiFoodAppend({ locale, timezone });
 
   useFocusEffect(
     useCallback(() => {
@@ -69,6 +74,25 @@ export default function HistoryScreen() {
     setEditingMenuName(meal.menuName);
     setEditingOriginal(meal.originalText);
   }, []);
+
+  /**
+   * 編集モーダルで AI 追加を実行する。
+   * 呼び出し元: FoodItemEditor の AI 追加ボタン。
+   */
+  const handleAiAppendEditingItems = useCallback(() => {
+    if (!editingMeal) {
+      Alert.alert('編集中の記録がありません');
+      return;
+    }
+    openAiAppendModal({
+      onDraft: (draft) => {
+        setEditingItems((prev) => [...prev, ...draft.items]);
+        if (draft.warnings.length > 0) {
+          Alert.alert('注意', draft.warnings.join('\n'));
+        }
+      },
+    });
+  }, [editingMeal, openAiAppendModal]);
 
   const handleSaveEdit = useCallback(async () => {
     if (!editingMeal) {
@@ -185,17 +209,18 @@ export default function HistoryScreen() {
                 placeholder="元テキスト"
                 multiline
               />
-              <FoodItemEditor items={editingItems} onChange={setEditingItems} />
+              <FoodItemEditor items={editingItems} onChange={setEditingItems} onRequestAiAppend={handleAiAppendEditingItems} />
               <View style={styles.modalFooter}>
-                <Pressable style={styles.primaryButton} onPress={handleSaveEdit}>
+                <Pressable style={styles.modalPrimaryButton} onPress={handleSaveEdit}>
                   <Text style={styles.primaryLabel}>保存</Text>
                 </Pressable>
-                <Pressable style={styles.secondaryButton} onPress={() => setEditingMeal(null)}>
+                <Pressable style={styles.modalSecondaryButton} onPress={() => setEditingMeal(null)}>
                   <Text style={styles.secondaryLabel}>閉じる</Text>
                 </Pressable>
               </View>
             </ScrollView>
           </KeyboardAvoidingView>
+          {aiAppendModal}
         </SafeAreaView>
       </Modal>
       </ScrollView>
@@ -247,6 +272,7 @@ const styles = StyleSheet.create({
   modalSafeArea: {
     flex: 1,
     backgroundColor: '#fff',
+    position: 'relative',
   },
   modalContainer: {
     flex: 1,
@@ -277,20 +303,26 @@ const styles = StyleSheet.create({
     minHeight: 80,
     textAlignVertical: 'top',
   },
-  primaryButton: {
+  modalPrimaryButton: {
+    flex: 1,
     backgroundColor: '#0a7ea4',
-    padding: 12,
-    borderRadius: 8,
+    paddingVertical: 16,
+    borderRadius: 10,
     alignItems: 'center',
-    marginBottom: 12,
+    justifyContent: 'center',
   },
   primaryLabel: {
     color: '#fff',
     fontWeight: '600',
   },
-  secondaryButton: {
-    padding: 12,
+  modalSecondaryButton: {
+    flex: 1,
+    paddingVertical: 16,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#0a7ea4',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   secondaryLabel: {
     color: '#0a7ea4',

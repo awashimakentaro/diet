@@ -18,7 +18,7 @@
  */
 
 import { memo } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { FoodItem } from '@/constants/schema';
 import { createId } from '@/lib/id';
@@ -26,6 +26,7 @@ import { createId } from '@/lib/id';
 export type FoodItemEditorProps = {
   items: FoodItem[];
   onChange: (items: FoodItem[]) => void;
+  onRequestAiAppend?: () => void;
 };
 
 /**
@@ -33,18 +34,34 @@ export type FoodItemEditorProps = {
  * 呼び出し元: 各スクリーン。
  * @param props 編集対象アイテムと onChange
  */
-export const FoodItemEditor = memo(function FoodItemEditorBase({ items, onChange }: FoodItemEditorProps) {
+export const FoodItemEditor = memo(function FoodItemEditorBase({ items, onChange, onRequestAiAppend }: FoodItemEditorProps) {
+  /**
+   * 指定インデックスのフィールド値を更新する。
+   * 呼び出し元: 各入力フォーム。
+   * @param index 編集対象の配列インデックス
+   * @param key 更新する FoodItem のキー
+   * @param value 入力値
+   */
   const handleChangeField = (index: number, key: keyof FoodItem, value: string) => {
     const next = items.map((item, idx) => (idx === index ? { ...item, [key]: key === 'name' || key === 'amount' ? value : Number(value) } : item));
     onChange(next);
   };
 
+  /**
+   * 指定インデックスの食品を削除する。
+   * 呼び出し元: 削除リンク。
+   * @param index 削除対象インデックス
+   */
   const handleDelete = (index: number) => {
     const next = items.filter((_, idx) => idx !== index);
     onChange(next);
   };
 
-  const handleAdd = () => {
+  /**
+   * 空の食品を末尾へ追加する。
+   * 呼び出し元: handleAddButtonPress。
+   */
+  const handleManualAdd = () => {
     const next: FoodItem = {
       id: createId('item'),
       name: '新しい食品',
@@ -56,6 +73,22 @@ export const FoodItemEditor = memo(function FoodItemEditorBase({ items, onChange
       carbs: 0,
     };
     onChange([...items, next]);
+  };
+
+  /**
+   * 追加ボタン押下時に追加方法を選択させる。
+   * 呼び出し元: 追加ボタン onPress。
+   */
+  const handleAddButtonPress = () => {
+    if (!onRequestAiAppend) {
+      handleManualAdd();
+      return;
+    }
+    Alert.alert('食品を追加', '追加方法を選択してください。', [
+      { text: 'AIで追加', onPress: onRequestAiAppend },
+      { text: '手動で追加', onPress: handleManualAdd },
+      { text: 'キャンセル', style: 'cancel' },
+    ]);
   };
 
   return (
@@ -88,7 +121,7 @@ export const FoodItemEditor = memo(function FoodItemEditorBase({ items, onChange
           </View>
         </View>
       ))}
-      <Pressable style={styles.addButton} onPress={handleAdd}>
+      <Pressable style={styles.addButton} onPress={handleAddButtonPress}>
         <Text style={styles.addLabel}>食品を追加</Text>
       </Pressable>
     </View>

@@ -14,7 +14,6 @@
  * - FoodLibraryAgent の API を呼び出す。
  */
 
-import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
@@ -32,11 +31,12 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { createDraftFromEntry, createEntry, deleteEntry, listEntries, refreshFoodLibrary, toMealDraft, updateEntry } from '@/agents/food-library-agent';
+import { createDraftFromEntry, createEntry, deleteEntry, listEntries, refreshFoodLibrary, updateEntry } from '@/agents/food-library-agent';
 import { FoodItem, FoodLibraryEntry } from '@/constants/schema';
 import { FoodItemEditor } from '@/components/food-item-editor';
 import { useDietState } from '@/hooks/use-diet-state';
 import { saveMeal } from '@/agents/save-meal-agent';
+import { useAiFoodAppend } from '@/hooks/use-ai-food-append';
 
 const typeFilters: Array<{ label: string; value: 'all' | 'single' | 'menu' }> = [
   { label: 'すべて', value: 'all' },
@@ -44,12 +44,13 @@ const typeFilters: Array<{ label: string; value: 'all' | 'single' | 'menu' }> = 
   { label: 'メニュー', value: 'menu' },
 ];
 
+const locale = 'ja-JP';
+
 /**
  * 食品タブのメインコンポーネント。
  * @returns JSX.Element
  */
 export default function FoodsScreen() {
-  const router = useRouter();
   const libraryState = useDietState((state) => state.foodLibrary);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [keyword, setKeyword] = useState('');
@@ -63,6 +64,8 @@ export default function FoodsScreen() {
   const [protein, setProtein] = useState('0');
   const [fat, setFat] = useState('0');
   const [carbs, setCarbs] = useState('0');
+  const timezone = useMemo(() => Intl.DateTimeFormat().resolvedOptions().timeZone, []);
+  const { open: openAiAppendModal, modal: aiAppendModal } = useAiFoodAppend({ locale, timezone });
 
   const reloadLibrary = useCallback(async () => {
     setIsRefreshing(true);
@@ -112,6 +115,21 @@ export default function FoodsScreen() {
     setEditorVisible(true);
   }, []);
 
+  /**
+   * フォームに AI 追加した食品を連結する。
+   * 呼び出し元: FoodItemEditor の AI 追加ボタン。
+   */
+  const handleAiAppendFormItems = useCallback(() => {
+    openAiAppendModal({
+      onDraft: (draft) => {
+        setFormItems((prev) => [...prev, ...draft.items]);
+        if (draft.warnings.length > 0) {
+          Alert.alert('注意', draft.warnings.join('\n'));
+        }
+      },
+    });
+  }, [openAiAppendModal]);
+
   const handleSaveEntry = useCallback(async () => {
     const payload = {
       name,
@@ -158,15 +176,6 @@ export default function FoodsScreen() {
       Alert.alert('追加できません', String((error as Error).message));
     }
   }, []);
-
-  const handleOpenRecord = useCallback((entryId: string) => {
-    try {
-      toMealDraft(entryId);
-      router.push('/(tabs)');
-    } catch (error) {
-      Alert.alert('開けません', String((error as Error).message));
-    }
-  }, [router]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -218,9 +227,6 @@ export default function FoodsScreen() {
               <Pressable onPress={() => handleEatToday(item.id)}>
                 <Text style={styles.link}>今日食べた</Text>
               </Pressable>
-              <Pressable onPress={() => handleOpenRecord(item.id)}>
-                <Text style={styles.link}>Record で開く</Text>
-              </Pressable>
             </View>
           </View>
         )}
@@ -257,18 +263,19 @@ export default function FoodsScreen() {
 
               <View style={styles.sectionCard}>
                 <Text style={styles.sectionTitle}>食品カード</Text>
-                <FoodItemEditor items={formItems} onChange={setFormItems} />
+                <FoodItemEditor items={formItems} onChange={setFormItems} onRequestAiAppend={handleAiAppendFormItems} />
               </View>
             </ScrollView>
             <View style={styles.modalFooter}>
-              <Pressable style={styles.primaryButton} onPress={handleSaveEntry}>
+              <Pressable style={styles.modalPrimaryButton} onPress={handleSaveEntry}>
                 <Text style={styles.primaryLabel}>保存</Text>
               </Pressable>
-              <Pressable style={styles.secondaryOutlineButton} onPress={() => setEditorVisible(false)}>
+              <Pressable style={styles.modalSecondaryButton} onPress={() => setEditorVisible(false)}>
                 <Text style={styles.secondaryLabel}>閉じる</Text>
               </Pressable>
             </View>
           </KeyboardAvoidingView>
+          {aiAppendModal}
         </SafeAreaView>
       </Modal>
       </View>
@@ -393,6 +400,7 @@ const styles = StyleSheet.create({
   modalSafeArea: {
     flex: 1,
     backgroundColor: '#fff',
+    position: 'relative',
   },
   modalContainer: {
     flex: 1,
@@ -408,7 +416,6 @@ const styles = StyleSheet.create({
   },
   modalFooter: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     gap: 12,
     marginTop: 12,
   },
@@ -423,11 +430,21 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 8,
   },
-  secondaryOutlineButton: {
+  modalPrimaryButton: {
+    flex: 1,
+    backgroundColor: '#0a7ea4',
+    paddingVertical: 16,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalSecondaryButton: {
+    flex: 1,
     borderWidth: 1,
     borderColor: '#0a7ea4',
-    borderRadius: 8,
-    paddingHorizontal: 16,
+    borderRadius: 10,
+    paddingVertical: 16,
+    alignItems: 'center',
     justifyContent: 'center',
   },
   modalTitle: {
