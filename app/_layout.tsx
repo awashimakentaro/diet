@@ -18,11 +18,13 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
+import { useEffect } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { AuthProvider, useAuth } from '@/providers/auth-provider';
 import { AuthScreen } from '@/components/auth-screen';
+import { initializeAnalytics } from '@/lib/analytics';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -47,6 +49,12 @@ export default function RootLayout() {
  */
 function RootNavigator(): JSX.Element {
   const { status } = useAuth();
+
+  useEffect(() => {
+    if (status === 'signed-in') {
+      initializeAnalytics();
+    }
+  }, [status]);
 
   if (status === 'checking') {
     return (

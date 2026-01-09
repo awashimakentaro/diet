@@ -45,6 +45,7 @@ import { syncMealsByDate } from '@/agents/history-agent';
 import { consumeDraftInbox } from '@/lib/diet-store';
 import { useDietState } from '@/hooks/use-diet-state';
 import { useAiFoodAppend } from '@/hooks/use-ai-food-append';
+import { logEvent, logScreen } from '@/lib/analytics';
 
 const locale = 'ja-JP';
 
@@ -73,6 +74,7 @@ export default function RecordScreen() {
 
   useFocusEffect(
     useCallback(() => {
+      void logScreen('Record', { date_key: todayKey });
       fetchGoal().catch((error) => console.warn(error));
       fetchNotificationSetting().catch((error) => console.warn(error));
       refreshFoodLibrary().catch((error) => console.warn(error));
@@ -99,6 +101,11 @@ export default function RecordScreen() {
       const draft = await analyze({ type: 'text', prompt: inputText, locale, timezone });
       setDrafts((prev) => [draft, ...prev]);
       setInputText('');
+      void logEvent('record_text_analyze_success', {
+        item_count: draft.items.length,
+        warning_count: draft.warnings.length,
+        source: draft.source,
+      });
     } catch (error) {
       Alert.alert('解析に失敗しました', String((error as Error).message));
     } finally {
@@ -227,6 +234,11 @@ export default function RecordScreen() {
         await saveMeal({ draft });
         setDrafts((prev) => prev.filter((item) => item.draftId !== draft.draftId));
         Alert.alert('保存しました', `${draft.menuName} を履歴へ追加しました。`);
+        void logEvent('record_meal_saved', {
+          item_count: draft.items.length,
+          total_kcal: draft.totals.kcal,
+          source: draft.source,
+        });
       } catch (error) {
         Alert.alert('保存できません', String((error as Error).message));
       }

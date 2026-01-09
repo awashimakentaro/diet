@@ -9,7 +9,8 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "googleServicesFile": "./ios/GoogleService-Info.plist"
     },
     "android": {
       "adaptiveIcon": {
@@ -20,7 +21,8 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.awashima.diet"
+      "package": "com.awashima.diet",
+      "googleServicesFile": "./android/app/google-services.json"
     },
     "web": {
       "output": "static",
@@ -44,6 +46,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "firebaseProjectId": "c4i0-d7c52",
+      "firebaseApiKey": "AIzaSyBj-MXlGbo871h3qNk3CWlR6mNEX5jKU1g",
+      "firebaseAppId": "1:331173625214:web:94e619aaee6d32f9e9c72f",
+      "firebaseMeasurementId": "G-ME0PEYD576",
+      "uiVariant": "v1"
     }
   }
 }
