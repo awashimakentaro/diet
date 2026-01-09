@@ -17,7 +17,7 @@
  * - agents/summary-agent.ts が提供する DailySummary を受け取る。
  */
 
-import { ReactNode, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { DailySummary } from '@/agents/summary-agent';

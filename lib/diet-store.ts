@@ -32,28 +32,44 @@ export type DietState = {
  */
 const listeners = new Set<() => void>();
 
-const emptyGoal: Goal = {
-  id: 'goal-pending',
-  kcal: 0,
-  protein: 0,
-  fat: 0,
-  carbs: 0,
-  source: 'manual',
-  updatedAt: new Date().toISOString(),
-};
+/**
+ * Goal の初期値を生成する。
+ * 呼び出し元: createInitialState, resetDietState。
+ * @returns 空の Goal
+ */
+function createEmptyGoal(): Goal {
+  return {
+    id: 'goal-pending',
+    kcal: 0,
+    protein: 0,
+    fat: 0,
+    carbs: 0,
+    source: 'manual',
+    updatedAt: new Date().toISOString(),
+  };
+}
 
-let state: DietState = {
-  meals: [],
-  foodLibrary: [],
-  goal: emptyGoal,
-  profile: null,
-  notification: {
-    enabled: false,
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    times: ['midnight'],
-  },
-  draftInbox: [],
-};
+/**
+ * DietState の初期構造を生成する。
+ * 呼び出し元: 初期化、resetDietState。
+ * @returns 初期状態
+ */
+function createInitialState(): DietState {
+  return {
+    meals: [],
+    foodLibrary: [],
+    goal: createEmptyGoal(),
+    profile: null,
+    notification: {
+      enabled: false,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      times: ['midnight'],
+    },
+    draftInbox: [],
+  };
+}
+
+let state: DietState = createInitialState();
 
 /**
  * 状態を購読し、変更時に通知を受け取る。
@@ -143,4 +159,13 @@ export function setGoal(goal: Goal): void {
  */
 export function setNotification(setting: NotificationSetting): void {
   setDietState((current) => ({ ...current, notification: setting }));
+}
+
+/**
+ * DietState を初期値へ戻し、全購読者へ通知する。
+ * 呼び出し元: AuthProvider でのサインアウト処理。
+ */
+export function resetDietState(): void {
+  state = createInitialState();
+  listeners.forEach((listener) => listener());
 }

@@ -31,10 +31,11 @@ import { SummaryCard } from '@/components/summary-card';
 import { useDailySummary } from '@/hooks/use-daily-summary';
 import { getTodayKey } from '@/lib/date';
 import { useDietState } from '@/hooks/use-diet-state';
-import { Goal, NotificationTime, Profile } from '@/constants/schema';
+import { NotificationTime, Profile } from '@/constants/schema';
 import { applyCalculatedGoal, calculateGoalFromProfile, fetchGoal, setManualGoal } from '@/agents/goal-agent';
 import { ProfileInput, saveProfile, toSnapshot } from '@/agents/profile-agent';
-import { buildPayload, cancelAll, fetchNotificationSetting, getNotificationSetting, requestPermission, updateSchedule } from '@/agents/notification-agent';
+import { buildPayload, cancelAll, fetchNotificationSetting, requestPermission, updateSchedule } from '@/agents/notification-agent';
+import { useAuth } from '@/providers/auth-provider';
 
 type AutoProfileForm = {
   gender: 'male' | 'female';
@@ -56,7 +57,7 @@ const defaultAutoForm: AutoProfileForm = {
   activityLevel: 'moderate',
 };
 
-const notificationTimeOptions: Array<{ value: NotificationTime; label: string; time: string }> = [
+const notificationTimeOptions: { value: NotificationTime; label: string; time: string }[] = [
   { value: 'morning', label: '朝', time: '09:00' },
   { value: 'noon', label: '昼', time: '14:00' },
   { value: 'evening', label: '夜', time: '20:00' },
@@ -73,6 +74,7 @@ export default function SettingsScreen() {
   const goal = useDietState((state) => state.goal);
   const profile = useDietState((state) => state.profile);
   const notification = useDietState((state) => state.notification);
+  const { user, signOut } = useAuth();
 
   const [manualForm, setManualForm] = useState({ kcal: '', protein: '', fat: '', carbs: '' });
   const [profileForm, setProfileForm] = useState<AutoProfileForm>(() => toAutoForm(profile));
@@ -193,6 +195,23 @@ export default function SettingsScreen() {
     }
   };
 
+  /**
+   * サインアウト確認を表示し、承諾された場合に Supabase からログアウトする。
+   * 呼び出し元: 「ログアウト」ボタン。
+   */
+  const handleSignOut = useCallback(() => {
+    Alert.alert('ログアウトしますか？', '他のユーザーで利用する場合はログアウトしてください。', [
+      { text: 'キャンセル', style: 'cancel' },
+      {
+        text: 'ログアウト',
+        style: 'destructive',
+        onPress: () => {
+          signOut().catch((error) => Alert.alert('ログアウトできません', String((error as Error).message)));
+        },
+      },
+    ]);
+  }, [signOut]);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
@@ -243,6 +262,13 @@ export default function SettingsScreen() {
         <Text style={styles.preview}>選択: {formatSelectedTimes(selectedTimes)}</Text>
         <PrimaryButton label="通知設定を保存" onPress={handleSaveNotification} />
         <Text style={styles.preview}>{notificationPreview.body}</Text>
+      </Section>
+
+      <Section title="アカウント">
+        <Text style={styles.accountEmail}>{user?.email ?? 'メールアドレス未設定'}</Text>
+        <Pressable style={styles.logoutButton} onPress={handleSignOut} accessibilityRole="button">
+          <Text style={styles.logoutText}>ログアウト</Text>
+        </Pressable>
       </Section>
       </ScrollView>
     </SafeAreaView>
@@ -307,7 +333,7 @@ function LabeledInput({ label, value, onChangeText, keyboardType = 'default' }: 
 }
 
 type SelectorProps<T extends string> = {
-  options: Array<{ label: string; value: T; subtitle?: string }>;
+  options: { label: string; value: T; subtitle?: string }[];
   value: T;
   onChange: (value: T) => void;
 };
@@ -548,5 +574,20 @@ const styles = StyleSheet.create({
   },
   timeChipTime: {
     color: '#666',
+  },
+  accountEmail: {
+    fontSize: 16,
+    color: '#555',
+    marginBottom: 12,
+  },
+  logoutButton: {
+    backgroundColor: '#fee2e2',
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  logoutText: {
+    color: '#b91c1c',
+    fontWeight: '600',
   },
 });
