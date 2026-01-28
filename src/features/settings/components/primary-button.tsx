@@ -26,7 +26,7 @@ export function PrimaryButton({ label, onPress }: PrimaryButtonProps) {
 const styles = StyleSheet.create({
   button: {
     marginTop: 8,
-    backgroundColor: '#0a7ea4',
+    backgroundColor: '#155dfc',
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',

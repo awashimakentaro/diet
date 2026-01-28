@@ -61,7 +61,7 @@ export function RecordQuickInputCard({
           disabled={isAnalyzing}
           accessibilityRole="button"
           accessibilityLabel="入力内容を解析">
-          <MaterialIcons name="send" size={18} color="#9ca3af" />
+          <MaterialIcons name="send" size={18} color="#ffffff" />
         </Pressable>
       </View>
       <View style={styles.actionRow}>
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 16,
-    backgroundColor: '#e5e7eb',
+    backgroundColor: '#155dfc',
     alignItems: 'center',
     justifyContent: 'center',
   },

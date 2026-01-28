@@ -9,24 +9,29 @@
  *
  * 【やらないこと】
  * - FoodLibraryAgent のロジック実装
+ *
+ * 【他ファイルとの関係】
+ * - useFoodsScreen と各 UI コンポーネントを結合する。
  */
 
 import type { JSX } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
 
 import { FoodFilterToolbar } from './components/food-filter-toolbar';
 import { FoodEntryList } from './components/food-entry-list';
 import { FoodEditorModal } from './components/food-editor-modal';
 import { FoodsHeader } from './components/foods-header';
 import { useFoodsScreen } from './use-foods-screen';
+import { RecordAiAppendModal } from '../record/components/record-ai-append-modal';
 
 /**
- * 食品タブ画面。
+ * 食品タブ画面を描画する。
+ * 呼び出し元: app/(tabs)/foods.tsx。
+ * @returns JSX.Element
+ * @remarks 副作用は存在しない。
  */
 export function FoodsScreen(): JSX.Element {
-  const router = useRouter();
   const {
     entries,
     isRefreshing,
@@ -36,41 +41,27 @@ export function FoodsScreen(): JSX.Element {
     openEditor,
     closeEditor,
     editorVisible,
+    editingEntry,
     name,
     setName,
-    amount,
-    setAmount,
-    calories,
-    setCalories,
-    protein,
-    setProtein,
-    fat,
-    setFat,
-    carbs,
-    setCarbs,
     formItems,
     handleChangeFormItems,
     handleSaveEntry,
     handleDeleteEntry,
     handleEatToday,
-    handleAiAppendFormItems,
-    aiAppendModal,
+    handleRequestAddFood,
+    aiPromptText,
+    setAiPromptText,
+    aiPromptVisible,
+    closeAiPromptModal,
+    handleSubmitAiPrompt,
+    isEditingAnalyzing,
     reloadLibrary,
   } = useFoodsScreen();
 
-  /**
-   * 設定タブへ遷移する。
-   * 呼び出し元: FoodsHeader。
-   * @returns void
-   * @remarks 副作用: ナビゲーション実行。
-   */
-  const handlePressSettings = () => {
-    router.push('/settings');
-  };
-
   return (
     <SafeAreaView style={styles.safeArea}>
-      <FoodsHeader onPressSettings={handlePressSettings} />
+      <FoodsHeader />
       <View style={styles.container}>
         <FoodFilterToolbar
           keyword={keyword}
@@ -87,32 +78,31 @@ export function FoodsScreen(): JSX.Element {
         />
       </View>
       <FoodEditorModal
-        visible={editorVisible}
+        visible={editorVisible && !aiPromptVisible}
+        title={editingEntry ? '食品を編集' : '食品を追加'}
         name={name}
-        amount={amount}
-        calories={calories}
-        protein={protein}
-        fat={fat}
-        carbs={carbs}
         items={formItems}
         onChangeName={setName}
-        onChangeAmount={setAmount}
-        onChangeCalories={setCalories}
-        onChangeProtein={setProtein}
-        onChangeFat={setFat}
-        onChangeCarbs={setCarbs}
         onChangeItems={handleChangeFormItems}
+        onRequestAddFood={handleRequestAddFood}
         onRequestClose={closeEditor}
         onSubmit={handleSaveEntry}
-        onRequestAiAppend={handleAiAppendFormItems}
+        isLoading={isEditingAnalyzing}
       />
-      {aiAppendModal}
+      <RecordAiAppendModal
+        visible={aiPromptVisible}
+        value={aiPromptText}
+        onChangeText={setAiPromptText}
+        onRequestClose={closeAiPromptModal}
+        onSubmit={handleSubmitAiPrompt}
+        isLoading={isEditingAnalyzing}
+      />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
- safeArea: {
+  safeArea: {
     flex: 1,
     backgroundColor: '#f9fafb',
   },

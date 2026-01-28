@@ -16,7 +16,17 @@
  */
 
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { ActivityIndicator, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 
 export type RecordAiAppendModalProps = {
   visible: boolean;
@@ -46,49 +56,54 @@ export function RecordAiAppendModal({
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onRequestClose}>
       <View style={styles.overlay}>
         <Pressable style={styles.backdrop} onPress={onRequestClose} />
-        <View style={styles.card}>
-          <View style={styles.headerRow}>
-            <Text style={styles.title}>AIで食品を追加</Text>
-            <Pressable style={styles.closeButton} onPress={onRequestClose} accessibilityRole="button">
-              <MaterialIcons name="close" size={16} color="#9ca3af" />
-            </Pressable>
+        <KeyboardAvoidingView
+          style={styles.avoidingView}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}>
+          <View style={styles.card}>
+            <View style={styles.headerRow}>
+              <Text style={styles.title}>AIで食品を追加</Text>
+              <Pressable style={styles.closeButton} onPress={onRequestClose} accessibilityRole="button">
+                <MaterialIcons name="close" size={16} color="#9ca3af" />
+              </Pressable>
+            </View>
+            <Text style={styles.helper}>例: サラダチキンと野菜スープ</Text>
+            <TextInput
+              style={styles.input}
+              value={value}
+              onChangeText={onChangeText}
+              placeholder="追加したい内容を入力"
+              placeholderTextColor="#cbd5e1"
+              multiline
+            />
+            <View style={styles.footerRow}>
+              <Pressable
+                style={styles.cancelButton}
+                onPress={onRequestClose}
+                accessibilityRole="button"
+                disabled={isLoading}>
+                <Text style={styles.cancelLabel}>キャンセル</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.submitButton, isLoading && styles.submitButtonDisabled]}
+                onPress={onSubmit}
+                accessibilityRole="button"
+                disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <ActivityIndicator size="small" color="#ffffff" />
+                    <Text style={styles.submitLabel}>解析中...</Text>
+                  </>
+                ) : (
+                  <>
+                    <MaterialIcons name="auto-awesome" size={18} color="#ffffff" />
+                    <Text style={styles.submitLabel}>追加する</Text>
+                  </>
+                )}
+              </Pressable>
+            </View>
           </View>
-          <Text style={styles.helper}>例: サラダチキンと野菜スープ</Text>
-          <TextInput
-            style={styles.input}
-            value={value}
-            onChangeText={onChangeText}
-            placeholder="追加したい内容を入力"
-            placeholderTextColor="#cbd5e1"
-            multiline
-          />
-          <View style={styles.footerRow}>
-            <Pressable
-              style={styles.cancelButton}
-              onPress={onRequestClose}
-              accessibilityRole="button"
-              disabled={isLoading}>
-              <Text style={styles.cancelLabel}>キャンセル</Text>
-            </Pressable>
-            <Pressable
-              style={[styles.submitButton, isLoading && styles.submitButtonDisabled]}
-              onPress={onSubmit}
-              accessibilityRole="button"
-              disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <ActivityIndicator size="small" color="#ffffff" />
-                  <Text style={styles.submitLabel}>解析中...</Text>
-                </>
-              ) : (
-                <>
-                  <MaterialIcons name="auto-awesome" size={18} color="#ffffff" />
-                  <Text style={styles.submitLabel}>追加する</Text>
-                </>
-              )}
-            </Pressable>
-          </View>
-        </View>
+        </KeyboardAvoidingView>
       </View>
     </Modal>
   );
@@ -103,6 +118,11 @@ const styles = StyleSheet.create({
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
+  },
+  avoidingView: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   card: {
     width: '86%',

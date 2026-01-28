@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
     color: '#99a1af',
   },
   genderLabelActive: {
-    color: '#0092b8',
+    color: '#155dfc',
   },
   inlineRow: {
     flexDirection: 'row',
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
     color: '#99a1af',
   },
   activityValueActive: {
-    color: '#0092b8',
+    color: '#155dfc',
   },
   actionRow: {
     flexDirection: 'row',
@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
   },
   secondaryButton: {
     flex: 1,
-    backgroundColor: '#f9fafb',
+    backgroundColor: '#eff6ff',
     borderRadius: 16,
     height: 48,
     alignItems: 'center',
@@ -303,11 +303,11 @@ const styles = StyleSheet.create({
   secondaryLabel: {
     fontSize: 12,
     fontWeight: '800',
-    color: '#99a1af',
+    color: '#155dfc',
   },
   primaryButton: {
     flex: 1,
-    backgroundColor: '#0092b8',
+    backgroundColor: '#155dfc',
     borderRadius: 16,
     height: 48,
     alignItems: 'center',

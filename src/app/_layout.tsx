@@ -25,6 +25,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { AuthProvider, useAuth } from '@/providers/auth-provider';
 import { AuthScreen } from '@/components/auth-screen';
 import { initializeAnalytics, updateAnalyticsUserId } from '@/lib/analytics';
+import { initializeNotificationHandler } from '@/agents/notification-agent';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -32,6 +33,10 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+
+  useEffect(() => {
+    initializeNotificationHandler();
+  }, []);
 
   return (
     <AuthProvider>

@@ -15,16 +15,23 @@
  */
 
 import { useFocusEffect } from '@react-navigation/native';
-import { type JSX, useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 
+import { analyze } from '@/agents/analyze-agent';
 import { createDraftFromEntry, createEntry, deleteEntry, listEntries, refreshFoodLibrary, updateEntry } from '@/agents/food-library-agent';
 import { saveMeal } from '@/agents/save-meal-agent';
 import { FoodItem, FoodLibraryEntry, calculateMacroFromItems } from '@/constants/schema';
 import { useDietState } from '@/hooks/use-diet-state';
-import { useAiFoodAppend } from '@/hooks/use-ai-food-append';
+import { createId } from '@/lib/id';
 
 const locale = 'ja-JP';
+
+type AppendItemsResult = {
+  items: FoodItem[];
+  warnings: string[];
+};
 
 export type FoodTypeFilter = 'all' | 'single' | 'menu';
 
@@ -42,30 +49,26 @@ export type UseFoodsScreenResult = {
   editingEntry: FoodLibraryEntry | null;
   name: string;
   setName: (value: string) => void;
-  amount: string;
-  setAmount: (value: string) => void;
-  calories: string;
-  setCalories: (value: string) => void;
-  protein: string;
-  setProtein: (value: string) => void;
-  fat: string;
-  setFat: (value: string) => void;
-  carbs: string;
-  setCarbs: (value: string) => void;
   formItems: FoodItem[];
-  setFormItems: (items: FoodItem[]) => void;
   handleChangeFormItems: (items: FoodItem[]) => void;
   handleSaveEntry: () => Promise<void>;
   handleDeleteEntry: (entryId: string) => void;
   handleEatToday: (entryId: string) => Promise<void>;
-  handleAiAppendFormItems: () => void;
-  aiAppendModal: JSX.Element | null;
+  handleRequestAddFood: () => void;
+  aiPromptText: string;
+  setAiPromptText: (value: string) => void;
+  aiPromptVisible: boolean;
+  closeAiPromptModal: () => void;
+  handleSubmitAiPrompt: () => Promise<void>;
+  isEditingAnalyzing: boolean;
   reloadLibrary: () => Promise<void>;
 };
 
 /**
  * 食品タブ用の状態管理フック。
  * 呼び出し元: FoodsScreen。
+ * @returns UseFoodsScreenResult UI 操作用の state と handler
+ * @remarks 副作用: FoodLibraryAgent / SaveMealAgent への I/O が含まれる。
  */
 export function useFoodsScreen(): UseFoodsScreenResult {
   const libraryState = useDietState((state) => state.foodLibrary);
@@ -81,9 +84,32 @@ export function useFoodsScreen(): UseFoodsScreenResult {
   const [protein, setProtein] = useState('0');
   const [fat, setFat] = useState('0');
   const [carbs, setCarbs] = useState('0');
+  const [aiPromptText, setAiPromptText] = useState('');
+  const [aiPromptVisible, setAiPromptVisible] = useState(false);
+  const [isEditingAnalyzing, setIsEditingAnalyzing] = useState(false);
   const timezone = useMemo(() => Intl.DateTimeFormat().resolvedOptions().timeZone, []);
-  const { open: openAiAppendModal, modal: aiAppendModal } = useAiFoodAppend({ locale, timezone });
 
+  /**
+   * FoodItem 配列からマクロ値を算出して state を更新する。
+   * 呼び出し元: handleChangeFormItems / appendItemsToForm など。
+   * @param items 更新対象の FoodItem 配列
+   * @returns void
+   * @remarks 副作用: calories / protein / fat / carbs の更新。
+   */
+  const syncMacrosFromItems = useCallback((items: FoodItem[]) => {
+    const totals = calculateMacroFromItems(items);
+    setCalories(String(Math.round(totals.kcal)));
+    setProtein(String(Math.round(totals.protein)));
+    setFat(String(Math.round(totals.fat)));
+    setCarbs(String(Math.round(totals.carbs)));
+  }, []);
+
+  /**
+   * 食品ライブラリをリロードする。
+   * 呼び出し元: useEffect / useFocusEffect。
+   * @returns Promise<void>
+   * @remarks 副作用: isRefreshing と store の更新。
+   */
   const reloadLibrary = useCallback(async () => {
     setIsRefreshing(true);
     try {
@@ -99,51 +125,284 @@ export function useFoodsScreen(): UseFoodsScreenResult {
     void reloadLibrary();
   }, [reloadLibrary]);
 
-  useFocusEffect(
-    useCallback(() => {
-      void reloadLibrary();
-    }, [reloadLibrary]),
-  );
+  /**
+   * フォーカス時にライブラリを同期する。
+   * 呼び出し元: useFocusEffect。
+   * @returns void
+   * @remarks 副作用: refreshFoodLibrary の呼び出し。
+   */
+  const handleFocusReload = useCallback(() => {
+    void reloadLibrary();
+  }, [reloadLibrary]);
+
+  useFocusEffect(handleFocusReload);
 
   const entries = useMemo(() => listEntries({ keyword, type: filter }), [filter, keyword, libraryState]);
 
+  /**
+   * フォームの FoodItem とマクロ値を同期する。
+   * 呼び出し元: FoodEditorModal。
+   * @param items 更新後のアイテム配列
+   * @returns void
+   * @remarks 副作用: formItems とマクロ値の更新。
+   */
+  const handleChangeFormItems = useCallback(
+    (items: FoodItem[]) => {
+      setFormItems(items);
+      syncMacrosFromItems(items);
+    },
+    [syncMacrosFromItems],
+  );
+
+  /**
+   * 新規エントリ編集を開く。
+   * 呼び出し元: FoodFilterToolbar。
+   * @returns void
+   * @remarks 副作用: 編集フォーム state の更新。
+   */
   const openNewEntryEditor = useCallback(() => {
     setEditingEntry(null);
     setName('');
     setAmount('1人前');
-    setCalories('0');
-    setProtein('0');
-    setFat('0');
-    setCarbs('0');
-    setFormItems([]);
+    setAiPromptVisible(false);
+    const nextItems = [createManualItem()];
+    setFormItems(nextItems);
+    syncMacrosFromItems(nextItems);
     setEditorVisible(true);
+  }, [syncMacrosFromItems]);
+
+  /**
+   * 既存エントリの編集を開く。
+   * 呼び出し元: FoodEntryList。
+   * @param entry 編集対象の FoodLibraryEntry
+   * @returns void
+   * @remarks 副作用: 編集フォーム state の更新。
+   */
+  const openEditor = useCallback(
+    (entry: FoodLibraryEntry) => {
+      setEditingEntry(entry);
+      setName(entry.name);
+      setAmount(entry.amount);
+      setAiPromptVisible(false);
+      const nextItems = entry.items.length > 0 ? entry.items.map((item) => ({ ...item })) : [createManualItem()];
+      setFormItems(nextItems);
+      syncMacrosFromItems(nextItems);
+      setEditorVisible(true);
+    },
+    [syncMacrosFromItems],
+  );
+
+  /**
+   * 編集モーダルを閉じる。
+   * 呼び出し元: FoodEditorModal。
+   * @returns void
+   * @remarks 副作用: editorVisible の更新。
+   */
+  const closeEditor = useCallback(() => {
+    setEditorVisible(false);
+    setAiPromptVisible(false);
   }, []);
 
-  const openEditor = useCallback((entry: FoodLibraryEntry) => {
-    setEditingEntry(entry);
-    setName(entry.name);
-    setAmount(entry.amount);
-    setCalories(String(entry.calories));
-    setProtein(String(entry.protein));
-    setFat(String(entry.fat));
-    setCarbs(String(entry.carbs));
-    setFormItems(entry.items.map((item) => ({ ...item })));
-    setEditorVisible(true);
-  }, []);
+  /**
+   * 編集フォームへ FoodItem を追加する。
+   * 呼び出し元: AI追加系ハンドラ。
+   * @param result 追加する FoodItem と警告
+   * @returns void
+   * @remarks 副作用: formItems とマクロ値の更新。
+   */
+  const appendItemsToForm = useCallback(
+    ({ items, warnings }: AppendItemsResult) => {
+      setFormItems((prev) => {
+        const next = [...prev, ...items];
+        syncMacrosFromItems(next);
+        return next;
+      });
+      if (warnings.length > 0) {
+        Alert.alert('注意', warnings.join('\n'));
+      }
+    },
+    [syncMacrosFromItems],
+  );
 
-  const closeEditor = useCallback(() => setEditorVisible(false), []);
-
-  const handleAiAppendFormItems = useCallback(() => {
-    openAiAppendModal({
-      onDraft: (draft) => {
-        handleChangeFormItems([...formItems, ...draft.items]);
-        if (draft.warnings.length > 0) {
-          Alert.alert('注意', draft.warnings.join('\n'));
-        }
-      },
+  /**
+   * 手動で FoodItem を追加する。
+   * 呼び出し元: handleRequestAddFood。
+   * @returns void
+   * @remarks 副作用: formItems の更新。
+   */
+  const handleAddFoodManual = useCallback(() => {
+    setFormItems((prev) => {
+      const next = [...prev, createManualItem()];
+      syncMacrosFromItems(next);
+      return next;
     });
-  }, [formItems, handleChangeFormItems, openAiAppendModal]);
+  }, [syncMacrosFromItems]);
 
+  /**
+   * AI 追加用のプロンプトを開く。
+   * 呼び出し元: handleRequestAddFood。
+   * @returns void
+   * @remarks 副作用: aiPromptVisible の更新。
+   */
+  const openAiPromptModal = useCallback(() => {
+    setAiPromptText('');
+    setAiPromptVisible(true);
+  }, []);
+
+  /**
+   * AI 追加プロンプトを閉じる。
+   * 呼び出し元: RecordAiAppendModal。
+   * @returns void
+   * @remarks 副作用: aiPromptVisible の更新。
+   */
+  const closeAiPromptModal = useCallback(() => setAiPromptVisible(false), []);
+
+  /**
+   * AI プロンプトから FoodItem を追加する。
+   * 呼び出し元: RecordAiAppendModal。
+   * @returns Promise<void>
+   * @remarks 副作用: formItems の更新。
+   */
+  const handleSubmitAiPrompt = useCallback(async () => {
+    if (!editorVisible) {
+      Alert.alert('編集中の食品がありません');
+      return;
+    }
+    if (!aiPromptText.trim()) {
+      Alert.alert('入力が空です', '追加したい内容を入力してください。');
+      return;
+    }
+    setIsEditingAnalyzing(true);
+    try {
+      const draft = await analyze({ type: 'text', prompt: aiPromptText, locale, timezone });
+      appendItemsToForm({ items: draft.items, warnings: draft.warnings });
+      setAiPromptVisible(false);
+    } catch (error) {
+      Alert.alert('解析に失敗しました', String((error as Error).message));
+    } finally {
+      setIsEditingAnalyzing(false);
+    }
+  }, [aiPromptText, appendItemsToForm, editorVisible, timezone]);
+
+  /**
+   * 画像解析結果をフォームへ追加する。
+   * 呼び出し元: handleAddFoodImageFromCamera / handleAddFoodImageFromLibrary。
+   * @param asset 画像アセット
+   * @returns Promise<void>
+   * @remarks 副作用: formItems の更新。
+   */
+  const appendImageAssetToForm = useCallback(
+    async (asset: ImagePicker.ImagePickerAsset) => {
+      if (!asset?.uri || !asset.base64) {
+        Alert.alert('画像を取得できません', '画像の読み込みに失敗しました。');
+        return;
+      }
+      setIsEditingAnalyzing(true);
+      try {
+        const draft = await analyze({ type: 'image', uri: asset.uri, base64: asset.base64, locale, timezone });
+        appendItemsToForm({ items: draft.items, warnings: draft.warnings });
+      } catch (error) {
+        Alert.alert('画像解析に失敗しました', String((error as Error).message));
+      } finally {
+        setIsEditingAnalyzing(false);
+      }
+    },
+    [appendItemsToForm, timezone],
+  );
+
+  /**
+   * カメラ撮影で FoodItem を追加する。
+   * 呼び出し元: handleRequestAddFood。
+   * @returns Promise<void>
+   * @remarks 副作用: formItems の更新。
+   */
+  const handleAddFoodImageFromCamera = useCallback(async () => {
+    try {
+      const permission = await ImagePicker.requestCameraPermissionsAsync();
+      if (permission.status !== 'granted') {
+        Alert.alert('カメラの許可が必要です');
+        return;
+      }
+      const result = await ImagePicker.launchCameraAsync({ allowsEditing: false, quality: 0.7, base64: true });
+      if (result.canceled || !result.assets?.[0]) {
+        return;
+      }
+      await appendImageAssetToForm(result.assets[0]);
+    } catch (error) {
+      Alert.alert('画像解析に失敗しました', String((error as Error).message));
+    }
+  }, [appendImageAssetToForm]);
+
+  /**
+   * ライブラリ選択で FoodItem を追加する。
+   * 呼び出し元: handleRequestAddFood。
+   * @returns Promise<void>
+   * @remarks 副作用: formItems の更新。
+   */
+  const handleAddFoodImageFromLibrary = useCallback(async () => {
+    try {
+      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (permission.status !== 'granted') {
+        Alert.alert('写真フォルダの許可が必要です');
+        return;
+      }
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: false,
+        quality: 0.7,
+        base64: true,
+      });
+      if (result.canceled || !result.assets?.[0]) {
+        return;
+      }
+      await appendImageAssetToForm(result.assets[0]);
+    } catch (error) {
+      Alert.alert('画像解析に失敗しました', String((error as Error).message));
+    }
+  }, [appendImageAssetToForm]);
+
+  /**
+   * 追加方法の選択ダイアログを開く。
+   * 呼び出し元: FoodEditorModal。
+   * @returns void
+   * @remarks 副作用: Alert 表示。
+   */
+  const handleRequestAddFood = useCallback(() => {
+    if (!editorVisible) {
+      Alert.alert('編集中の食品がありません');
+      return;
+    }
+    Alert.alert('食品を追加', '追加方法を選択してください。', [
+      {
+        text: 'AIで追加',
+        onPress: () => {
+          Alert.alert('AIで追加', '追加方法を選択してください。', [
+            { text: 'プロンプトで追加', onPress: openAiPromptModal },
+            {
+              text: '写真で追加',
+              onPress: () => {
+                Alert.alert('写真で追加', '取得方法を選択してください。', [
+                  { text: '写真を撮影', onPress: () => void handleAddFoodImageFromCamera() },
+                  { text: 'ライブラリから選ぶ', onPress: () => void handleAddFoodImageFromLibrary() },
+                  { text: 'キャンセル', style: 'cancel' },
+                ]);
+              },
+            },
+            { text: 'キャンセル', style: 'cancel' },
+          ]);
+        },
+      },
+      { text: '手動で追加', onPress: handleAddFoodManual },
+      { text: 'キャンセル', style: 'cancel' },
+    ]);
+  }, [editorVisible, handleAddFoodImageFromCamera, handleAddFoodImageFromLibrary, handleAddFoodManual, openAiPromptModal]);
+
+  /**
+   * エントリを保存する。
+   * 呼び出し元: FoodEditorModal。
+   * @returns Promise<void>
+   * @remarks 副作用: FoodLibraryAgent への保存。
+   */
   const handleSaveEntry = useCallback(async () => {
     const payload = {
       name,
@@ -167,6 +426,13 @@ export function useFoodsScreen(): UseFoodsScreenResult {
     }
   }, [amount, calories, carbs, closeEditor, editingEntry, formItems, name, protein, fat, reloadLibrary]);
 
+  /**
+   * エントリを削除する。
+   * 呼び出し元: FoodEntryList。
+   * @param entryId 削除対象 ID
+   * @returns void
+   * @remarks 副作用: Alert 表示とリロード。
+   */
   const handleDeleteEntry = useCallback(
     (entryId: string) => {
       Alert.alert('削除しますか？', 'この食品を削除します。', [
@@ -184,6 +450,13 @@ export function useFoodsScreen(): UseFoodsScreenResult {
     [reloadLibrary],
   );
 
+  /**
+   * ライブラリエントリを履歴に追加する。
+   * 呼び出し元: FoodEntryList。
+   * @param entryId 追加対象 ID
+   * @returns Promise<void>
+   * @remarks 副作用: saveMeal の実行。
+   */
   const handleEatToday = useCallback(async (entryId: string) => {
     try {
       const draft = createDraftFromEntry(entryId);
@@ -208,39 +481,37 @@ export function useFoodsScreen(): UseFoodsScreenResult {
     editingEntry,
     name,
     setName,
-    amount,
-    setAmount,
-    calories,
-    setCalories,
-    protein,
-    setProtein,
-    fat,
-    setFat,
-    carbs,
-    setCarbs,
     formItems,
-    setFormItems,
     handleChangeFormItems,
     handleSaveEntry,
     handleDeleteEntry,
     handleEatToday,
-    handleAiAppendFormItems,
-    aiAppendModal,
+    handleRequestAddFood,
+    aiPromptText,
+    setAiPromptText,
+    aiPromptVisible,
+    closeAiPromptModal,
+    handleSubmitAiPrompt,
+    isEditingAnalyzing,
     reloadLibrary,
   };
 }
-  /**
-   * フォームの食品アイテムとマクロ値を同期する。
-   * 呼び出し元: FoodEditorModal / AI追加。
-   * @param items 更新後のアイテム配列
-   * @returns void
-   * @remarks 副作用: formItems と macro の更新。
-   */
-  const handleChangeFormItems = useCallback((items: FoodItem[]) => {
-    setFormItems(items);
-    const totals = calculateMacroFromItems(items);
-    setCalories(String(Math.round(totals.kcal)));
-    setProtein(String(Math.round(totals.protein)));
-    setFat(String(Math.round(totals.fat)));
-    setCarbs(String(Math.round(totals.carbs)));
-  }, []);
+
+/**
+ * 空の FoodItem を生成する。
+ * 呼び出し元: openNewEntryEditor / handleAddFoodManual。
+ * @returns FoodItem
+ * @remarks 副作用は存在しない。
+ */
+function createManualItem(): FoodItem {
+  return {
+    id: createId('item'),
+    name: '',
+    category: 'unknown',
+    amount: '1人前',
+    kcal: 0,
+    protein: 0,
+    fat: 0,
+    carbs: 0,
+  };
+}

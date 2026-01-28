@@ -11,14 +11,14 @@
  * - 保存ロジックや state 更新
  *
  * 【他ファイルとの関係】
- * - components/food-item-editor-sheet を利用して食品リストを編集する。
+ * - HistoryScreen から渡された編集値を表示する。
  */
 
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { FoodItem } from '@/constants/schema';
-import { FoodItemEditorSheet } from '@/components/food-item-editor-sheet';
+import { createId } from '@/lib/id';
 
 export type EditMealModalProps = {
   visible: boolean;
@@ -28,9 +28,10 @@ export type EditMealModalProps = {
   onChangeMenuName: (value: string) => void;
   onChangeOriginalText: (value: string) => void;
   onChangeItems: (items: FoodItem[]) => void;
+  onRequestAddFood: () => void;
   onRequestClose: () => void;
   onSubmit: () => void;
-  onRequestAiAppend: () => void;
+  isLoading: boolean;
 };
 
 /**
@@ -45,46 +46,117 @@ export function EditMealModal({
   onChangeMenuName,
   onChangeOriginalText,
   onChangeItems,
+  onRequestAddFood,
   onRequestClose,
   onSubmit,
-  onRequestAiAppend,
+  isLoading,
 }: EditMealModalProps) {
-  const summary = buildMealSummary(items);
+  /**
+   * FoodItem を削除する。
+   * 呼び出し元: 削除ボタン。
+   * @param index 削除対象インデックス
+   * @returns void
+   * @remarks 副作用: onChangeItems の呼び出し。
+   */
+  const handleRemoveItem = (index: number) => {
+    const next = items.filter((_, idx) => idx !== index);
+    if (next.length === 0) {
+      onChangeItems([createEmptyItem()]);
+      return;
+    }
+    onChangeItems(next);
+  };
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onRequestClose}>
       <View style={styles.overlay}>
         <Pressable style={styles.backdrop} onPress={onRequestClose} />
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
-          style={styles.sheet}>
+        <View style={styles.sheet}>
           <View style={styles.header}>
-            <Text style={styles.title}>記録を編集</Text>
+            <Text style={styles.title}>入力内容の確認</Text>
             <Pressable style={styles.closeButton} onPress={onRequestClose} accessibilityRole="button">
-              <MaterialIcons name="close" size={18} color="#9ca3af" />
+              <MaterialIcons name="close" size={16} color="#9ca3af" />
             </Pressable>
           </View>
           <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-            <SectionLabel label="食品名" />
-            <View style={styles.inputCard}>
-              <TextInput
-                style={styles.inputText}
-                value={menuName}
-                onChangeText={onChangeMenuName}
-                placeholder="食品名"
-              />
-            </View>
-            <SectionLabel label="基準量とカロリー" />
-            <View style={styles.baseRow}>
-              <Text style={styles.baseAmount}>{summary.amount}</Text>
-              <View style={styles.baseDivider} />
-              <View style={styles.baseKcalBlock}>
-                <Text style={styles.baseKcalValue}>{summary.kcal}</Text>
-                <Text style={styles.baseKcalUnit}>kcal</Text>
+            <View style={styles.section}>
+              <Text style={styles.sectionLabel}>食事の名称</Text>
+              <View style={styles.mealInputRow}>
+                <MaterialIcons name="restaurant" size={18} color="#0092b8" />
+                <TextInput
+                  style={styles.mealInput}
+                  value={menuName}
+                  onChangeText={onChangeMenuName}
+                  placeholder="例: パワーランチ"
+                  placeholderTextColor="#d1d5dc"
+                />
               </View>
             </View>
-            <FoodItemEditorSheet items={items} onChange={onChangeItems} onRequestAiAppend={onRequestAiAppend} />
+            <View style={styles.section}>
+              <Text style={styles.sectionLabel}>内訳の詳細</Text>
+              {items.map((item, index) => (
+                <View key={item.id} style={styles.detailCard}>
+                  <View style={styles.detailHeader}>
+                    <View style={styles.indexBadge}>
+                      <Text style={styles.indexLabel}>{index + 1}</Text>
+                    </View>
+                    <TextInput
+                      style={styles.itemName}
+                      value={item.name}
+                      onChangeText={(value) => handleChangeItemField(items, index, 'name', value, onChangeItems)}
+                      placeholder="食品名"
+                      placeholderTextColor="#d1d5dc"
+                    />
+                    <Pressable style={styles.itemDelete} onPress={() => handleRemoveItem(index)} accessibilityRole="button">
+                      <MaterialIcons name="close" size={14} color="#ff6467" />
+                    </Pressable>
+                  </View>
+                  <View style={styles.inlineRow}>
+                    <LabeledField
+                      label="分量"
+                      value={item.amount}
+                      placeholder="1人前"
+                      onChange={(value) => handleChangeItemField(items, index, 'amount', value, onChangeItems)}
+                    />
+                    <LabeledField
+                      label="カロリー"
+                      value={String(item.kcal)}
+                      placeholder="0"
+                      unit="kcal"
+                      keyboardType="numeric"
+                      onChange={(value) => handleChangeItemField(items, index, 'kcal', value, onChangeItems)}
+                    />
+                  </View>
+                  <View style={styles.macroRow}>
+                    <MacroField
+                      label="P"
+                      labelColor="#0092b8"
+                      labelBg="#ecfeff"
+                      value={String(item.protein)}
+                      onChange={(value) => handleChangeItemField(items, index, 'protein', value, onChangeItems)}
+                    />
+                    <MacroField
+                      label="F"
+                      labelColor="#d08700"
+                      labelBg="#fefce8"
+                      value={String(item.fat)}
+                      onChange={(value) => handleChangeItemField(items, index, 'fat', value, onChangeItems)}
+                    />
+                    <MacroField
+                      label="C"
+                      labelColor="#00a63e"
+                      labelBg="#f0fdf4"
+                      value={String(item.carbs)}
+                      onChange={(value) => handleChangeItemField(items, index, 'carbs', value, onChangeItems)}
+                    />
+                  </View>
+                </View>
+              ))}
+              <Pressable style={styles.addButton} onPress={onRequestAddFood} accessibilityRole="button">
+                <MaterialIcons name="add" size={18} color="#99a1af" />
+                <Text style={styles.addLabel}>別の食品を追加する</Text>
+              </Pressable>
+            </View>
             <TextInput
               style={styles.hiddenOriginal}
               value={originalText}
@@ -94,51 +166,152 @@ export function EditMealModal({
           </ScrollView>
           <View style={styles.footer}>
             <Pressable style={styles.saveButton} onPress={onSubmit} accessibilityRole="button">
-              <Text style={styles.saveLabel}>保存</Text>
+              <Text style={styles.saveLabel}>この内容で確定する</Text>
+              <MaterialIcons name="check-circle" size={20} color="#ffffff" />
             </Pressable>
           </View>
-        </KeyboardAvoidingView>
+          {isLoading ? (
+            <View style={styles.loadingOverlay}>
+              <ActivityIndicator size="large" color="#0092b8" />
+              <Text style={styles.loadingText}>AIが食品を解析中...</Text>
+            </View>
+          ) : null}
+        </View>
       </View>
     </Modal>
   );
 }
 
-type SectionLabelProps = {
+type LabeledFieldProps = {
   label: string;
+  value: string;
+  placeholder: string;
+  unit?: string;
+  keyboardType?: 'default' | 'numeric';
+  onChange: (value: string) => void;
 };
 
 /**
- * セクションラベルを描画する。
+ * ラベル付きの入力欄を描画する。
  * 呼び出し元: EditMealModal。
- * @param props ラベル表示
+ * @param props 入力値とラベル
  * @returns JSX.Element
- * @remarks 副作用は存在しない。
+ * @remarks 副作用は props のコールバック実行のみ。
  */
-function SectionLabel({ label }: SectionLabelProps) {
+function LabeledField({ label, value, placeholder, unit, keyboardType = 'default', onChange }: LabeledFieldProps) {
   return (
-    <View style={styles.sectionLabelRow}>
-      <View style={styles.sectionBar} />
-      <Text style={styles.sectionLabelText}>{label}</Text>
+    <View style={styles.fieldBlock}>
+      <Text style={styles.fieldLabel}>{label}</Text>
+      <View style={styles.fieldInputRow}>
+        <TextInput
+          style={styles.fieldInput}
+          value={value}
+          onChangeText={onChange}
+          placeholder={placeholder}
+          placeholderTextColor="rgba(16,24,40,0.5)"
+          keyboardType={keyboardType}
+        />
+        {unit ? <Text style={styles.unitLabel}>{unit}</Text> : null}
+      </View>
     </View>
   );
 }
 
-type MealSummary = {
-  amount: string;
-  kcal: number;
+type MacroFieldProps = {
+  label: string;
+  labelColor: string;
+  labelBg: string;
+  value: string;
+  onChange: (value: string) => void;
 };
 
 /**
- * 編集画面用の表示サマリーを生成する。
+ * PFC 入力用の小コンポーネント。
  * 呼び出し元: EditMealModal。
- * @param items FoodItem 配列
- * @returns サマリー情報
+ * @param props ラベルと入力値
+ * @returns JSX.Element
+ * @remarks 副作用は props のコールバック実行のみ。
+ */
+function MacroField({ label, labelColor, labelBg, value, onChange }: MacroFieldProps) {
+  return (
+    <View style={styles.macroBlock}>
+      <View style={[styles.macroBadge, { backgroundColor: labelBg }]}>
+        <Text style={[styles.macroBadgeLabel, { color: labelColor }]}>{label}</Text>
+      </View>
+      <TextInput
+        style={styles.macroInput}
+        value={value}
+        onChangeText={onChange}
+        keyboardType="numeric"
+        textAlign="center"
+      />
+      <Text style={styles.macroUnit}>g</Text>
+    </View>
+  );
+}
+
+/**
+ * FoodItem を更新する。
+ * 呼び出し元: EditMealModal。
+ * @param items 既存配列
+ * @param index 対象インデックス
+ * @param key 更新キー
+ * @param value 入力値
+ * @param onChange 更新コールバック
+ * @returns void
+ * @remarks 副作用: onChange の呼び出し。
+ */
+function handleChangeItemField(
+  items: FoodItem[],
+  index: number,
+  key: keyof FoodItem,
+  value: string,
+  onChange: (items: FoodItem[]) => void,
+) {
+  const next = items.map((item, idx) => {
+    if (idx !== index) {
+      return item;
+    }
+    if (key === 'name' || key === 'amount') {
+      return { ...item, [key]: value };
+    }
+    return { ...item, [key]: parseManualNumber(value) };
+  });
+  onChange(next);
+}
+
+/**
+ * 数値入力を安全に数値へ変換する。
+ * 呼び出し元: handleChangeItemField。
+ * @param value 入力文字列
+ * @returns 数値 (不正値は 0)
  * @remarks 副作用は存在しない。
  */
-function buildMealSummary(items: FoodItem[]): MealSummary {
-  const totalKcal = items.reduce((sum, item) => sum + item.kcal, 0);
-  const fallbackAmount = items[0]?.amount || '1人前';
-  return { amount: fallbackAmount, kcal: Math.round(totalKcal) };
+function parseManualNumber(value: string): number {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) {
+    return 0;
+  }
+  return parsed;
+}
+
+/**
+ * 空の FoodItem を生成する。
+ * 呼び出し元: handleRemoveItem。
+ * @returns FoodItem
+ * @remarks 副作用は存在しない。
+ */
+function createEmptyItem(): FoodItem {
+  return {
+    id: createId('item'),
+    name: '',
+    category: 'unknown',
+    amount: '1人前',
+    kcal: 0,
+    protein: 0,
+    fat: 0,
+    carbs: 0,
+  };
 }
 
 const styles = StyleSheet.create({
@@ -151,120 +324,225 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
   },
   sheet: {
-    backgroundColor: '#ffffff',
-    borderTopLeftRadius: 40,
-    borderTopRightRadius: 40,
-    overflow: 'hidden',
+    width: '100%',
     maxHeight: '92%',
+    backgroundColor: '#f9fafb',
+    borderTopLeftRadius: 48,
+    borderTopRightRadius: 48,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOpacity: 0.25,
+    shadowRadius: 25,
+    shadowOffset: { width: 0, height: -10 },
+    elevation: 12,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 24,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f9fafb',
+    paddingTop: 16,
+    paddingBottom: 8,
   },
   title: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: '800',
     color: '#101828',
   },
   closeButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#f9fafb',
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#f3f4f6',
     alignItems: 'center',
     justifyContent: 'center',
   },
   content: {
-    paddingHorizontal: 24,
     paddingTop: 20,
+    paddingHorizontal: 24,
     paddingBottom: 24,
-    gap: 20,
+    gap: 24,
   },
-  sectionLabelRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  section: {
+    gap: 12,
   },
-  sectionBar: {
-    width: 6,
-    height: 24,
-    borderRadius: 999,
-    backgroundColor: '#2b7fff',
-  },
-  sectionLabelText: {
-    fontSize: 12,
+  sectionLabel: {
+    fontSize: 10,
     fontWeight: '800',
     color: '#99a1af',
-    letterSpacing: 1.2,
+    letterSpacing: 1.1,
+    paddingLeft: 8,
   },
-  inputCard: {
-    backgroundColor: '#f9fafb',
-    borderRadius: 16,
-    padding: 16,
+  mealInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+    borderRadius: 24,
+    paddingHorizontal: 20,
+    height: 68,
+    gap: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 2,
   },
-  inputText: {
+  mealInput: {
+    flex: 1,
     fontSize: 18,
     fontWeight: '800',
     color: '#101828',
   },
-  baseRow: {
+  detailCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 40,
+    borderWidth: 1,
+    borderColor: 'rgba(243,244,246,0.5)',
+    padding: 20,
+    gap: 16,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 2,
+  },
+  detailHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f9fafb',
-    borderRadius: 16,
-    paddingVertical: 16,
-    paddingHorizontal: 16,
     gap: 12,
   },
-  baseAmount: {
+  indexBadge: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#ecfeff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  indexLabel: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#0092b8',
+  },
+  itemName: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#101828',
+  },
+  itemDelete: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#fef2f2',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  inlineRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  fieldBlock: {
+    flex: 1,
+    gap: 6,
+  },
+  fieldLabel: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: '#99a1af',
+  },
+  fieldInputRow: {
+    backgroundColor: '#f9fafb',
+    borderRadius: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    height: 44,
+  },
+  fieldInput: {
     flex: 1,
     fontSize: 14,
     fontWeight: '700',
-    color: '#364153',
+    color: '#101828',
   },
-  baseDivider: {
-    width: 1,
-    height: 16,
-    backgroundColor: '#e5e7eb',
+  unitLabel: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: '#d1d5dc',
+    textTransform: 'uppercase',
   },
-  baseKcalBlock: {
+  macroRow: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
-    gap: 4,
+    gap: 10,
   },
-  baseKcalValue: {
-    fontSize: 18,
+  macroBlock: {
+    flex: 1,
+    gap: 8,
+    alignItems: 'center',
+  },
+  macroBadge: {
+    borderRadius: 10,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+  },
+  macroBadgeLabel: {
+    fontSize: 8,
+    fontWeight: '800',
+    letterSpacing: 0.2,
+  },
+  macroInput: {
+    width: '100%',
+    backgroundColor: 'rgba(249,250,251,0.5)',
+    borderRadius: 16,
+    paddingVertical: 8,
+    fontSize: 12,
     fontWeight: '800',
     color: '#101828',
   },
-  baseKcalUnit: {
-    fontSize: 11,
+  macroUnit: {
+    fontSize: 8,
     fontWeight: '800',
-    color: '#99a1af',
-    marginBottom: 2,
+    color: '#d1d5dc',
   },
-  footer: {
-    paddingHorizontal: 24,
-    paddingTop: 12,
-    paddingBottom: 24,
-    borderTopWidth: 1,
-    borderTopColor: '#f9fafb',
-  },
-  saveButton: {
-    backgroundColor: '#155dfc',
-    borderRadius: 32,
+  addButton: {
+    marginTop: 8,
+    borderWidth: 2,
+    borderColor: '#f3f4f6',
+    borderRadius: 40,
     height: 64,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#dbeafe',
+    flexDirection: 'row',
+    gap: 8,
+    backgroundColor: '#ffffff',
+  },
+  addLabel: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#99a1af',
+  },
+  footer: {
+    borderTopWidth: 1,
+    borderTopColor: '#f3f4f6',
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 32,
+    paddingTop: 24,
+    paddingBottom: 32,
+  },
+  saveButton: {
+    backgroundColor: '#0092b8',
+    borderRadius: 24,
+    height: 68,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    gap: 12,
+    shadowColor: 'rgba(16,78,100,0.2)',
     shadowOpacity: 1,
-    shadowRadius: 20,
-    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 25,
+    shadowOffset: { width: 0, height: 12 },
     elevation: 4,
   },
   saveLabel: {
@@ -275,5 +553,17 @@ const styles = StyleSheet.create({
   hiddenOriginal: {
     height: 0,
     opacity: 0,
+  },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+  },
+  loadingText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#0092b8',
   },
 });

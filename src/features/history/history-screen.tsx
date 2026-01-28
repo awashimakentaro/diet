@@ -16,7 +16,6 @@
 
 import type { JSX } from 'react';
 import { useState } from 'react';
-import { useRouter } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -25,6 +24,7 @@ import { HistoryDatePickerModal } from './components/history-date-picker-modal';
 import { HistoryHeader } from './components/history-header';
 import { HistoryMealList } from './components/history-meal-list';
 import { EditMealModal } from './components/edit-meal-modal';
+import { RecordAiAppendModal } from '../record/components/record-ai-append-modal';
 import { useHistoryScreen } from './use-history-screen';
 
 /**
@@ -32,7 +32,6 @@ import { useHistoryScreen } from './use-history-screen';
  * 呼び出し元: app/(tabs)/history.tsx。
  */
 export function HistoryScreen(): JSX.Element {
-  const router = useRouter();
   const {
     dateKey,
     meals,
@@ -50,20 +49,15 @@ export function HistoryScreen(): JSX.Element {
     setEditingOriginal,
     handleSaveEdit,
     closeEditor,
-    handleAiAppendEditingItems,
-    aiAppendModal,
+    handleRequestAddFood,
+    aiPromptText,
+    setAiPromptText,
+    aiPromptVisible,
+    closeAiPromptModal,
+    handleSubmitAiPrompt,
+    isEditingAnalyzing,
   } = useHistoryScreen();
   const [datePickerVisible, setDatePickerVisible] = useState(false);
-
-  /**
-   * 設定タブへ遷移する。
-   * 呼び出し元: HistoryHeader。
-   * @returns void
-   * @remarks 副作用: ナビゲーション実行。
-   */
-  const handlePressSettings = () => {
-    router.push('/settings');
-  };
 
   /**
    * 日付ピッカーを開く。
@@ -99,7 +93,7 @@ export function HistoryScreen(): JSX.Element {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <HistoryHeader onPressSettings={handlePressSettings} />
+      <HistoryHeader />
       <ScrollView contentContainerStyle={styles.container}>
         <DateNavigator dateKey={dateKey} onOpenPicker={handleOpenDatePicker} />
         <HistoryMealList
@@ -113,16 +107,25 @@ export function HistoryScreen(): JSX.Element {
         </Pressable>
       </ScrollView>
       <EditMealModal
-        visible={Boolean(editingMeal)}
+        visible={Boolean(editingMeal) && !aiPromptVisible}
         menuName={editingMenuName}
         originalText={editingOriginal}
         items={editingItems}
         onChangeMenuName={setEditingMenuName}
         onChangeOriginalText={setEditingOriginal}
         onChangeItems={setEditingItems}
+        onRequestAddFood={handleRequestAddFood}
         onRequestClose={closeEditor}
         onSubmit={handleSaveEdit}
-        onRequestAiAppend={handleAiAppendEditingItems}
+        isLoading={isEditingAnalyzing}
+      />
+      <RecordAiAppendModal
+        visible={aiPromptVisible}
+        value={aiPromptText}
+        onChangeText={setAiPromptText}
+        onRequestClose={closeAiPromptModal}
+        onSubmit={handleSubmitAiPrompt}
+        isLoading={isEditingAnalyzing}
       />
       <HistoryDatePickerModal
         visible={datePickerVisible}
@@ -130,7 +133,6 @@ export function HistoryScreen(): JSX.Element {
         onSelectDateKey={handlePickDateKey}
         onRequestClose={handleCloseDatePicker}
       />
-      {aiAppendModal}
     </SafeAreaView>
   );
 }

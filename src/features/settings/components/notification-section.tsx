@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   toggleTrackActive: {
-    backgroundColor: '#0092b8',
+    backgroundColor: '#155dfc',
     alignItems: 'flex-end',
   },
   toggleKnob: {
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   timeChipActive: {
-    backgroundColor: '#ecfeff',
+    backgroundColor: '#eff6ff',
   },
   timeChipDisabled: {
     opacity: 0.4,
@@ -159,10 +159,10 @@ const styles = StyleSheet.create({
     color: '#99a1af',
   },
   timeLabelActive: {
-    color: '#0092b8',
+    color: '#155dfc',
   },
   saveButton: {
-    backgroundColor: '#101828',
+    backgroundColor: '#155dfc',
     borderRadius: 16,
     height: 60,
     alignItems: 'center',

@@ -67,8 +67,8 @@ export function HistoryMealCard({ meal, onEdit, onDelete, onSave }: HistoryMealC
         ))}
       </View>
       <View style={styles.actionRow}>
-        <ActionButton icon="edit" label="編集" onPress={onEdit} />
-        <ActionButton icon="delete-outline" label="削除" onPress={onDelete} />
+        <ActionButton icon="edit" label="編集" onPress={onEdit} tone="link" />
+        <ActionButton icon="delete-outline" label="削除" onPress={onDelete} tone="danger" />
         <ActionButton icon="bookmark-border" label="保存" onPress={onSave} accent />
       </View>
     </View>
@@ -80,23 +80,50 @@ type ActionButtonProps = {
   label: string;
   onPress: () => void;
   accent?: boolean;
+  tone?: 'link' | 'danger';
 };
 
 /**
  * 操作ボタンを描画する。
  * 呼び出し元: HistoryMealCard。
- * @param props アイコンとラベル
+ * @param props アイコンとラベル、表示トーン、押下時のハンドラ
  * @returns JSX.Element
  * @remarks 副作用は props のコールバック実行のみ。
  */
-function ActionButton({ icon, label, onPress, accent }: ActionButtonProps) {
+function ActionButton({ icon, label, onPress, accent, tone }: ActionButtonProps) {
+  const toneColors = {
+    icon: '#4a5565',
+    label: '#4a5565',
+    border: '#f3f4f6',
+    background: '#ffffff',
+  };
+
+  if (accent) {
+    toneColors.icon = '#155dfc';
+    toneColors.label = '#155dfc';
+    toneColors.border = '#dbeafe';
+    toneColors.background = 'rgba(239,246,255,0.5)';
+  } else if (tone === 'link') {
+    toneColors.icon = '#2b7fff';
+    toneColors.label = '#2b7fff';
+  } else if (tone === 'danger') {
+    toneColors.icon = '#ff6467';
+    toneColors.label = '#ff6467';
+  }
+
   return (
     <Pressable
       onPress={onPress}
-      style={[styles.actionButton, accent ? styles.actionButtonAccent : null]}
+      style={[
+        styles.actionButton,
+        {
+          borderColor: toneColors.border,
+          backgroundColor: toneColors.background,
+        },
+      ]}
       accessibilityRole="button">
-      <MaterialIcons name={icon} size={14} color={accent ? '#155dfc' : '#4a5565'} />
-      <Text style={[styles.actionLabel, accent ? styles.actionLabelAccent : null]}>{label}</Text>
+      <MaterialIcons name={icon} size={14} color={toneColors.icon} />
+      <Text style={[styles.actionLabel, { color: toneColors.label }]}>{label}</Text>
     </Pressable>
   );
 }
@@ -201,23 +228,13 @@ const styles = StyleSheet.create({
     height: 38,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#f3f4f6',
-    backgroundColor: '#ffffff',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
   },
-  actionButtonAccent: {
-    borderColor: '#dbeafe',
-    backgroundColor: 'rgba(239,246,255,0.5)',
-  },
   actionLabel: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#4a5565',
-  },
-  actionLabelAccent: {
-    color: '#155dfc',
   },
 });

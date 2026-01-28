@@ -2,7 +2,7 @@
  * features/history/components/history-header.tsx
  *
  * 【責務】
- * 履歴タブのブランドヘッダーを描画し、設定への導線を提供する。
+ * 履歴タブのブランドヘッダーを描画する。
  *
  * 【使用箇所】
  * - HistoryScreen
@@ -12,37 +12,24 @@
  * - 画面全体のレイアウト制御
  *
  * 【他ファイルとの関係】
- * - HistoryScreen から設定遷移用コールバックを受け取る。
+ * - HistoryScreen から呼び出される。
  */
 
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-
-export type HistoryHeaderProps = {
-  onPressSettings: () => void;
-};
+import { StyleSheet, Text, View } from 'react-native';
 
 /**
  * 履歴タブのヘッダーを描画する。
  * 呼び出し元: HistoryScreen。
- * @param props 設定遷移のコールバック
  * @returns JSX.Element
- * @remarks 副作用は props のコールバック実行のみ。
+ * @remarks 副作用は存在しない。
  */
-export function HistoryHeader({ onPressSettings }: HistoryHeaderProps) {
+export function HistoryHeader() {
   return (
     <View style={styles.container}>
       <View style={styles.titleBlock}>
         <Text style={styles.title}>PFC TRACKER</Text>
         <Text style={styles.subtitle}>FITNESS ANALYTICS</Text>
       </View>
-      <Pressable
-        style={styles.actionButton}
-        onPress={onPressSettings}
-        accessibilityRole="button"
-        accessibilityLabel="設定を開く">
-        <MaterialIcons name="tune" size={18} color="#155dfc" />
-      </Pressable>
     </View>
   );
 }
@@ -73,13 +60,5 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: '#99a1af',
     letterSpacing: 1.2,
-  },
-  actionButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 14,
-    backgroundColor: '#eff6ff',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });

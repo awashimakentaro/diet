@@ -15,7 +15,6 @@
  * - SettingsScreen から呼び出される。
  */
 
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import type { JSX } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
@@ -31,9 +30,6 @@ export function SettingsHeader(): JSX.Element {
       <View style={styles.titleBlock}>
         <Text style={styles.title}>PFC TRACKER</Text>
         <Text style={styles.subtitle}>FITNESS ANALYTICS</Text>
-      </View>
-      <View style={styles.iconWrapper}>
-        <MaterialIcons name="settings" size={18} color="#0092b8" />
       </View>
     </View>
   );
@@ -65,13 +61,5 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: '#99a1af',
     letterSpacing: 1.2,
-  },
-  iconWrapper: {
-    width: 36,
-    height: 36,
-    borderRadius: 14,
-    backgroundColor: '#eff6ff',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });

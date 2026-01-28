@@ -2,21 +2,27 @@
  * agents/notification-agent.ts
  *
  * 【責務】
- * 0 時通知のスケジュール状態を管理し、本文生成ロジックを提供する。
+ * 端末内のローカル通知スケジュールを管理し、本文生成ロジックを提供する。
  *
  * 【使用箇所】
  * - SettingsScreen
+ * - RootLayout（通知ハンドラ初期化）
  *
  * 【やらないこと】
- * - 実際の OS 通知スケジューリング（Expo Notifications は未導入のため）
+ * - バックエンドからのプッシュ通知配信
  *
  * 【他ファイルとの関係】
  * - lib/diet-store.ts の notification 設定を更新する。
+ * - summary-agent.ts の日次サマリーを通知本文に利用する。
  */
 
+import * as Notifications from 'expo-notifications';
+import { Platform } from 'react-native';
+
+import { DailySummary, getDailySummary } from '@/agents/summary-agent';
 import { NotificationSetting, NotificationTime } from '@/constants/schema';
-import { DailySummary } from '@/agents/summary-agent';
 import { setNotification, getDietState } from '@/lib/diet-store';
+import { getTodayKey } from '@/lib/date';
 import { supabase, requireUserId } from '@/lib/supabase';
 import { mapNotificationRow } from '@/lib/mappers';
 
@@ -25,13 +31,46 @@ export type NotificationContent = {
   body: string;
 };
 
+const notificationTimeTable: Record<NotificationTime, { hour: number; minute: number }> = {
+  morning: { hour: 9, minute: 0 },
+  noon: { hour: 13, minute: 0 },
+  evening: { hour: 19, minute: 0 },
+  midnight: { hour: 22, minute: 0 },
+};
+
+let notificationHandlerConfigured = false;
+
 /**
- * 通知権限を要求するダミー実装。
+ * フォアグラウンド時の通知表示方針を初期化する。
+ * 呼び出し元: RootLayout。
+ * @remarks 副作用としてハンドラを登録する。
+ */
+export function initializeNotificationHandler(): void {
+  if (notificationHandlerConfigured) {
+    return;
+  }
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    }),
+  });
+  notificationHandlerConfigured = true;
+}
+
+/**
+ * 通知権限を要求する。
  * 呼び出し元: SettingsScreen。
- * @returns 常に true（デモ用途）
+ * @returns 許可された場合は true
  */
 export async function requestPermission(): Promise<boolean> {
-  return true;
+  const current = await Notifications.getPermissionsAsync();
+  if (current.granted) {
+    return true;
+  }
+  const requested = await Notifications.requestPermissionsAsync();
+  return requested.granted;
 }
 
 /**
@@ -51,6 +90,8 @@ export async function updateSchedule(setting: NotificationSetting): Promise<void
   if (error) {
     throw new Error(error.message);
   }
+  await ensureNotificationChannel();
+  await scheduleLocalNotifications(setting);
   setNotification({ ...setting, lastScheduledAt: new Date().toISOString() });
 }
 
@@ -70,6 +111,7 @@ export async function cancelAll(): Promise<void> {
   if (error) {
     throw new Error(error.message);
   }
+  await Notifications.cancelAllScheduledNotificationsAsync();
   setNotification({ ...getDietState().notification, enabled: false });
 }
 
@@ -119,6 +161,66 @@ export async function fetchNotificationSetting(): Promise<NotificationSetting> {
   const setting = deriveSettingFromRow(data);
   setNotification(setting);
   return setting;
+}
+
+/**
+ * ローカル通知を指定の時間で再スケジュールする。
+ * 呼び出し元: updateSchedule。
+ * @param setting 通知設定
+ * @remarks 副作用として端末内のスケジュールを置き換える。
+ */
+async function scheduleLocalNotifications(setting: NotificationSetting): Promise<void> {
+  await Notifications.cancelAllScheduledNotificationsAsync();
+  if (!setting.enabled) {
+    return;
+  }
+  const content = buildContentForSchedule();
+  const uniqueTimes = Array.from(new Set(setting.times));
+  await Promise.all(
+    uniqueTimes.map(async (time) => {
+      const schedule = notificationTimeTable[time];
+      await Notifications.scheduleNotificationAsync({
+        content,
+        trigger: { hour: schedule.hour, minute: schedule.minute, repeats: true },
+      });
+    }),
+  );
+}
+
+/**
+ * スケジュール用の通知本文を生成する。
+ * 呼び出し元: scheduleLocalNotifications。
+ * @returns NotificationContentInput
+ * @remarks 副作用は存在しない。
+ */
+function buildContentForSchedule(): Notifications.NotificationContentInput {
+  const todayKey = getTodayKey();
+  const summary = getDailySummary(todayKey);
+  const payload = buildPayload(todayKey, summary);
+  return {
+    title: payload.title,
+    body: payload.body,
+    sound: 'default',
+    channelId: Platform.OS === 'android' ? 'daily-summary' : undefined,
+  };
+}
+
+/**
+ * Android の通知チャンネルを用意する。
+ * 呼び出し元: updateSchedule。
+ * @remarks 副作用として OS の通知チャンネルを作成する。
+ */
+async function ensureNotificationChannel(): Promise<void> {
+  if (Platform.OS !== 'android') {
+    return;
+  }
+  await Notifications.setNotificationChannelAsync('daily-summary', {
+    name: 'Daily Summary',
+    importance: Notifications.AndroidImportance.HIGH,
+    sound: 'default',
+    vibrationPattern: [0, 250, 250, 250],
+    lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+  });
 }
 
 function deriveSettingFromRow(row: any): NotificationSetting {

@@ -15,7 +15,6 @@
  */
 
 import type { JSX } from 'react';
-import { useNavigation } from '@react-navigation/native';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -32,7 +31,6 @@ import { useRecordScreen } from './use-record-screen';
  * 呼び出し元: app/(tabs)/index.tsx。
  */
 export function RecordScreen(): JSX.Element {
-  const navigation = useNavigation();
   const {
     summary,
     inputText,
@@ -60,19 +58,9 @@ export function RecordScreen(): JSX.Element {
     handleSelectLibraryEntry,
   } = useRecordScreen();
 
-  /**
-   * 設定タブへ遷移する。
-   * 呼び出し元: RecordHeader。
-   * @returns void
-   * @remarks 副作用: ナビゲーション実行。
-   */
-  const handlePressSettings = () => {
-    navigation.navigate('settings' as never);
-  };
-
   return (
     <SafeAreaView style={styles.safeArea}>
-      <RecordHeader onPressSettings={handlePressSettings} />
+      <RecordHeader />
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.section}>
           <RecordSummaryCard summary={summary} />
