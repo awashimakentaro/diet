@@ -15,6 +15,7 @@
  * - agents ディレクトリで import される。
  */
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
 import Constants from 'expo-constants';
 
@@ -26,7 +27,14 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('Supabase 環境変数が設定されていません。EXPO_PUBLIC_SUPABASE_URL / EXPO_PUBLIC_SUPABASE_ANON_KEY を確認してください。');
 }
 
-export const supabase = createClient(supabaseUrl ?? '', supabaseAnonKey ?? '');
+export const supabase = createClient(supabaseUrl ?? '', supabaseAnonKey ?? '', {
+  auth: {
+    storage: AsyncStorage,
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: false,
+  },
+});
 
 /**
  * 現在のユーザー ID を取得する。未ログインの場合は例外を投げる。

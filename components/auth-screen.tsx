@@ -15,7 +15,7 @@
  * - providers/auth-provider.tsx が提供する useAuth を利用する。
  */
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -30,6 +30,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuth } from '@/providers/auth-provider';
+import { logEvent, logScreen } from '@/lib/analytics';
 
 type AuthMode = 'sign-in' | 'sign-up';
 
@@ -51,6 +52,17 @@ export function AuthScreen(): JSX.Element {
   );
   const toggleCta = useMemo(() => (mode === 'sign-in' ? '新規登録に切り替え' : 'ログインに戻る'), [mode]);
 
+  useEffect(() => {
+    void logScreen('Auth', { mode });
+  }, [mode]);
+
+  const trackInputFocus = useCallback(
+    (field: 'email' | 'password') => {
+      void logEvent('auth_input_focus', { field, mode });
+    },
+    [mode],
+  );
+
   /**
    * 現在のモードに応じてサインインまたはサインアップを実行する。
    * 呼び出し元: 送信ボタン onPress。
@@ -58,13 +70,25 @@ export function AuthScreen(): JSX.Element {
   const handleSubmit = useCallback(async () => {
     try {
       setLoading(true);
+      const baseParams = {
+        mode,
+        email_length: email.trim().length,
+        password_length: password.trim().length,
+      };
+      void logEvent('auth_submit_attempt', baseParams);
       if (mode === 'sign-in') {
         await signIn(email, password);
+        void logEvent('auth_sign_in_success', baseParams);
       } else {
         await signUp(email, password);
+        void logEvent('auth_sign_up_success', baseParams);
         Alert.alert('仮登録を受け付けました', '確認メールのリンクから認証を完了してください。');
       }
     } catch (error) {
+      void logEvent('auth_failure', {
+        mode,
+        error_message: (error as Error).message,
+      });
       Alert.alert('認証に失敗しました', String((error as Error).message));
     } finally {
       setLoading(false);
@@ -76,7 +100,11 @@ export function AuthScreen(): JSX.Element {
    * 呼び出し元: トグルリンク。
    */
   const handleToggleMode = useCallback(() => {
-    setMode((prev) => (prev === 'sign-in' ? 'sign-up' : 'sign-in'));
+    setMode((prev) => {
+      const next = prev === 'sign-in' ? 'sign-up' : 'sign-in';
+      void logEvent('auth_toggle_mode', { from_mode: prev, to_mode: next });
+      return next;
+    });
   }, []);
 
   const disabled = loading || !email.trim() || password.trim().length < 6;
@@ -97,6 +125,7 @@ export function AuthScreen(): JSX.Element {
             value={email}
             onChangeText={setEmail}
             textContentType="emailAddress"
+            onFocus={() => trackInputFocus('email')}
           />
           <TextInput
             autoCapitalize="none"
@@ -108,6 +137,7 @@ export function AuthScreen(): JSX.Element {
             value={password}
             onChangeText={setPassword}
             textContentType="password"
+            onFocus={() => trackInputFocus('password')}
           />
           <Pressable style={[styles.button, disabled && styles.buttonDisabled]} disabled={disabled} onPress={handleSubmit}>
             {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>{headline}</Text>}

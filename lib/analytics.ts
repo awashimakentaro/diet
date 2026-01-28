@@ -27,6 +27,7 @@ const isSupportedPlatform = ['ios', 'android', 'web'].includes(Platform.OS);
 
 let initialized = false;
 let analyticsEnabled = isSupportedPlatform;
+let pendingUserId: string | null = null;
 
 /**
  * Firebase Analytics の利用準備を行う。
@@ -41,6 +42,24 @@ export function initializeAnalytics(): void {
   analyticsEnabled = isSupportedPlatform;
   if (!analyticsEnabled) {
     console.info('Firebase Analytics は現在のプラットフォームで無効化されています');
+    return;
+  }
+}
+
+/**
+ * Firebase Analytics のユーザー ID を更新する。
+ * 呼び出し元: 認証状態が変化したタイミング。
+ * @param userId サインイン済みならユーザー ID、未ログインなら null
+ */
+export async function updateAnalyticsUserId(userId: string | undefined): Promise<void> {
+  pendingUserId = userId;
+  if (!analyticsEnabled) {
+    return;
+  }
+  try {
+    await Analytics.setUserId(userId);
+  } catch (error) {
+    console.warn('Analytics ユーザー ID 設定に失敗しました', error);
   }
 }
 
@@ -70,6 +89,10 @@ async function dispatchAnalytics(eventName: string, params?: Record<string, unkn
     return;
   }
   try {
+    if (pendingUserId !== null) {
+      await Analytics.setUserId(pendingUserId);
+      pendingUserId = null;
+    }
     await Analytics.logEvent(eventName, appendCommonParams(params));
   } catch (error) {
     analyticsEnabled = false;

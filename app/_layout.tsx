@@ -24,7 +24,7 @@ import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { AuthProvider, useAuth } from '@/providers/auth-provider';
 import { AuthScreen } from '@/components/auth-screen';
-import { initializeAnalytics } from '@/lib/analytics';
+import { initializeAnalytics, updateAnalyticsUserId } from '@/lib/analytics';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -48,13 +48,19 @@ export default function RootLayout() {
  * 呼び出し元: RootLayout。
  */
 function RootNavigator(): JSX.Element {
-  const { status } = useAuth();
+  const { status, user } = useAuth();
 
   useEffect(() => {
     if (status === 'signed-in') {
       initializeAnalytics();
     }
-  }, [status]);
+  }, [status, user?.id]);
+
+  useEffect(() => {
+    if (status === 'signed-in') {
+      void updateAnalyticsUserId(user?.id ?? undefined);
+    }
+  }, [status, user?.id]);
 
   if (status === 'checking') {
     return (
