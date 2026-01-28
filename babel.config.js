@@ -32,9 +32,9 @@ module.exports = function createBabelConfig(api) {
       [
         'module-resolver',
         {
-          root: ['./'],
+          root: ['./src'],
           alias: {
-            '@': './',
+            '@': './src',
           },
         },
       ],

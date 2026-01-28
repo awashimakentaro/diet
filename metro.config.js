@@ -32,7 +32,7 @@ const projectRoot = __dirname;
  */
 function normalizeAlias(moduleName) {
   if (moduleName.startsWith('@/')) {
-    return path.join(projectRoot, moduleName.replace(/^@\//, ''));
+    return path.join(projectRoot, 'src', moduleName.replace(/^@\//, ''));
   }
 
   return moduleName;
