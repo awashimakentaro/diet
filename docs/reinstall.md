@@ -58,3 +58,6 @@ open ios/Diet.xcodeproj
 2. Xcode で Release を Run
 
 上記で再インストール完了。
+
+metroサーバー不要でスマホで使いたかったら
+ios/Diet.xcodeproj を Xcode で開き、実機を選択。product - Scheme の edit scheme - Run 設定を開いて Build Configuration を Releasにする。

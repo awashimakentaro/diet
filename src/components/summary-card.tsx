@@ -24,6 +24,7 @@ import { DailySummary } from '@/agents/summary-agent';
 
 export type SummaryCardProps = {
   summary: DailySummary;
+  title?: string;
   actionLabel?: string;
   onPressAction?: () => void;
 };
@@ -33,12 +34,14 @@ export type SummaryCardProps = {
  * 呼び出し元: 各スクリーン。
  * @param props summary 表示に必要な情報
  * @returns JSX.Element
+ * @remarks 副作用は存在しない。
  */
-export function SummaryCard({ summary, actionLabel, onPressAction }: SummaryCardProps) {
+export function SummaryCard({ summary, title, actionLabel, onPressAction }: SummaryCardProps) {
+  const displayTitle = title ?? '本日のサマリー';
   return (
     <View style={styles.card}>
       <View style={styles.headerRow}>
-        <Text style={styles.title}>本日のサマリー</Text>
+        <Text style={styles.title}>{displayTitle}</Text>
         {actionLabel && onPressAction ? (
           <Pressable onPress={onPressAction} accessibilityRole="button">
             <Text style={styles.link}>{actionLabel}</Text>
@@ -66,6 +69,7 @@ type MacroRowProps = {
  * 呼び出し元: SummaryCard。
  * @param props ラベルと数値
  * @returns JSX.Element
+ * @remarks 副作用は存在しない。
  */
 function MacroRow({ label, value, goal, diff }: MacroRowProps) {
   const ratio = goal > 0 ? Math.min(1, Math.max(0, value / goal)) : 0;
@@ -84,6 +88,13 @@ type AnimatedProgressProps = {
   ratio: number;
 };
 
+/**
+ * 進捗バーのアニメーション表示を担う。
+ * 呼び出し元: MacroRow。
+ * @param props ratio 0〜1 の進捗率
+ * @returns JSX.Element
+ * @remarks 副作用: アニメーションの開始。
+ */
 function AnimatedProgress({ ratio }: AnimatedProgressProps) {
   const animated = useRef(new Animated.Value(ratio)).current;
   useEffect(() => {
@@ -106,6 +117,13 @@ type CalorieGraphProps = {
   goal: number;
 };
 
+/**
+ * カロリー進捗のバーと説明文を描画する。
+ * 呼び出し元: SummaryCard。
+ * @param props total 実績値 / goal 目標値
+ * @returns JSX.Element
+ * @remarks 副作用: アニメーションの開始。
+ */
 function CalorieGraph({ total, goal }: CalorieGraphProps) {
   const baseRatio = goal > 0 ? Math.min(1, total / goal) : 0;
   const overflowRatio = goal > 0 ? Math.max(0, total / goal - 1) : 0;

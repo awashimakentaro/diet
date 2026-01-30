@@ -6,6 +6,7 @@
  *
  * 【使用箇所】
  * - RecordScreen
+ * - HistoryScreen
  *
  * 【やらないこと】
  * - サマリー計算

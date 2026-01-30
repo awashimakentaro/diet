@@ -25,6 +25,7 @@ import { HistoryHeader } from './components/history-header';
 import { HistoryMealList } from './components/history-meal-list';
 import { EditMealModal } from './components/edit-meal-modal';
 import { RecordAiAppendModal } from '../record/components/record-ai-append-modal';
+import { RecordSummaryCard } from '../record/components/record-summary-card';
 import { useHistoryScreen } from './use-history-screen';
 
 /**
@@ -34,6 +35,7 @@ import { useHistoryScreen } from './use-history-screen';
 export function HistoryScreen(): JSX.Element {
   const {
     dateKey,
+    summary,
     meals,
     handleSelectDateKey,
     handleOpenEdit,
@@ -96,6 +98,7 @@ export function HistoryScreen(): JSX.Element {
       <HistoryHeader />
       <ScrollView contentContainerStyle={styles.container}>
         <DateNavigator dateKey={dateKey} onOpenPicker={handleOpenDatePicker} />
+        <RecordSummaryCard summary={summary} />
         <HistoryMealList
           meals={meals}
           onEdit={handleOpenEdit}
