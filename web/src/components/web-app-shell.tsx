@@ -17,7 +17,7 @@
  *
  * 【他ファイルとの関係】
  * - 各ページから `currentPath` を受け取り、モバイル版に近い共通フレームとして利用される。
- * - web/src/providers/web-auth-provider.tsx のログアウト処理を利用する。
+ * - web/src/app/provider.tsx のログアウト処理を利用する。
  */
 
 'use client';
@@ -26,7 +26,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { JSX, ReactNode } from 'react';
 
-import { useWebAuth } from '@/providers/web-auth-provider';
+import { useWebAuth } from '@/app/provider';
 
 type WebAppShellProps = {
   currentPath: string;

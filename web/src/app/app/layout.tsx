@@ -15,7 +15,7 @@
  * - タブナビゲーションの描画
  *
  * 【他ファイルとの関係】
- * - web/src/providers/web-auth-provider.tsx の認証状態を参照する。
+ * - web/src/app/provider.tsx の認証状態を参照する。
  * - 未認証時は web/src/app/page.tsx のログイン画面へ遷移させる。
  */
 
@@ -23,7 +23,7 @@ import type { JSX, ReactNode } from 'react';
 import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 
-import { useWebAuth } from '@/providers/web-auth-provider';
+import { useWebAuth } from '@/app/provider';
 
 type AuthenticatedAppLayoutProps = {
   children: ReactNode;
