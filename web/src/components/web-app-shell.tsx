@@ -1,0 +1,74 @@
+/**
+ * web/src/components/web-app-shell.tsx
+ *
+ * 【責務】
+ * Web 版全ページの共通ブランドヘッダーとタブナビゲーションを描画する。
+ *
+ * 【使用箇所】
+ * - web/app/record/page.tsx
+ * - web/app/history/page.tsx
+ * - web/app/foods/page.tsx
+ * - web/app/settings/page.tsx
+ *
+ * 【やらないこと】
+ * - データ取得
+ * - 認証制御
+ * - 個別画面ロジック
+ *
+ * 【他ファイルとの関係】
+ * - 各ページから `currentPath` を受け取り、モバイル版に近い共通フレームとして利用される。
+ */
+
+import Link from 'next/link';
+import type { JSX, ReactNode } from 'react';
+
+type WebAppShellProps = {
+  currentPath: string;
+  children: ReactNode;
+};
+
+const navigationItems = [
+  { href: '/record', label: '記録' },
+  { href: '/history', label: '履歴' },
+  { href: '/foods', label: 'ライブラリ' },
+  { href: '/settings', label: '設定' },
+];
+
+/**
+ * 共通シェルを描画する。
+ * 呼び出し元: Web 版の各 page.tsx。
+ * @param props 現在位置とページ本文
+ * @returns 共通フレーム JSX
+ * @remarks 副作用は存在しない。
+ */
+export function WebAppShell({
+  currentPath,
+  children,
+}: WebAppShellProps): JSX.Element {
+  return (
+    <div className="app-shell">
+      <header className="app-header">
+        <div className="brand-block">
+          <h1>PFC TRACKER</h1>
+          <p>FITNESS ANALYTICS</p>
+        </div>
+      </header>
+      <nav className="tab-nav" aria-label="Primary">
+        <div className="tab-nav__inner">
+          {navigationItems.map((item) => (
+            <Link
+              className={item.href === currentPath ? 'tab-link tab-link--active' : 'tab-link'}
+              href={item.href}
+              key={item.href}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
+      </nav>
+      <main className="main-column">
+        <div className="page-grid">{children}</div>
+      </main>
+    </div>
+  );
+}

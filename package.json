@@ -1,0 +1,20 @@
+{
+  "name": "diet-workspace",
+  "private": true,
+  "scripts": {
+    "start": "npm --prefix mobile run start",
+    "android": "npm --prefix mobile run android",
+    "ios": "npm --prefix mobile run ios",
+    "lint": "npm --prefix mobile run lint",
+    "mobile": "npm --prefix mobile run start",
+    "mobile:start": "npm --prefix mobile run start",
+    "mobile:android": "npm --prefix mobile run android",
+    "mobile:ios": "npm --prefix mobile run ios",
+    "mobile:web": "npm --prefix mobile run web",
+    "mobile:lint": "npm --prefix mobile run lint",
+    "web": "npm --prefix web run dev",
+    "web:dev": "npm --prefix web run dev",
+    "web:build": "npm --prefix web run build",
+    "web:start": "npm --prefix web run start"
+  }
+}
