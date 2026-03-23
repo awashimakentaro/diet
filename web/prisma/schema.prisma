@@ -1,0 +1,30 @@
+/**
+ * web/prisma/schema.prisma
+ *
+ * 【責務】
+ * Web 版で利用する Prisma Client の最小スキーマを定義する。
+ *
+ * 【使用箇所】
+ * - `npm run prisma:generate`
+ *
+ * 【やらないこと】
+ * - Next.js 画面実装
+ * - API ハンドラ実装
+ *
+ * 【他ファイルとの関係】
+ * - Prisma Client の生成元として扱われる。
+ */
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model HealthCheck {
+  id        String   @id @default(cuid())
+  label     String
+  createdAt DateTime @default(now())
+}
