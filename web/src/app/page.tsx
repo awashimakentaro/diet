@@ -2,28 +2,40 @@
  * web/app/page.tsx
  *
  * 【責務】
- * Web 版トップページから記録タブへ誘導する。
+ * Web 版トップページでログイン / サインアップ画面を表示する。
  *
  * 【使用箇所】
  * - `/` ルートで表示される。
  *
  * 【やらないこと】
- * - 記録画面の描画
- * - データ取得
- * - 状態管理
+ * - `/app/*` の認証ガード
+ * - セッション永続化
+ * - 食事データ取得
  *
  * 【他ファイルとの関係】
- * - web/app/record/page.tsx の記録ページへリダイレクトする。
+ * - web/src/components/web-auth-screen.tsx を描画して認証導線を提供する。
  */
 
-import { redirect } from 'next/navigation';
+import type { JSX } from 'react';
+
+import { WebAuthScreen } from '@/components/web-auth-screen';
+
+type HomePageProps = {
+  searchParams?: Promise<{
+    redirect?: string;
+  }>;
+};
 
 /**
- * `/` から `/record` へ遷移させる。
+ * `/` に認証画面を表示する。
  * 呼び出し元: Next.js `/` ルート。
- * @returns 常にリダイレクトを発生させる。
- * @remarks 副作用: ルーティング遷移を発生させる。
+ * @returns 認証画面 JSX
+ * @remarks 副作用は存在しない。
  */
-export default function HomePage(): never {
-  redirect('/record');
+export default async function HomePage({
+  searchParams,
+}: HomePageProps): Promise<JSX.Element> {
+  const resolvedSearchParams = (await searchParams) ?? {};
+
+  return <WebAuthScreen redirectPathCandidate={resolvedSearchParams.redirect ?? null} />;
 }

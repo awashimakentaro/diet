@@ -19,7 +19,8 @@
 import type { Metadata } from 'next';
 import type { JSX, ReactNode } from 'react';
 
-import './globals.css';
+import '@/styles/globals.css';
+import { AppProvider } from '@/app/provider';
 
 export const metadata: Metadata = {
   title: 'Diet Web',
@@ -40,7 +41,9 @@ type RootLayoutProps = {
 export default function RootLayout({ children }: RootLayoutProps): JSX.Element {
   return (
     <html lang="ja">
-      <body>{children}</body>
+      <body>
+        <AppProvider>{children}</AppProvider>
+      </body>
     </html>
   );
 }
