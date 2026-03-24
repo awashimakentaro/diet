@@ -12,8 +12,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const status = isLoading ? "checking" : user ? "signed-in" : "signed-out";
 
-  async function signIn(input: { email: string; password: string }) {
-    await login(input);
+  async function signIn(input: { email: string; password: string }) {//この関数でloginしたい情報をsupabaseに送る
+    await login(input);//これがログインのdataを変えす
     await mutate();
   }
 
@@ -51,3 +51,6 @@ export function useAuth() {
   return context;
 }
 //useAuth() はAuthProvider が共有した user や signIn を取り出すための入口
+
+//{children}にapp/配下のページ全て含まれてる
+export { AuthProvider as AppProvider, useAuth as useWebAuth };

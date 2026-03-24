@@ -16,5 +16,8 @@
     "web:dev": "npm --prefix web run dev",
     "web:build": "npm --prefix web run build",
     "web:start": "npm --prefix web run start"
+  },
+  "dependencies": {
+    "@radix-ui/react-form": "^0.1.8"
   }
 }
