@@ -2,10 +2,11 @@
  * web/src/features/record/record-form-schema.ts
  *
  * 【責務】
- * Record 画面で使うフォームスキーマを Zod で定義する。
+ * Record 画面で使う入力項目と下書き編集項目のフォームスキーマを Zod で定義する。
  *
  * 【使用箇所】
  * - web/src/features/record/use-record-form.ts
+ * - web/src/features/record/use-record-screen.ts
  *
  * 【やらないこと】
  * - フォーム状態管理
@@ -18,11 +19,20 @@
 
 import { z } from 'zod';
 
-export const recordFormSchema = z.object({
-  prompt: z
-    .string()
-    .trim()
-    .min(1, '入力内容を設定してください。'),
+export const recordFoodItemSchema = z.object({
+  name: z.string().trim(),
+  amount: z.string().trim(),
+  kcal: z.string().trim(),
+  protein: z.string().trim(),
+  fat: z.string().trim(),
+  carbs: z.string().trim(),
 });
 
+export const recordFormSchema = z.object({
+  prompt: z.string().trim(),
+  mealName: z.string().trim(),
+  items: z.array(recordFoodItemSchema).min(1),
+});
+
+export type RecordFoodItemValues = z.infer<typeof recordFoodItemSchema>;
 export type RecordFormValues = z.infer<typeof recordFormSchema>;

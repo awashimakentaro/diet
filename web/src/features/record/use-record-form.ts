@@ -2,10 +2,10 @@
  * web/src/features/record/use-record-form.ts
  *
  * 【責務】
- * Record 画面向けの React Hook Form 設定を提供する。
+ * Record 画面向けの React Hook Form 設定と初期下書きを提供する。
  *
  * 【使用箇所】
- * - 今後の web/app/record/page.tsx のフォーム化
+ * - web/src/features/record/use-record-screen.ts
  *
  * 【やらないこと】
  * - UI 描画
@@ -21,6 +21,17 @@ import { useForm, type UseFormReturn } from 'react-hook-form';
 
 import { recordFormSchema, type RecordFormValues } from './record-form-schema';
 
+function createDefaultFoodItem() {
+  return {
+    name: '',
+    amount: '1人前',
+    kcal: '0',
+    protein: '0',
+    fat: '0',
+    carbs: '0',
+  };
+}
+
 /**
  * Record 画面のフォーム設定を返す。
  * 呼び出し元: Record 画面のフォーム UI。
@@ -32,6 +43,8 @@ export function useRecordForm(): UseFormReturn<RecordFormValues> {
     resolver: zodResolver(recordFormSchema),
     defaultValues: {
       prompt: '',
+      mealName: '',
+      items: [createDefaultFoodItem()],
     },
   });
 }
