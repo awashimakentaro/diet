@@ -1,20 +1,26 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, type JSX } from 'react';
+import { useRouter } from 'next/navigation';
 
 import { AuthLayout } from '@/app/auth/components/auth-layout';
 import { LoginForm } from '@/features/auth/components/login-form';
 import { paths } from '@/config/paths';
 
-
-export default function LoginPage(){
+function LoginPageContent(): JSX.Element {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  
 
   return (
     <AuthLayout>
       <LoginForm onSuccess={() => router.replace(paths.app.record.getHref())} />
     </AuthLayout>
+  );
+}
+//LoginPageContent を Suspense の中に入れて、useSearchParams を安全に使えるようにしている
+export default function LoginPage(): JSX.Element {
+  return (
+    <Suspense fallback={null}>
+      <LoginPageContent />
+    </Suspense>
   );
 }

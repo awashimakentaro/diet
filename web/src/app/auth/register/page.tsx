@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense, type JSX } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { AuthLayout } from '@/app/auth/components/auth-layout';
@@ -13,7 +14,7 @@ function normalizeRedirectTo(candidate: string | null): string {
   return candidate;
 }
 
-export default function RegisterPage() {
+function RegisterPageContent(): JSX.Element {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = normalizeRedirectTo(searchParams.get('redirectTo'));
@@ -22,5 +23,13 @@ export default function RegisterPage() {
     <AuthLayout>
       <RegisterForm onSuccess={() => router.replace(redirectTo)} />
     </AuthLayout>
+  );
+}
+//LoginPageContent を Suspense の中に入れて、useSearchParams を安全に使えるようにしている
+export default function RegisterPage(): JSX.Element {
+  return (
+    <Suspense fallback={null}>
+      <RegisterPageContent />
+    </Suspense>
   );
 }
