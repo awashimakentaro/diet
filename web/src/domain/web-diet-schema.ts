@@ -25,6 +25,11 @@ export type WebMacro = {
   carbs: number;
 };
 
+export type WebTopFood = {
+  name: string;
+  count: number;
+};
+
 export type WebMealSource = 'text' | 'image' | 'manual' | 'library';
 
 export interface WebFoodItem {
@@ -45,6 +50,14 @@ export interface WebMeal {
   source: WebMealSource;
   totals: WebMacro;
   items: WebFoodItem[];
+}
+
+export interface WebDailySummary {
+  date: string;
+  totals: WebMacro;
+  mealCount: number;
+  topFoods: WebTopFood[];
+  updatedAt: string;
 }
 
 export interface WebLibraryEntry {

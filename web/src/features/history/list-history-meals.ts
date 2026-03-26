@@ -15,6 +15,7 @@
  *
  * 【他ファイルとの関係】
  * - getSupabaseBrowserClient と map-web-meal-row.ts を利用する。
+ * - prune-old-meals.ts で保持期限超過分を先に削除する。
  */
 
 import type { WebMeal } from '@/domain/web-diet-schema';
@@ -22,8 +23,15 @@ import { getSupabaseBrowserClient } from '@/lib/supabase';
 import { getUtcRangeForDateKey } from '@/lib/web-date';
 
 import { mapWebMealRow } from './map-web-meal-row';
+import { pruneOldMealsForCurrentUser } from './prune-old-meals';
 
 export async function listHistoryMeals(dateKey: string): Promise<WebMeal[]> {
+  try {
+    await pruneOldMealsForCurrentUser();
+  } catch {
+    // Retention cleanup failure should not block history listing.
+  }
+
   const client = getSupabaseBrowserClient();
   const { data: userData, error: userError } = await client.auth.getUser();
 

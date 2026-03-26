@@ -19,9 +19,8 @@
  */
 
 import useSWR from 'swr';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
-import { mockGoal } from '@/data/mock-diet-data';
 import type { WebMeal } from '@/domain/web-diet-schema';
 import type { NutritionSummary } from '@/features/record/components/record-summary-card';
 import { formatDateKey, getTodayKey, parseDateKey } from '@/lib/web-date';
@@ -30,6 +29,9 @@ import { deleteHistoryMeal } from './delete-history-meal';
 import { listHistoryMeals } from './list-history-meals';
 import { saveHistoryMealToFoods } from './save-history-meal-to-foods';
 import { updateHistoryMeal } from './update-history-meal';
+import { buildNutritionSummary } from '../summary/build-nutrition-summary';
+import { listDailySummary } from '../summary/list-daily-summary';
+import { recomputeDailySummaryForDateKey } from '../summary/recompute-daily-summary';
 
 export type UseHistoryScreenResult = {
   meals: WebMeal[];
@@ -81,6 +83,10 @@ export function useHistoryScreen(): UseHistoryScreenResult {
       fallbackData: [],
     },
   );
+  const { data: dailySummary, mutate: mutateDailySummary } = useSWR(
+    `/summary/daily/${selectedDateKey}`,
+    () => listDailySummary(selectedDateKey),
+  );
 
   const meals = useMemo(() => {
     return data ?? [];
@@ -93,57 +99,7 @@ export function useHistoryScreen(): UseHistoryScreenResult {
       weekday: 'short',
     }).format(parseDateKey(selectedDateKey));
   }, [selectedDateKey]);
-  const summary = useMemo(() => {
-    const totals = meals.reduce(
-      (accumulator, meal) => ({
-        kcal: accumulator.kcal + meal.totals.kcal,
-        protein: accumulator.protein + meal.totals.protein,
-        fat: accumulator.fat + meal.totals.fat,
-        carbs: accumulator.carbs + meal.totals.carbs,
-      }),
-      { kcal: 0, protein: 0, fat: 0, carbs: 0 },
-    );
-    const goal = mockGoal.totals;
-    const toProgress = (current: number, target: number): number => {
-      if (target <= 0) {
-        return 0;
-      }
-
-      return Math.min(100, Math.max(0, Math.round((current / target) * 100)));
-    };
-
-    return {
-      kcal: totals.kcal,
-      goalKcal: goal.kcal,
-      leftKcal: goal.kcal - totals.kcal,
-      macros: [
-        {
-          label: 'Protein (P)',
-          current: totals.protein,
-          target: goal.protein,
-          remaining: totals.protein - goal.protein,
-          tone: 'protein' as const,
-          progress: toProgress(totals.protein, goal.protein),
-        },
-        {
-          label: 'Fat (F)',
-          current: totals.fat,
-          target: goal.fat,
-          remaining: totals.fat - goal.fat,
-          tone: 'fat' as const,
-          progress: toProgress(totals.fat, goal.fat),
-        },
-        {
-          label: 'Carbs (C)',
-          current: totals.carbs,
-          target: goal.carbs,
-          remaining: totals.carbs - goal.carbs,
-          tone: 'carbs' as const,
-          progress: toProgress(totals.carbs, goal.carbs),
-        },
-      ],
-    };
-  }, [meals]);
+  const summary = useMemo(() => buildNutritionSummary(dailySummary ?? null), [dailySummary]);
   const editingMeal = useMemo(() => {
     if (editingMealId === null) {
       return null;
@@ -152,9 +108,22 @@ export function useHistoryScreen(): UseHistoryScreenResult {
     return meals.find((meal) => meal.id === editingMealId) ?? null;
   }, [editingMealId, meals]);
 
+  useEffect(() => {
+    if (dailySummary !== null || meals.length === 0) {
+      return;
+    }
+
+    void (async () => {
+      await recomputeDailySummaryForDateKey(selectedDateKey);
+      await mutateDailySummary();
+    })();
+  }, [dailySummary, meals.length, mutateDailySummary, selectedDateKey]);
+
   async function handleDeleteMeal(mealId: string): Promise<void> {
     try {
       await deleteHistoryMeal(mealId);
+      await recomputeDailySummaryForDateKey(selectedDateKey);
+      await mutateDailySummary();
       await mutate();
       setFeedbackMessage('履歴から削除しました。');
       setFeedbackTone('info');
@@ -200,6 +169,8 @@ export function useHistoryScreen(): UseHistoryScreenResult {
         mealName: values.mealName,
         items: values.items,
       });
+      await recomputeDailySummaryForDateKey(selectedDateKey);
+      await mutateDailySummary();
       await mutate();
       setFeedbackMessage('履歴を更新しました。');
       setFeedbackTone('info');

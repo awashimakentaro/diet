@@ -14,44 +14,63 @@
  * - 永続化
  *
  * 【他ファイルとの関係】
- * - web-formatters.ts の表示用関数に依存する。
+ * - web-diet-schema.ts の WebLibraryEntry 型に依存する。
  */
 
-import { ChevronRight } from 'lucide-react';
+import { Bookmark, Pencil, Trash2 } from 'lucide-react';
 import type { JSX } from 'react';
 
 import type { WebLibraryEntry } from '@/domain/web-diet-schema';
-import { formatKcal } from '@/lib/web-formatters';
 
 type FoodLibraryCardProps = {
   entry: WebLibraryEntry;
-  addedAt: string;
+  isSaving: boolean;
   onDelete: (entryId: string) => void;
   onReuse: (entryId: string) => void;
 };
 
 export function FoodLibraryCard({
   entry,
-  addedAt,
+  isSaving,
   onDelete,
   onReuse,
 }: FoodLibraryCardProps): JSX.Element {
   return (
     <article className="foods-screen__card">
       <div className="foods-screen__card-head">
-        <div>
+        <div className="foods-screen__meal-meta">
           <h2>{entry.name}</h2>
-          <p>単品 / {entry.items.length}品</p>
+          <p>
+            P {entry.totals.protein}g
+            <span>•</span>
+            F {entry.totals.fat}g
+            <span>•</span>
+            C {entry.totals.carbs}g
+          </p>
         </div>
-        <time>{addedAt}</time>
+
+        <div className="foods-screen__kcal-box">
+          <strong>{entry.totals.kcal}</strong>
+          <span>kcal</span>
+        </div>
       </div>
 
-      <p className="foods-screen__card-total">
-        基準量: {entry.amount} / <strong>{formatKcal(entry.totals.kcal)}</strong>
-      </p>
+      {entry.items.length > 0 ? (
+        <div className="foods-screen__item-list">
+          {entry.items.slice(0, 3).map((item) => (
+            <div className="foods-screen__item-row" key={item.id}>
+              <span>{item.name}</span>
+              <div>
+                <strong>{item.kcal} kcal</strong>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : null}
 
       <div className="foods-screen__card-actions">
         <button className="foods-screen__action foods-screen__action--edit" type="button">
+          <Pencil size={14} strokeWidth={1.9} />
           編集
         </button>
         <button
@@ -59,15 +78,26 @@ export function FoodLibraryCard({
           onClick={() => onDelete(entry.id)}
           type="button"
         >
+          <Trash2 size={14} strokeWidth={1.9} />
           削除
         </button>
         <button
           className="foods-screen__action foods-screen__action--reuse"
+          disabled={isSaving}
           onClick={() => onReuse(entry.id)}
           type="button"
         >
-          今日食べた
-          <ChevronRight size={14} strokeWidth={2.4} />
+          {isSaving ? (
+            <>
+              <span className="foods-screen__action-spinner" />
+              <span>追加中...</span>
+            </>
+          ) : (
+            <>
+              <Bookmark size={14} strokeWidth={1.9} />
+              <span>今日食べた</span>
+            </>
+          )}
         </button>
       </div>
     </article>

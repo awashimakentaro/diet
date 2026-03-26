@@ -11,7 +11,8 @@
     "check-types": "tsc --project tsconfig.json --pretty --noEmit",
     "storybook": "STORYBOOK_DISABLE_TELEMETRY=1 storybook dev -p 6006",
     "build-storybook": "STORYBOOK_DISABLE_TELEMETRY=1 storybook build",
-    "prisma:generate": "prisma generate"
+    "prisma:generate": "prisma generate --schema ../prisma/schema.prisma",
+    "prisma:validate": "prisma validate --schema ../prisma/schema.prisma"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

@@ -15,10 +15,15 @@
  *
  * 【他ファイルとの関係】
  * - getSupabaseBrowserClient と record-form-schema.ts の型を利用する。
+ * - prune-old-meals.ts を利用して保持期限外履歴を削除する。
+ * - recompute-daily-summary.ts を利用して日次集計を更新する。
  */
 
 import { getSupabaseBrowserClient } from '@/lib/supabase';
+import { getTodayKey } from '@/lib/web-date';
 
+import { pruneOldMealsForCurrentUser } from '../history/prune-old-meals';
+import { recomputeDailySummaryForDateKey } from '../summary/recompute-daily-summary';
 import type { RecordFormValues } from './record-form-schema';
 
 type SaveRecordMealParams = {
@@ -116,5 +121,17 @@ export async function saveRecordMeal({
     if (fallbackError) {
       throw new Error(fallbackError.message);
     }
+  }
+
+  try {
+    await recomputeDailySummaryForDateKey(getTodayKey());
+  } catch {
+    // Summary recompute failure should not block current save.
+  }
+
+  try {
+    await pruneOldMealsForCurrentUser();
+  } catch {
+    // Retention cleanup failure should not block current save.
   }
 }

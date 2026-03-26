@@ -23,6 +23,7 @@ import { useMemo, useState } from 'react';
 
 import type { WebLibraryEntry } from '@/domain/web-diet-schema';
 
+import { createMealFromLibraryEntry } from './create-meal-from-library-entry';
 import { deleteFoodLibraryEntry } from './delete-food-library-entry';
 import { listFoodLibraryEntries } from './list-food-library-entries';
 
@@ -30,6 +31,7 @@ export type UseFoodsScreenResult = {
   visibleEntries: Array<WebLibraryEntry & { addedAt: string }>;
   searchTerm: string;
   feedbackMessage: string | null;
+  savingEntryId: string | null;
   headerCount: number;
   handleSearchChange: (value: string) => void;
   handleAddFood: () => void;
@@ -58,6 +60,7 @@ function includesKeyword(entry: WebLibraryEntry, keyword: string): boolean {
 export function useFoodsScreen(): UseFoodsScreenResult {
   const [searchTerm, setSearchTerm] = useState('');
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+  const [savingEntryId, setSavingEntryId] = useState<string | null>(null);
   const { data, mutate } = useSWR('/foods/library', listFoodLibraryEntries, {
     fallbackData: [],
   });
@@ -97,20 +100,33 @@ export function useFoodsScreen(): UseFoodsScreenResult {
     }
   }
 
-  function handleReuseEntry(entryId: string): void {
+  async function handleReuseEntry(entryId: string): Promise<void> {
     const targetEntry = (data ?? []).find((entry) => entry.id === entryId);
 
     if (!targetEntry) {
       return;
     }
 
-    setFeedbackMessage(`「${targetEntry.name}」を今日の記録候補にしました。`);
+    try {
+      setSavingEntryId(entryId);
+      await createMealFromLibraryEntry(targetEntry);
+      setFeedbackMessage(`「${targetEntry.name}」を履歴へ追加しました。`);
+    } catch (error) {
+      setFeedbackMessage(
+        error instanceof Error
+          ? error.message
+          : '履歴へ追加できませんでした。',
+      );
+    } finally {
+      setSavingEntryId(null);
+    }
   }
 
   return {
     visibleEntries,
     searchTerm,
     feedbackMessage,
+    savingEntryId,
     headerCount: visibleEntries.length,
     handleSearchChange,
     handleAddFood,

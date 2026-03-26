@@ -33,6 +33,7 @@ export function FoodsScreen(): JSX.Element {
     visibleEntries,
     searchTerm,
     feedbackMessage,
+    savingEntryId,
     handleSearchChange,
     handleAddFood,
     handleDeleteEntry,
@@ -63,8 +64,8 @@ export function FoodsScreen(): JSX.Element {
           ) : (
             visibleEntries.map((entry) => (
               <FoodLibraryCard
-                addedAt={entry.addedAt}
                 entry={entry}
+                isSaving={savingEntryId === entry.id}
                 key={entry.id}
                 onDelete={handleDeleteEntry}
                 onReuse={handleReuseEntry}
