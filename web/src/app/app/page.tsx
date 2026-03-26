@@ -2,28 +2,30 @@
  * web/app/app/page.tsx
  *
  * 【責務】
- * `/app` でアクセスされた場合に認証済みの記録ページへ誘導する。
+ * `/app` の Home 画面入口として、ダッシュボード UI を配置する。
  *
  * 【使用箇所】
  * - `http://localhost:3000/app`
  *
  * 【やらないこと】
- * - 画面描画
- * - データ取得
- * - 状態管理
+ * - 詳細な UI 構築
+ * - API 通信
+ * - 認証制御
  *
  * 【他ファイルとの関係】
- * - web/src/app/app/record/page.tsx の記録ページへリダイレクトする。
+ * - web/src/features/home/home-screen.tsx を呼び出す。
  */
 
-import { redirect } from 'next/navigation';
+import type { JSX } from 'react';
+
+import { HomeScreen } from '@/features/home/home-screen';
 
 /**
- * `/app` から `/app/record` へ遷移させる。
+ * Home 画面を描画する。
  * 呼び出し元: Next.js `/app` ルート。
- * @returns 常にリダイレクトを発生させる。
- * @remarks 副作用: ルーティング遷移を発生させる。
+ * @returns Home 画面 JSX
+ * @remarks 副作用は存在しない。
  */
-export default function AppIndexRedirectPage(): never {
-  redirect('/app/record');
+export default function AppHomePage(): JSX.Element {
+  return <HomeScreen />;
 }

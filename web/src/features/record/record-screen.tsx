@@ -4,7 +4,7 @@
  * web/src/features/record/record-screen.tsx
  *
  * 【責務】
- * Record 画面全体のトップバー、サマリー、入力、編集、下部ナビを組み立てる。
+ * Record 画面全体のトップバー、下部入力、ワークスペース、下部ナビを組み立てる。
  *
  * 【使用されるエージェント / 処理フロー】
  * - web/src/app/app/record/page.tsx から呼ばれる。
@@ -27,17 +27,19 @@ import { AppTopBar } from '@/components/app-top-bar';
 
 import { RecordEditorPanel } from './components/record-editor-panel';
 import { RecordQuickInputCard } from './components/record-quick-input-card';
-import { RecordSummaryCard } from './components/record-summary-card';
+import { RecordWorkspacePlaceholder } from './components/record-workspace-placeholder';
 import { useRecordScreen } from './use-record-screen';
 
 export function RecordScreen(): JSX.Element {
   const {
     form,
     itemFields,
-    dailySummary,
+    workspaceMode,
     draftTotals,
     feedbackMessage,
     handleApplyPrompt,
+    handleOpenManualInput,
+    handleCloseManualInput,
     handlePhotoRecord,
     handleAddItem,
     handleRemoveItem,
@@ -48,29 +50,32 @@ export function RecordScreen(): JSX.Element {
     <div className="record-screen">
       <AppTopBar />
 
-      <main className="record-screen__main">
-        <div className="record-screen__sidebar">
-          <RecordSummaryCard summary={dailySummary} />
-
-          <RecordQuickInputCard
-            onApplyPrompt={handleApplyPrompt}
-            onPhotoRecord={handlePhotoRecord}
-            promptRegistration={form.register('prompt')}
-          />
-        </div>
-
+      <main className="record-screen__main record-screen__main--focused">
         <div className="record-screen__workspace">
-          <RecordEditorPanel
-            draftTotals={draftTotals}
-            feedbackMessage={feedbackMessage}
-            form={form}
-            itemFields={itemFields}
-            onAddItem={handleAddItem}
-            onConfirm={handleConfirmDraft}
-            onRemoveItem={handleRemoveItem}
-          />
+          {workspaceMode === 'idle' ? (
+            <RecordWorkspacePlaceholder />
+          ) : (
+            <RecordEditorPanel
+              mode={workspaceMode}
+              draftTotals={draftTotals}
+              feedbackMessage={feedbackMessage}
+              form={form}
+              itemFields={itemFields}
+              onAddItem={handleAddItem}
+              onClose={handleCloseManualInput}
+              onConfirm={handleConfirmDraft}
+              onRemoveItem={handleRemoveItem}
+            />
+          )}
         </div>
       </main>
+
+      <RecordQuickInputCard
+        onApplyPrompt={handleApplyPrompt}
+        onOpenManualInput={handleOpenManualInput}
+        onPhotoRecord={handlePhotoRecord}
+        promptRegistration={form.register('prompt')}
+      />
 
       <AppBottomNav currentPath="/app/record" />
     </div>

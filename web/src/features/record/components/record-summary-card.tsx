@@ -2,11 +2,11 @@
  * web/src/features/record/components/record-summary-card.tsx
  *
  * 【責務】
- * Record 画面上部の PFC サマリーカードを描画する。
+ * Nutrition Status の PFC サマリーカードを描画する。
  *
  * 【使用されるエージェント / 処理フロー】
- * - record-screen.tsx から呼ばれる。
- * - use-record-screen.ts が組み立てたサマリーを受け取る。
+ * - Home 画面などから呼ばれる。
+ * - 呼び出し元が組み立てたサマリーを受け取る。
  *
  * 【やらないこと】
  * - フォーム state 管理
@@ -28,13 +28,15 @@ type MacroSummary = {
   progress: number;
 };
 
+export type NutritionSummary = {
+  kcal: number;
+  goalKcal: number;
+  leftKcal: number;
+  macros: MacroSummary[];
+};
+
 type RecordSummaryCardProps = {
-  summary: {
-    kcal: number;
-    goalKcal: number;
-    leftKcal: number;
-    macros: MacroSummary[];
-  };
+  summary: NutritionSummary;
 };
 
 export function RecordSummaryCard({

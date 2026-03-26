@@ -17,13 +17,14 @@
  * - use-record-screen.ts の state とハンドラに依存する。
  */
 
-import { CheckCircle2, Plus, Salad, Trash2 } from 'lucide-react';
+import { CheckCircle2, Plus, Salad, Trash2, X } from 'lucide-react';
 import type { JSX } from 'react';
 import type { FieldArrayWithId, UseFormReturn } from 'react-hook-form';
 
 import type { RecordFormValues } from '../record-form-schema';
 
 type RecordEditorPanelProps = {
+  mode: 'manual' | 'generated';
   form: UseFormReturn<RecordFormValues>;
   itemFields: FieldArrayWithId<RecordFormValues, 'items', 'id'>[];
   feedbackMessage: string | null;
@@ -34,22 +35,44 @@ type RecordEditorPanelProps = {
     carbs: number;
   };
   onAddItem: () => void;
+  onClose: () => void;
   onRemoveItem: (index: number) => void;
   onConfirm: () => void;
 };
 
 export function RecordEditorPanel({
+  mode,
   form,
   itemFields,
   feedbackMessage,
   draftTotals,
   onAddItem,
+  onClose,
   onRemoveItem,
   onConfirm,
 }: RecordEditorPanelProps): JSX.Element {
+  const title = mode === 'generated' ? '解析結果を確認' : '食事内容を編集';
+  const eyebrow = mode === 'generated' ? 'プロンプト結果' : '手動入力';
+
   return (
     <section className="record-screen__editor-shell">
       <div className="record-screen__editor">
+        <div className="record-screen__editor-topbar">
+          <div>
+            <p className="record-screen__field-label">{eyebrow}</p>
+            <h2 className="record-screen__editor-title">{title}</h2>
+          </div>
+
+          <button
+            aria-label="手動入力パネルを閉じる"
+            className="record-screen__editor-close"
+            onClick={onClose}
+            type="button"
+          >
+            <X size={16} strokeWidth={2.4} />
+          </button>
+        </div>
+
         <div className="record-screen__field-group">
           <label className="record-screen__field-label" htmlFor="meal-name">
             食事の名称

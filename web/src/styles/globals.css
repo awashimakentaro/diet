@@ -612,13 +612,14 @@ input {
 .record-screen__main {
   display: grid;
   gap: 24px;
-  padding: 16px 24px 24px;
+  padding: 16px 24px 220px;
 }
 
 .record-screen__sidebar,
 .record-screen__workspace {
   display: grid;
   gap: 24px;
+  align-items: start;
 }
 
 .record-screen__summary-card,
@@ -630,16 +631,16 @@ input {
 }
 
 .record-screen__summary-card {
+  align-self: start;
+  height: fit-content;
   border-radius: 32px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.1);
-  padding: 24px;
+  padding: 20px;
 }
 
 .record-screen__summary-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 16px;
+  display: grid;
+  gap: 14px;
 }
 
 .record-screen__eyebrow {
@@ -659,22 +660,22 @@ input {
 
 .record-screen__headline strong {
   color: #101828;
-  font-size: 56px;
+  font-size: 44px;
   line-height: 0.95;
   font-weight: 800;
   letter-spacing: -0.08em;
 }
 
 .record-screen__headline span {
-  padding-bottom: 8px;
+  padding-bottom: 6px;
   color: #99a1af;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
 }
 
 .record-screen__left-pill {
-  align-self: flex-start;
-  padding: 10px 12px;
+  justify-self: start;
+  padding: 8px 12px;
   border-radius: 10px;
   background: #eff6ff;
   color: #155dfc;
@@ -685,26 +686,30 @@ input {
 
 .record-screen__macro-list {
   display: grid;
-  gap: 16px;
-  margin-top: 24px;
+  gap: 14px;
+  margin-top: 20px;
 }
 
 .record-screen__macro-row {
   display: grid;
-  gap: 6px;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 18px;
+  background: #f8fafc;
 }
 
 .record-screen__macro-meta {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
-  gap: 16px;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .record-screen__macro-label {
   margin: 0;
   color: #6a7282;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -712,6 +717,7 @@ input {
   display: flex;
   align-items: baseline;
   gap: 4px;
+  margin-left: auto;
 }
 
 .record-screen__macro-values strong {
@@ -735,7 +741,7 @@ input {
 
 .record-screen__track {
   width: 100%;
-  height: 10px;
+  height: 8px;
   border-radius: 999px;
   overflow: hidden;
   background: #f3f4f6;
@@ -759,11 +765,58 @@ input {
 }
 
 .record-screen__quick-card {
+  position: fixed;
+  right: 16px;
+  bottom: 72px;
+  left: 16px;
+  z-index: 30;
   display: grid;
-  gap: 16px;
-  border-radius: 40px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
-  padding: 12px;
+  border: 1px solid rgba(226, 232, 240, 0.92);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+  padding: 14px 14px 12px;
+}
+
+.record-screen__prompt-shell {
+  display: grid;
+  gap: 10px;
+}
+
+.record-screen__attachment-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.record-screen__attachment-chip {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #f2f4f7;
+}
+
+.record-screen__attachment-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.record-screen__attachment-remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.72);
+  color: #ffffff;
 }
 
 .record-screen__prompt-box {
@@ -772,59 +825,173 @@ input {
 
 .record-screen__prompt-input {
   width: 100%;
-  min-height: 96px;
+  min-height: 72px;
   resize: none;
   border: 0;
-  border-radius: 24px;
-  background: #f9fafb;
-  padding: 20px 56px 20px 20px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #f8fafc 0%, #f2f4f7 100%);
+  padding: 16px 18px;
   color: var(--text);
+  font-size: 0.95rem;
+  line-height: 1.45;
 }
 
 .record-screen__prompt-input::placeholder {
-  color: #99a1af;
+  color: #98a2b3;
+  font-weight: 600;
+}
+
+.record-screen__prompt-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.record-screen__prompt-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.record-screen__photo-input {
+  display: none;
+}
+
+.record-screen__prompt-tool {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: #f6f7f9;
+  color: #344054;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.record-screen__prompt-tool svg:first-child {
+  color: #155dfc;
 }
 
 .record-screen__prompt-submit {
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
-  width: 48px;
-  height: 48px;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
   border: 0;
-  border-radius: 16px;
-  background: #e5e7eb;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #155dfc 0%, #0047ff 100%);
   color: #ffffff;
-}
-
-.record-screen__photo-button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  min-height: 50px;
-  border: 0;
-  border-radius: 16px;
-  background: #ecfeff;
-  color: #0092b8;
-  font-size: 12px;
-  font-weight: 800;
 }
 
 .record-screen__editor-shell {
   display: grid;
   gap: 0;
-  border-radius: 48px 48px 0 0;
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12);
+  border-radius: 36px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 32px 70px rgba(15, 23, 42, 0.2);
 }
 
 .record-screen__editor {
   display: grid;
   gap: 32px;
-  border-top-left-radius: 48px;
-  border-top-right-radius: 48px;
+  border-top-left-radius: 36px;
+  border-top-right-radius: 36px;
   padding: 24px 24px 32px;
+}
+
+.record-screen__editor-topbar {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.record-screen__editor-title {
+  margin: 6px 0 0;
+  color: #101828;
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.record-screen__editor-close {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 14px;
+  background: #f8fafc;
+  color: #667085;
+}
+
+.record-screen__workspace-placeholder {
+  display: grid;
+  gap: 20px;
+  padding: 28px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.record-screen__workspace-placeholder-head {
+  display: grid;
+  gap: 10px;
+}
+
+.record-screen__workspace-title {
+  margin: 0;
+  color: #101828;
+  font-size: 1.6rem;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+}
+
+.record-screen__workspace-copy {
+  margin: 0;
+  color: #667085;
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+.record-screen__workspace-guides {
+  display: grid;
+  gap: 14px;
+}
+
+.record-screen__workspace-guide {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 22px;
+  background: #f8fafc;
+  color: #475467;
+}
+
+.record-screen__workspace-guide svg {
+  color: #155dfc;
+  margin-top: 2px;
+}
+
+.record-screen__workspace-guide strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #101828;
+  font-size: 0.98rem;
+  font-weight: 800;
+}
+
+.record-screen__workspace-guide p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
 }
 
 .record-screen__field-group {
@@ -1111,6 +1278,10 @@ input {
 }
 
 @media (max-width: 480px) {
+  .home-screen__main {
+    padding: 16px 16px 112px;
+  }
+
   .record-screen__main {
     padding: 16px 16px 24px;
   }
@@ -1127,9 +1298,188 @@ input {
   }
 }
 
+.home-screen {
+  min-height: 100vh;
+}
+
+.home-screen__main {
+  display: grid;
+  gap: 24px;
+  padding: 16px 24px 112px;
+}
+
+.home-screen__hero-grid,
+.home-screen__grid {
+  display: grid;
+  gap: 24px;
+}
+
+.home-screen__card {
+  display: grid;
+  gap: 20px;
+  padding: 24px;
+  border: 1px solid #f3f4f6;
+  border-radius: 32px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.home-screen__card-head {
+  display: grid;
+  gap: 8px;
+}
+
+.home-screen__eyebrow {
+  margin: 0;
+  color: #99a1af;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.21em;
+  text-transform: uppercase;
+}
+
+.home-screen__section-title {
+  margin: 0;
+  color: #101828;
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+}
+
+.home-screen__streak {
+  display: grid;
+  gap: 6px;
+}
+
+.home-screen__streak strong {
+  color: #155dfc;
+  font-size: 3.2rem;
+  line-height: 0.95;
+  font-weight: 900;
+  letter-spacing: -0.08em;
+}
+
+.home-screen__streak span {
+  color: #667085;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.home-screen__support-copy {
+  margin: 0;
+  color: #667085;
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.home-screen__insight-list {
+  display: grid;
+  gap: 14px;
+}
+
+.home-screen__insight-card {
+  display: grid;
+  gap: 8px;
+  padding: 18px 20px;
+  border-radius: 22px;
+  background: #f8fafc;
+}
+
+.home-screen__insight-card p,
+.home-screen__insight-card span {
+  margin: 0;
+}
+
+.home-screen__insight-card p {
+  color: #667085;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.home-screen__insight-card strong {
+  color: #101828;
+  font-size: 1.18rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.home-screen__insight-card span {
+  color: #475467;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.home-screen__usage-chart {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 12px;
+  align-items: end;
+  min-height: 184px;
+  padding: 8px 4px 0;
+}
+
+.home-screen__usage-bar {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+}
+
+.home-screen__usage-fill {
+  width: 100%;
+  min-height: 24px;
+  border-radius: 999px 999px 16px 16px;
+  background: linear-gradient(180deg, #60a5fa 0%, #155dfc 100%);
+}
+
+.home-screen__usage-bar span {
+  color: #667085;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.home-screen__recent-list {
+  display: grid;
+  gap: 12px;
+}
+
+.home-screen__recent-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  border-radius: 20px;
+  background: #f8fafc;
+}
+
+.home-screen__recent-item strong,
+.home-screen__recent-item p,
+.home-screen__recent-item span {
+  margin: 0;
+}
+
+.home-screen__recent-item strong {
+  display: block;
+  color: #101828;
+  font-size: 0.96rem;
+  font-weight: 800;
+}
+
+.home-screen__recent-item p {
+  margin-top: 6px;
+  color: #667085;
+  font-size: 0.82rem;
+}
+
+.home-screen__recent-item span {
+  color: #101828;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
 .app-bottom-nav {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   align-items: center;
   gap: 2px;
   padding: 8px 16px 10px;
@@ -2082,6 +2432,7 @@ input {
     box-shadow: 8px 0 24px rgba(15, 23, 42, 0.04);
   }
 
+  .home-screen,
   .record-screen,
   .foods-screen,
   .history-screen,
@@ -2104,6 +2455,7 @@ input {
     font-size: 10px;
   }
 
+  .home-screen__main,
   .record-screen__main,
   .foods-screen__main,
   .history-screen__main,
@@ -2113,17 +2465,35 @@ input {
     padding: 28px 40px 40px;
   }
 
+  .home-screen,
   .record-screen {
     min-height: 100vh;
     grid-template-rows: auto 1fr;
   }
 
-  .record-screen__main {
-    grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
+  .home-screen__hero-grid {
+    grid-template-columns: minmax(320px, 420px) minmax(320px, 1fr);
     align-items: start;
   }
 
+  .home-screen__grid {
+    grid-template-columns: minmax(320px, 1fr) minmax(440px, 1.1fr);
+    align-items: start;
+  }
+
+  .record-screen__main {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    padding-bottom: 164px;
+  }
+
+  .record-screen__main--focused .record-screen__workspace {
+    width: min(100%, 1040px);
+    margin: 0 auto;
+  }
+
   .record-screen__summary-card,
+  .home-screen__card,
   .record-screen__quick-card,
   .record-screen__editor,
   .record-screen__confirm-bar,
@@ -2136,9 +2506,16 @@ input {
     box-shadow: 0 16px 30px rgba(15, 23, 42, 0.05);
   }
 
-  .record-screen__sidebar {
-    position: sticky;
-    top: 28px;
+  .record-screen__quick-card {
+    right: 40px;
+    bottom: 24px;
+    left: 160px;
+    width: auto;
+    max-width: none;
+  }
+
+  .record-screen__workspace {
+    padding-top: 0;
   }
 
   .app-bottom-nav__item {
@@ -2181,6 +2558,10 @@ input {
   .history-screen__feedback,
   .settings-screen__feedback {
     max-width: 760px;
+  }
+
+  .home-screen__insight-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .foods-screen__list,

@@ -4,7 +4,7 @@
  * web/src/features/record/use-record-screen.ts
  *
  * 【責務】
- * Record 画面のローカル state、フォーム編集、見た目用サマリー計算をまとめる。
+ * Record 画面のローカル state とフォーム編集状態をまとめる。
  *
  * 【使用されるエージェント / 処理フロー】
  * - features/record/record-screen.tsx から呼ばれる。
@@ -28,33 +28,6 @@ import {
   type RecordFormValues,
 } from './record-form-schema';
 import { useRecordForm } from './use-record-form';
-
-type DailyMacroSummary = {
-  label: string;
-  current: number;
-  target: number;
-  remaining: number;
-  tone: 'protein' | 'fat' | 'carbs';
-  progress: number;
-};
-
-type DailySummary = {
-  kcal: number;
-  goalKcal: number;
-  leftKcal: number;
-  macros: DailyMacroSummary[];
-};
-
-const DAILY_SUMMARY: DailySummary = {
-  kcal: 431,
-  goalKcal: 2000,
-  leftKcal: 1569,
-  macros: [
-    { label: 'Protein (P)', current: 49, target: 160, remaining: -111, tone: 'protein', progress: 30.6 },
-    { label: 'Fat (F)', current: 13, target: 55, remaining: -42, tone: 'fat', progress: 23.6 },
-    { label: 'Carbs (C)', current: 37, target: 210, remaining: -173, tone: 'carbs', progress: 17.6 },
-  ],
-};
 
 function createEmptyItem(): RecordFoodItemValues {
   return {
@@ -81,10 +54,12 @@ function buildMealNameFromPrompt(prompt: string): string {
   return compact.length <= 18 ? compact : `${compact.slice(0, 18)}…`;
 }
 
+type WorkspaceMode = 'idle' | 'manual' | 'generated';
+
 export type UseRecordScreenResult = {
   form: ReturnType<typeof useRecordForm>;
   itemFields: ReturnType<typeof useFieldArray<RecordFormValues, 'items'>>['fields'];
-  dailySummary: DailySummary;
+  workspaceMode: WorkspaceMode;
   draftTotals: {
     kcal: number;
     protein: number;
@@ -93,6 +68,8 @@ export type UseRecordScreenResult = {
   };
   feedbackMessage: string | null;
   handleApplyPrompt: () => void;
+  handleOpenManualInput: () => void;
+  handleCloseManualInput: () => void;
   handlePhotoRecord: () => void;
   handleAddItem: () => void;
   handleRemoveItem: (index: number) => void;
@@ -101,6 +78,7 @@ export type UseRecordScreenResult = {
 
 export function useRecordScreen(): UseRecordScreenResult {
   const form = useRecordForm();
+  const [workspaceMode, setWorkspaceMode] = useState<WorkspaceMode>('idle');
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -138,11 +116,22 @@ export function useRecordScreen(): UseRecordScreenResult {
       form.setValue('items.0.name', firstToken);
     }
 
+    setWorkspaceMode('generated');
     setFeedbackMessage('テキスト入力を下書きへ反映しました。');
   }
 
   function handlePhotoRecord(): void {
     setFeedbackMessage('写真記録の導線は次に接続します。');
+  }
+
+  function handleOpenManualInput(): void {
+    setWorkspaceMode('manual');
+    setFeedbackMessage(null);
+  }
+
+  function handleCloseManualInput(): void {
+    setWorkspaceMode('idle');
+    setFeedbackMessage(null);
   }
 
   function handleAddItem(): void {
@@ -166,10 +155,12 @@ export function useRecordScreen(): UseRecordScreenResult {
   return {
     form,
     itemFields: fields,
-    dailySummary: DAILY_SUMMARY,
+    workspaceMode,
     draftTotals,
     feedbackMessage,
     handleApplyPrompt,
+    handleOpenManualInput,
+    handleCloseManualInput,
     handlePhotoRecord,
     handleAddItem,
     handleRemoveItem,
