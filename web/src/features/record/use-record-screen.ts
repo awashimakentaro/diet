@@ -23,10 +23,12 @@
 import { useMemo, useState } from 'react';
 import { useFieldArray, useWatch } from 'react-hook-form';
 
+import { applyRecordAnalysisToForm } from './apply-record-analysis';
 import {
   type RecordFoodItemValues,
   type RecordFormValues,
 } from './record-form-schema';
+import { requestRecordAnalysis } from './request-record-analysis';
 import { useRecordForm } from './use-record-form';
 
 function createEmptyItem(): RecordFoodItemValues {
@@ -60,6 +62,8 @@ export type UseRecordScreenResult = {
   form: ReturnType<typeof useRecordForm>;
   itemFields: ReturnType<typeof useFieldArray<RecordFormValues, 'items'>>['fields'];
   workspaceMode: WorkspaceMode;
+  isAnalyzing: boolean;
+  promptGuideMessage: string | null;
   draftTotals: {
     kcal: number;
     protein: number;
@@ -79,8 +83,9 @@ export type UseRecordScreenResult = {
 export function useRecordScreen(): UseRecordScreenResult {
   const form = useRecordForm();
   const [workspaceMode, setWorkspaceMode] = useState<WorkspaceMode>('idle');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, replace } = useFieldArray({
     control: form.control,
     name: 'items',
   });
@@ -99,7 +104,20 @@ export function useRecordScreen(): UseRecordScreenResult {
     );
   }, [items]);
 
-  function handleApplyPrompt(): void {
+  const promptGuideMessage = useMemo(() => {
+    const hasMeaningfulDraft =
+      workspaceMode !== 'idle'
+      && (form.getValues('mealName').trim().length > 0
+        || (items ?? []).some((item) => item.name.trim().length > 0));
+
+    if (!hasMeaningfulDraft) {
+      return null;
+    }
+
+    return 'さらに食品を追加したい場合は、食材名や料理名を入力して送信すると、いまのカードに候補を追加できます。';
+  }, [form, items, workspaceMode]);
+
+  async function handleApplyPrompt(): Promise<void> {
     const trimmedPrompt = prompt.trim();
 
     if (trimmedPrompt.length === 0) {
@@ -107,21 +125,53 @@ export function useRecordScreen(): UseRecordScreenResult {
       return;
     }
 
-    if (form.getValues('mealName').trim().length === 0) {
-      form.setValue('mealName', buildMealNameFromPrompt(trimmedPrompt));
-    }
+    setIsAnalyzing(true);
 
-    if (form.getValues('items.0.name').trim().length === 0) {
-      const firstToken = trimmedPrompt.split(/[、,\s]+/).filter(Boolean)[0] ?? '';
-      form.setValue('items.0.name', firstToken);
-    }
+    try {
+      const draft = await requestRecordAnalysis({ prompt: trimmedPrompt });
+      const shouldAppend =
+        workspaceMode !== 'idle'
+        && (form.getValues('mealName').trim().length > 0
+          || (items ?? []).some((item) => item.name.trim().length > 0));
 
-    setWorkspaceMode('generated');
-    setFeedbackMessage('テキスト入力を下書きへ反映しました。');
+      applyRecordAnalysisToForm({
+        form,
+        replaceItems: replace,
+        currentItems: shouldAppend ? items ?? [] : [],
+        draft,
+        mode: shouldAppend ? 'append' : 'replace',
+      });
+
+      setWorkspaceMode('generated');
+      setFeedbackMessage(
+        draft.warnings[0]
+          ?? (shouldAppend
+            ? 'AI が推定した食品候補を既存カードへ追加しました。'
+            : 'AI が推定した栄養情報を下書きカードへ反映しました。'),
+      );
+    } catch (error) {
+      if (form.getValues('mealName').trim().length === 0) {
+        form.setValue('mealName', buildMealNameFromPrompt(trimmedPrompt));
+      }
+
+      if (form.getValues('items.0.name').trim().length === 0) {
+        const firstToken = trimmedPrompt.split(/[、,\s]+/).filter(Boolean)[0] ?? '';
+        form.setValue('items.0.name', firstToken);
+      }
+
+      setWorkspaceMode('generated');
+      setFeedbackMessage(
+        error instanceof Error
+          ? error.message
+          : '解析に失敗したため、簡易的な下書きを表示しています。',
+      );
+    } finally {
+      setIsAnalyzing(false);
+    }
   }
 
   function handlePhotoRecord(): void {
-    setFeedbackMessage('写真記録の導線は次に接続します。');
+    setFeedbackMessage(null);
   }
 
   function handleOpenManualInput(): void {
@@ -156,6 +206,8 @@ export function useRecordScreen(): UseRecordScreenResult {
     form,
     itemFields: fields,
     workspaceMode,
+    isAnalyzing,
+    promptGuideMessage,
     draftTotals,
     feedbackMessage,
     handleApplyPrompt,

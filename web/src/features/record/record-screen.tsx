@@ -27,6 +27,7 @@ import { AppTopBar } from '@/components/app-top-bar';
 
 import { RecordEditorPanel } from './components/record-editor-panel';
 import { RecordQuickInputCard } from './components/record-quick-input-card';
+import { RecordWorkspaceLoading } from './components/record-workspace-loading';
 import { RecordWorkspacePlaceholder } from './components/record-workspace-placeholder';
 import { useRecordScreen } from './use-record-screen';
 
@@ -35,6 +36,8 @@ export function RecordScreen(): JSX.Element {
     form,
     itemFields,
     workspaceMode,
+    isAnalyzing,
+    promptGuideMessage,
     draftTotals,
     feedbackMessage,
     handleApplyPrompt,
@@ -45,6 +48,7 @@ export function RecordScreen(): JSX.Element {
     handleRemoveItem,
     handleConfirmDraft,
   } = useRecordScreen();
+  const isWorkspaceLoading = isAnalyzing && workspaceMode === 'idle';
 
   return (
     <div className="record-screen">
@@ -52,30 +56,39 @@ export function RecordScreen(): JSX.Element {
 
       <main className="record-screen__main record-screen__main--focused">
         <div className="record-screen__workspace">
-          {workspaceMode === 'idle' ? (
+          {isWorkspaceLoading ? (
+            <RecordWorkspaceLoading />
+          ) : workspaceMode === 'idle' ? (
             <RecordWorkspacePlaceholder />
           ) : (
             <RecordEditorPanel
               mode={workspaceMode}
               draftTotals={draftTotals}
-              feedbackMessage={feedbackMessage}
               form={form}
+              isAnalyzing={isAnalyzing}
               itemFields={itemFields}
               onAddItem={handleAddItem}
+              onApplyPrompt={handleApplyPrompt}
+              onPhotoRecord={handlePhotoRecord}
               onClose={handleCloseManualInput}
               onConfirm={handleConfirmDraft}
               onRemoveItem={handleRemoveItem}
+              promptRegistration={form.register('prompt')}
             />
           )}
         </div>
       </main>
 
-      <RecordQuickInputCard
-        onApplyPrompt={handleApplyPrompt}
-        onOpenManualInput={handleOpenManualInput}
-        onPhotoRecord={handlePhotoRecord}
-        promptRegistration={form.register('prompt')}
-      />
+      {workspaceMode === 'idle' ? (
+        <RecordQuickInputCard
+          isAnalyzing={isAnalyzing}
+          onApplyPrompt={handleApplyPrompt}
+          onOpenManualInput={handleOpenManualInput}
+          onPhotoRecord={handlePhotoRecord}
+          promptGuideMessage={promptGuideMessage}
+          promptRegistration={form.register('prompt')}
+        />
+      ) : null}
 
       <AppBottomNav currentPath="/app/record" />
     </div>

@@ -21,26 +21,18 @@
  */
 
 import { Camera, ImagePlus, PenLine, Send, X } from 'lucide-react';
-import {
-  useEffect,
-  useId,
-  useState,
-  type ChangeEvent,
-  type JSX,
-} from 'react';
+import { useId, type ChangeEvent, type JSX } from 'react';
 import type { UseFormRegisterReturn } from 'react-hook-form';
+
+import { usePromptAttachments } from '../use-prompt-attachments';
 
 type RecordQuickInputCardProps = {
   promptRegistration: UseFormRegisterReturn;
   onApplyPrompt: () => void;
   onOpenManualInput: () => void;
   onPhotoRecord: () => void;
-};
-
-type PromptAttachment = {
-  id: string;
-  name: string;
-  previewUrl: string;
+  isAnalyzing: boolean;
+  promptGuideMessage: string | null;
 };
 
 export function RecordQuickInputCard({
@@ -48,46 +40,23 @@ export function RecordQuickInputCard({
   onApplyPrompt,
   onOpenManualInput,
   onPhotoRecord,
+  isAnalyzing,
+  promptGuideMessage,
 }: RecordQuickInputCardProps): JSX.Element {
   const fileInputId = useId();
-  const [attachments, setAttachments] = useState<PromptAttachment[]>([]);
-
-  useEffect(() => {
-    return () => {
-      attachments.forEach((attachment) => {
-        URL.revokeObjectURL(attachment.previewUrl);
-      });
-    };
-  }, [attachments]);
+  const cameraInputId = useId();
+  const {
+    attachments,
+    handleAttachmentChange,
+    handleRemoveAttachment,
+  } = usePromptAttachments();
 
   function handlePhotoChange(event: ChangeEvent<HTMLInputElement>): void {
-    const { files } = event.target;
+    const hasAttached = handleAttachmentChange(event);
 
-    if (!files || files.length === 0) {
-      return;
+    if (hasAttached) {
+      onPhotoRecord();
     }
-
-    const nextAttachments = Array.from(files).map((file, index) => ({
-      id: `${file.name}-${file.size}-${index}`,
-      name: file.name,
-      previewUrl: URL.createObjectURL(file),
-    }));
-
-    setAttachments((current) => [...current, ...nextAttachments]);
-    event.target.value = '';
-    onPhotoRecord();
-  }
-
-  function handleRemoveAttachment(attachmentId: string): void {
-    setAttachments((current) => {
-      const target = current.find((attachment) => attachment.id === attachmentId);
-
-      if (target) {
-        URL.revokeObjectURL(target.previewUrl);
-      }
-
-      return current.filter((attachment) => attachment.id !== attachmentId);
-    });
   }
 
   return (
@@ -116,6 +85,13 @@ export function RecordQuickInputCard({
         ) : null}
 
         <div className="record-screen__prompt-box">
+          {promptGuideMessage !== null ? (
+            <div className="record-screen__prompt-guide">
+              <p className="record-screen__prompt-guide-label">追加ガイド</p>
+              <p className="record-screen__prompt-guide-copy">{promptGuideMessage}</p>
+            </div>
+          ) : null}
+
           <textarea
             className="record-screen__prompt-input"
             placeholder="メッセージを入力"
@@ -134,19 +110,24 @@ export function RecordQuickInputCard({
               type="file"
             />
 
+            <input
+              accept="image/*"
+              capture="environment"
+              className="record-screen__photo-input"
+              id={cameraInputId}
+              onChange={handlePhotoChange}
+              type="file"
+            />
+
             <label className="record-screen__prompt-tool" htmlFor={fileInputId}>
               <ImagePlus size={16} strokeWidth={2.1} />
               <span>写真を追加</span>
             </label>
 
-            <button
-              className="record-screen__prompt-tool"
-              onClick={onPhotoRecord}
-              type="button"
-            >
+            <label className="record-screen__prompt-tool" htmlFor={cameraInputId}>
               <Camera size={16} strokeWidth={2.1} />
               <span>カメラ</span>
-            </button>
+            </label>
 
             <button
               className="record-screen__prompt-tool"
@@ -161,6 +142,7 @@ export function RecordQuickInputCard({
           <button
             aria-label="入力内容を反映"
             className="record-screen__prompt-submit"
+            disabled={isAnalyzing}
             onClick={onApplyPrompt}
             type="button"
           >
