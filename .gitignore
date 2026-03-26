@@ -49,3 +49,4 @@ app-example
 /mobile/dist/
 /mobile/web-build/
 /mobile/.dist/
+/web/storybook-static/
