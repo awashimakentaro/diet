@@ -15,7 +15,9 @@
     "web": "npm --prefix web run dev",
     "web:dev": "npm --prefix web run dev",
     "web:build": "npm --prefix web run build",
-    "web:start": "npm --prefix web run start"
+    "web:start": "npm --prefix web run start",
+    "prisma:generate": "npm --prefix web exec prisma generate --schema ../prisma/schema.prisma",
+    "prisma:validate": "npm --prefix web exec prisma validate --schema ../prisma/schema.prisma"
   },
   "dependencies": {
     "@radix-ui/react-form": "^0.1.8"

@@ -1,0 +1,92 @@
+/**
+ * prisma/schema.prisma
+ *
+ * 【責務】
+ * Diet プロジェクト全体で利用する Supabase Postgres 向け Prisma スキーマを定義する。
+ *
+ * 【使用箇所】
+ * - `npm run prisma:generate`
+ * - `npm run prisma:validate`
+ * - 今後の Prisma migrate / db pull / generate
+ *
+ * 【やらないこと】
+ * - Next.js 画面実装
+ * - Expo 画面実装
+ * - API ハンドラ実装
+ *
+ * 【他ファイルとの関係】
+ * - ルート package.json / web/package.json の Prisma スクリプトから参照される。
+ * - mobile/supabase/schema.sql と整合する必要がある。
+ */
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../web/node_modules/.prisma/diet-root-client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Food {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  name      String
+  amount    String
+  calories  Decimal  @db.Decimal
+  protein   Decimal  @db.Decimal
+  fat       Decimal  @db.Decimal
+  carbs     Decimal  @db.Decimal
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  items     Json     @default(dbgenerated("'[]'::jsonb")) @db.JsonB
+
+  @@map("foods")
+}
+
+model Goal {
+  userId    String   @id @map("user_id") @db.Uuid
+  calories  Decimal  @db.Decimal
+  protein   Decimal  @db.Decimal
+  fat       Decimal  @db.Decimal
+  carbs     Decimal  @db.Decimal
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("goals")
+}
+
+model Meal {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId       String   @map("user_id") @db.Uuid
+  originalText String   @map("original_text")
+  foods        Json     @db.JsonB
+  total        Json     @db.JsonB
+  timestamp    DateTime @default(now()) @db.Timestamptz(6)
+  insertedAt   DateTime @default(now()) @map("inserted_at") @db.Timestamptz(6)
+  menuName     String   @map("menu_name")
+
+  @@map("meals")
+}
+
+model DailySummary {
+  userId    String   @map("user_id") @db.Uuid
+  date      DateTime @db.Date
+  kcal      Decimal  @default(0) @db.Decimal
+  protein   Decimal  @default(0) @db.Decimal
+  fat       Decimal  @default(0) @db.Decimal
+  carbs     Decimal  @default(0) @db.Decimal
+  mealCount Int      @default(0) @map("meal_count")
+  topFoods  Json     @default(dbgenerated("'[]'::jsonb")) @map("top_foods") @db.JsonB
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@id([userId, date])
+  @@map("daily_summaries")
+}
+
+model NotificationPreference {
+  userId           String   @id @map("user_id") @db.Uuid
+  notifyAtMidnight Boolean  @default(true) @map("notify_at_midnight")
+  pushToken        String?  @map("push_token")
+  updatedAt        DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("notification_preferences")
+}
