@@ -56,6 +56,15 @@ function buildMealNameFromPrompt(prompt: string): string {
   return compact.length <= 18 ? compact : `${compact.slice(0, 18)}…`;
 }
 
+function getTodayDateKey(): string {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = `${date.getMonth() + 1}`.padStart(2, '0');
+  const day = `${date.getDate()}`.padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+}
+
 type WorkspaceMode = 'idle' | 'manual' | 'generated';
 type FeedbackTone = 'info' | 'error';
 
@@ -230,6 +239,7 @@ export function useRecordScreen(): UseRecordScreenResult {
 
   async function handleConfirmDraft(): Promise<void> {
     const values = {
+      recordedDate: form.getValues('recordedDate'),
       mealName: form.getValues('mealName'),
       items: form.getValues('items'),
     };
@@ -255,6 +265,7 @@ export function useRecordScreen(): UseRecordScreenResult {
       });
 
       form.setValue('prompt', '', { shouldDirty: false });
+      form.setValue('recordedDate', getTodayDateKey(), { shouldDirty: false });
       form.setValue('mealName', '', { shouldDirty: false });
       replace([createEmptyItem()]);
       setDraftOriginalText('');

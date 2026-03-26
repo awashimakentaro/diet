@@ -20,14 +20,14 @@
  */
 
 import { getSupabaseBrowserClient } from '@/lib/supabase';
-import { getTodayKey } from '@/lib/web-date';
+import { parseDateKey } from '@/lib/web-date';
 
 import { pruneOldMealsForCurrentUser } from '../history/prune-old-meals';
 import { recomputeDailySummaryForDateKey } from '../summary/recompute-daily-summary';
 import type { RecordFormValues } from './record-form-schema';
 
 type SaveRecordMealParams = {
-  values: Pick<RecordFormValues, 'mealName' | 'items'>;
+  values: Pick<RecordFormValues, 'recordedDate' | 'mealName' | 'items'>;
   originalText: string;
   source: 'text' | 'manual';
 };
@@ -97,12 +97,14 @@ export async function saveRecordMeal({
 
   const menuName = values.mealName.trim() || items[0]?.name || '名称未設定';
   const totals = buildTotals(items);
+  const recordedTimestamp = parseDateKey(values.recordedDate).toISOString();
   const payload = {
     user_id: userId,
     original_text: originalText.trim(),
     foods: items,
     total: totals,
     menu_name: menuName,
+    timestamp: recordedTimestamp,
     source,
   };
 
@@ -115,6 +117,7 @@ export async function saveRecordMeal({
       foods: items,
       total: totals,
       menu_name: menuName,
+      timestamp: recordedTimestamp,
     };
     const { error: fallbackError } = await client.from('meals').insert(fallbackPayload);
 
@@ -124,7 +127,7 @@ export async function saveRecordMeal({
   }
 
   try {
-    await recomputeDailySummaryForDateKey(getTodayKey());
+    await recomputeDailySummaryForDateKey(values.recordedDate);
   } catch {
     // Summary recompute failure should not block current save.
   }

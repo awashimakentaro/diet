@@ -305,7 +305,7 @@ input {
 }
 
 .three-column-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr)           ;
 }
 
 .macro-card,
@@ -742,14 +742,14 @@ input {
 .record-screen__track {
   width: 100%;
   height: 8px;
-  border-radius: 999px;
+  border-radius: 8px;
   overflow: hidden;
   background: #f3f4f6;
 }
 
 .record-screen__fill {
   height: 100%;
-  border-radius: inherit;
+  border-radius: 8px;
 }
 
 .record-screen__fill--protein {
@@ -1142,6 +1142,19 @@ input {
 .record-screen__mini-field input::placeholder,
 .record-screen__macro-input input::placeholder {
   color: #d1d5dc;
+}
+
+.record-screen__date-input {
+  width: 100%;
+  height: 56px;
+  border: 1px solid #f3f4f6;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05);
+  padding: 0 18px;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 700;
 }
 
 .record-screen__item-stack {
@@ -1689,10 +1702,24 @@ input {
 
 .home-screen__insight-card {
   display: grid;
-  gap: 8px;
-  padding: 18px 20px;
+  gap: 10px;
+  padding: 18px 20px 20px;
+  border: 1px solid #e5e7eb;
   border-radius: 22px;
-  background: #f8fafc;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 250, 252, 0.96) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.home-screen__insight-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.home-screen__insight-dot {
+  display: none;
 }
 
 .home-screen__insight-card p,
@@ -1702,21 +1729,24 @@ input {
 
 .home-screen__insight-card p {
   color: #667085;
-  font-size: 0.84rem;
-  font-weight: 700;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
 
 .home-screen__insight-card strong {
   color: #101828;
-  font-size: 1.18rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  font-size: 1.42rem;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: -0.05em;
 }
 
 .home-screen__insight-card span {
   color: #475467;
-  font-size: 0.9rem;
-  line-height: 1.6;
+  font-size: 0.88rem;
+  line-height: 1.55;
 }
 
 .home-screen__usage-chart {
@@ -1730,15 +1760,21 @@ input {
 
 .home-screen__usage-bar {
   display: grid;
+  grid-template-rows: 136px auto;
   justify-items: center;
   gap: 10px;
 }
 
 .home-screen__usage-fill {
   width: 100%;
-  min-height: 24px;
-  border-radius: 999px 999px 16px 16px;
+  height: 0%;
+  border-radius: 12px 12px 8px 8px;
   background: linear-gradient(180deg, #60a5fa 0%, #155dfc 100%);
+  align-self: end;
+}
+
+.home-screen__usage-fill--empty {
+  background: transparent;
 }
 
 .home-screen__usage-bar span {
@@ -3112,7 +3148,7 @@ input {
   }
 
   .home-screen__insight-list {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);           
   }
 
   .foods-screen__list,

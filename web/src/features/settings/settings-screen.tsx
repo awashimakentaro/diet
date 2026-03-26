@@ -19,6 +19,7 @@
  * - components/settings-* と app-bottom-nav.tsx を利用する。
  */
 
+import { motion, useReducedMotion } from 'framer-motion';
 import type { JSX } from 'react';
 
 import { AppBottomNav } from '@/components/app-bottom-nav';
@@ -31,6 +32,7 @@ import { SettingsProfileCard } from './components/settings-profile-card';
 import { useSettingsScreen } from './use-settings-screen';
 
 export function SettingsScreen(): JSX.Element {
+  const reduceMotion = useReducedMotion();
   const {
     manualTargets,
     profileValues,
@@ -52,49 +54,91 @@ export function SettingsScreen(): JSX.Element {
     handleSaveNotifications,
     handleSignOut,
   } = useSettingsScreen();
+  const sectionTransition = reduceMotion
+    ? { duration: 0 }
+    : { duration: 0.45, ease: 'easeOut' as const };
 
   return (
     <div className="settings-screen">
       <AppTopBar />
 
-      <main className="settings-screen__main">
+      <motion.main
+        animate={{ opacity: 1, y: 0 }}
+        className="settings-screen__main"
+        initial={{ opacity: 0, y: 18 }}
+        transition={sectionTransition}
+      >
         <div className="settings-screen__grid">
-          <div className="settings-screen__primary-column">
-            <SettingsManualTargetCard
-              onChange={handleManualTargetChange}
-              onSubmit={handleManualTargetSubmit}
-              values={manualTargets}
-            />
+          <motion.div
+            animate={{ opacity: 1, y: 0 }}
+            className="settings-screen__primary-column"
+            initial={{ opacity: 0, y: 20 }}
+            transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.06 }}
+          >
+            <motion.div
+              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 14 }}
+              transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.1 }}
+            >
+              <SettingsManualTargetCard
+                onChange={handleManualTargetChange}
+                onSubmit={handleManualTargetSubmit}
+                values={manualTargets}
+              />
+            </motion.div>
 
-            <SettingsProfileCard
-              activityLevel={activityLevel}
-              gender={gender}
-              onActivityChange={handleActivityChange}
-              onGenderChange={handleGenderChange}
-              onRunAutoCalculate={handleRunAutoCalculate}
-              onSaveProfile={handleSaveProfile}
-              onValueChange={handleProfileValueChange}
-              values={profileValues}
-            />
-          </div>
+            <motion.div
+              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 14 }}
+              transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.14 }}
+            >
+              <SettingsProfileCard
+                activityLevel={activityLevel}
+                gender={gender}
+                onActivityChange={handleActivityChange}
+                onGenderChange={handleGenderChange}
+                onRunAutoCalculate={handleRunAutoCalculate}
+                onSaveProfile={handleSaveProfile}
+                onValueChange={handleProfileValueChange}
+                values={profileValues}
+              />
+            </motion.div>
+          </motion.div>
 
-          <div className="settings-screen__secondary-column">
-            <SettingsNotificationCard
-              enabled={notificationsEnabled}
-              onSave={handleSaveNotifications}
-              onSelectReminder={handleReminderSelect}
-              onToggleEnabled={handleToggleNotifications}
-              selectedReminder={selectedReminder}
-            />
+          <motion.div
+            animate={{ opacity: 1, y: 0 }}
+            className="settings-screen__secondary-column"
+            initial={{ opacity: 0, y: 20 }}
+            transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.1 }}
+          >
+            <motion.div
+              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 14 }}
+              transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.14 }}
+            >
+              <SettingsNotificationCard
+                enabled={notificationsEnabled}
+                onSave={handleSaveNotifications}
+                onSelectReminder={handleReminderSelect}
+                onToggleEnabled={handleToggleNotifications}
+                selectedReminder={selectedReminder}
+              />
+            </motion.div>
 
-            <SettingsAccountCard email={accountEmail} onSignOut={handleSignOut} />
+            <motion.div
+              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 14 }}
+              transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.18 }}
+            >
+              <SettingsAccountCard email={accountEmail} onSignOut={handleSignOut} />
+            </motion.div>
 
             {feedbackMessage !== null ? (
               <p className="settings-screen__feedback">{feedbackMessage}</p>
             ) : null}
-          </div>
+          </motion.div>
         </div>
-      </main>
+      </motion.main>
 
       <AppBottomNav currentPath="/app/settings" />
     </div>

@@ -20,6 +20,7 @@
  * - use-record-screen.ts に依存する。
  */
 
+import { motion, useReducedMotion } from 'framer-motion';
 import type { JSX } from 'react';
 
 import { AppBottomNav } from '@/components/app-bottom-nav';
@@ -32,6 +33,7 @@ import { RecordWorkspacePlaceholder } from './components/record-workspace-placeh
 import { useRecordScreen } from './use-record-screen';
 
 export function RecordScreen(): JSX.Element {
+  const reduceMotion = useReducedMotion();
   const {
     form,
     itemFields,
@@ -51,13 +53,26 @@ export function RecordScreen(): JSX.Element {
     handleConfirmDraft,
   } = useRecordScreen();
   const isWorkspaceLoading = isAnalyzing && workspaceMode === 'idle';
+  const sectionTransition = reduceMotion
+    ? { duration: 0 }
+    : { duration: 0.45, ease: 'easeOut' as const };
 
   return (
     <div className="record-screen">
       <AppTopBar />
 
-      <main className="record-screen__main record-screen__main--focused">
-        <div className="record-screen__workspace">
+      <motion.main
+        animate={{ opacity: 1, y: 0 }}
+        className="record-screen__main record-screen__main--focused"
+        initial={{ opacity: 0, y: 18 }}
+        transition={sectionTransition}
+      >
+        <motion.div
+          animate={{ opacity: 1, y: 0 }}
+          className="record-screen__workspace"
+          initial={{ opacity: 0, y: 24 }}
+          transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.08 }}
+        >
           {isWorkspaceLoading ? (
             <RecordWorkspaceLoading />
           ) : workspaceMode === 'idle' ? (
@@ -81,18 +96,24 @@ export function RecordScreen(): JSX.Element {
               promptRegistration={form.register('prompt')}
             />
           )}
-        </div>
-      </main>
+        </motion.div>
+      </motion.main>
 
       {workspaceMode === 'idle' ? (
-        <RecordQuickInputCard
-          isAnalyzing={isAnalyzing}
-          onApplyPrompt={handleApplyPrompt}
-          onOpenManualInput={handleOpenManualInput}
-          onPhotoRecord={handlePhotoRecord}
-          promptGuideMessage={promptGuideMessage}
-          promptRegistration={form.register('prompt')}
-        />
+        <motion.div
+          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 18 }}
+          transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.12 }}
+        >
+          <RecordQuickInputCard
+            isAnalyzing={isAnalyzing}
+            onApplyPrompt={handleApplyPrompt}
+            onOpenManualInput={handleOpenManualInput}
+            onPhotoRecord={handlePhotoRecord}
+            promptGuideMessage={promptGuideMessage}
+            promptRegistration={form.register('prompt')}
+          />
+        </motion.div>
       ) : null}
 
       <AppBottomNav currentPath="/app/record" />

@@ -25,13 +25,13 @@ import { useEffect } from 'react';
 import { mockGoal } from '@/data/mock-diet-data';
 import type { WebDailySummary } from '@/domain/web-diet-schema';
 import type { NutritionSummary } from '@/features/record/components/record-summary-card';
-import { getTodayKey, parseDateKey } from '@/lib/web-date';
+import { formatDateKey, getTodayKey, parseDateKey } from '@/lib/web-date';
 
 import { buildNutritionSummary } from '../summary/build-nutrition-summary';
 import { listDailySummary } from '../summary/list-daily-summary';
-import { listRecentDailySummaries } from '../summary/list-recent-daily-summaries';
 import { listRecentMeals } from '../summary/list-recent-meals';
 import { recomputeRecentDailySummaries } from '../summary/recompute-recent-daily-summaries';
+import { listWeekDailySummaries } from '../summary/list-week-daily-summaries';
 
 type HomeInsight = {
   label: string;
@@ -42,6 +42,7 @@ type HomeInsight = {
 type HomeUsageBar = {
   label: string;
   value: number;
+  hasRecord: boolean;
 };
 
 type HomeRecentMeal = Awaited<ReturnType<typeof listRecentMeals>>[number];
@@ -81,9 +82,10 @@ function getTodayKeyFromDate(date: Date): string {
 
 function buildInsights(
   summaries: WebDailySummary[],
-  todaySummary: WebDailySummary | null,
 ): HomeInsight[] {
-  if (summaries.length === 0) {
+  const recordedSummaries = summaries.filter((summary) => summary.mealCount > 0);
+
+  if (recordedSummaries.length === 0) {
     return [
       {
         label: '平均摂取カロリー',
@@ -91,53 +93,32 @@ function buildInsights(
         description: 'まだ集計対象の履歴がありません。',
       },
       {
-        label: '高たんぱくデー',
-        value: '未記録',
-        description: '履歴を記録すると高たんぱくだった日を表示します。',
-      },
-      {
-        label: 'よく食べた食品',
-        value: '未記録',
-        description: '日次集計から頻出食品をまとめます。',
+        label: '平均たんぱく質',
+        value: '0 g',
+        description: '履歴を記録すると平均値を表示します。',
       },
     ];
   }
 
   const averageKcal = Math.round(
-    summaries.reduce((sum, summary) => sum + summary.totals.kcal, 0) / summaries.length,
+    recordedSummaries.reduce((sum, summary) => sum + summary.totals.kcal, 0)
+      / recordedSummaries.length,
   );
-  const highestProteinDay = [...summaries].sort(
-    (left, right) => right.totals.protein - left.totals.protein,
-  )[0];
-  const topFoodCounts = new Map<string, number>();
-
-  summaries.forEach((summary) => {
-    summary.topFoods.forEach((food) => {
-      topFoodCounts.set(food.name, (topFoodCounts.get(food.name) ?? 0) + food.count);
-    });
-  });
-
-  const mostFrequentFood = [...topFoodCounts.entries()].sort(
-    (left, right) => right[1] - left[1],
-  )[0];
+  const averageProtein = Math.round(
+    (recordedSummaries.reduce((sum, summary) => sum + summary.totals.protein, 0)
+      / recordedSummaries.length) * 10,
+  ) / 10;
 
   return [
     {
       label: '平均摂取カロリー',
       value: `${averageKcal} kcal`,
-      description: `直近 ${summaries.length} 日の平均です。`,
+      description: `記録がある ${recordedSummaries.length} 日分の平均です。`,
     },
     {
-      label: '高たんぱくデー',
-      value: `${highestProteinDay.totals.protein}g`,
-      description: `${formatSummaryDate(highestProteinDay.date)} が最も高たんぱくでした。`,
-    },
-    {
-      label: 'よく食べた食品',
-      value: mostFrequentFood?.[0] ?? '未記録',
-      description: todaySummary?.topFoods[0]
-        ? `今日は ${todaySummary.topFoods[0].name} を中心に記録しています。`
-        : '直近の記録から頻出食品を表示します。',
+      label: '平均たんぱく質',
+      value: `${averageProtein} g`,
+      description: `記録がある ${recordedSummaries.length} 日分の平均です。`,
     },
   ];
 }
@@ -145,32 +126,87 @@ function buildInsights(
 function buildUsageBars(summaries: WebDailySummary[]): HomeUsageBar[] {
   return summaries.map((summary) => {
     const date = parseDateKey(summary.date);
+    const kcalCeiling = 3000;
+    const normalizedValue = Math.min(
+      100,
+      Math.max(0, Math.round((summary.totals.kcal / kcalCeiling) * 100)),
+    );
 
     return {
       label: new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(date),
-      value: mockGoal.totals.kcal <= 0
-        ? 0
-        : Math.min(100, Math.round((summary.totals.kcal / mockGoal.totals.kcal) * 100)),
+      value: normalizedValue,
+      hasRecord: summary.mealCount > 0,
     };
   });
 }
 
-function formatSummaryDate(dateKey: string): string {
-  return new Intl.DateTimeFormat('ja-JP', {
-    month: 'numeric',
-    day: 'numeric',
-  }).format(parseDateKey(dateKey));
+function getCurrentWeekRange(today: Date): { startDateKey: string; endDateKey: string } {
+  const start = new Date(today);
+  const day = start.getDay();
+  const offsetFromMonday = day === 0 ? 6 : day - 1;
+  start.setDate(start.getDate() - offsetFromMonday);
+
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+
+  return {
+    startDateKey: formatDateKey(start),
+    endDateKey: formatDateKey(end),
+  };
+}
+
+function buildWeekDateKeys(today: Date): string[] {
+  const { startDateKey } = getCurrentWeekRange(today);
+  const start = parseDateKey(startDateKey);
+
+  return Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(start);
+    date.setDate(start.getDate() + index);
+    return formatDateKey(date);
+  });
+}
+
+function normalizeWeekSummaries(
+  summaries: WebDailySummary[],
+  weekDateKeys: string[],
+): WebDailySummary[] {
+  const summariesByDate = new Map(
+    summaries.map((summary) => [summary.date, summary] as const),
+  );
+
+  return weekDateKeys.map((dateKey) => {
+    const existingSummary = summariesByDate.get(dateKey);
+
+    if (existingSummary) {
+      return existingSummary;
+    }
+
+    return {
+      date: dateKey,
+      totals: {
+        kcal: 0,
+        protein: 0,
+        fat: 0,
+        carbs: 0,
+      },
+      mealCount: 0,
+      topFoods: [],
+      updatedAt: '',
+    };
+  });
 }
 
 export function useHomeScreen(): UseHomeScreenResult {
   const todayKey = getTodayKey();
+  const weekRange = getCurrentWeekRange(new Date());
+  const weekDateKeys = buildWeekDateKeys(new Date());
   const { data: todaySummary, mutate: mutateTodaySummary } = useSWR(
     `/summary/daily/${todayKey}`,
     () => listDailySummary(todayKey),
   );
-  const { data: recentSummaries = [], mutate: mutateRecentSummaries } = useSWR(
-    '/summary/daily/recent/7',
-    () => listRecentDailySummaries(7),
+  const { data: weeklySummaries = [], mutate: mutateWeeklySummaries } = useSWR(
+    `/summary/daily/week/${weekRange.startDateKey}-${weekRange.endDateKey}`,
+    () => listWeekDailySummaries(weekRange),
     {
       fallbackData: [],
     },
@@ -184,27 +220,32 @@ export function useHomeScreen(): UseHomeScreenResult {
   );
 
   useEffect(() => {
-    if (recentMeals.length === 0 || recentSummaries.length > 0) {
+    if (recentMeals.length === 0 || weeklySummaries.length > 0) {
       return;
     }
 
     void (async () => {
       await recomputeRecentDailySummaries(7);
-      await mutateRecentSummaries();
+      await mutateWeeklySummaries();
       await mutateTodaySummary();
     })();
   }, [
-    mutateRecentSummaries,
+    mutateWeeklySummaries,
     mutateTodaySummary,
     recentMeals.length,
-    recentSummaries.length,
+    weeklySummaries.length,
   ]);
+
+  const normalizedWeeklySummaries = normalizeWeekSummaries(
+    weeklySummaries,
+    weekDateKeys,
+  );
 
   return {
     summary: buildNutritionSummary(todaySummary ?? null),
-    consecutiveDays: buildConsecutiveDays(recentSummaries),
-    insights: buildInsights(recentSummaries, todaySummary ?? null),
-    usageBars: buildUsageBars(recentSummaries),
+    consecutiveDays: buildConsecutiveDays(weeklySummaries),
+    insights: buildInsights(weeklySummaries),
+    usageBars: buildUsageBars(normalizedWeeklySummaries),
     recentMeals,
   };
 }

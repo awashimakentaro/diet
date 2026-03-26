@@ -21,6 +21,7 @@
  */
 
 import type { JSX } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 
 import { AppBottomNav } from '@/components/app-bottom-nav';
 import { AppTopBar } from '@/components/app-top-bar';
@@ -30,16 +31,36 @@ import { useHomeScreen } from './use-home-screen';
 
 export function HomeScreen(): JSX.Element {
   const { summary, consecutiveDays, insights, usageBars, recentMeals } = useHomeScreen();
+  const chartHeight = 136;
+  const reduceMotion = useReducedMotion();
+  const sectionTransition = reduceMotion
+    ? { duration: 0 }
+    : { duration: 0.55, ease: 'easeOut' as const };
 
   return (
     <div className="home-screen">
       <AppTopBar />
 
-      <main className="home-screen__main">
-        <section className="home-screen__hero-grid">
+      <motion.main
+        animate={{ opacity: 1, y: 0 }}
+        className="home-screen__main"
+        initial={{ opacity: 0, y: 14 }}
+        transition={sectionTransition}
+      >
+        <motion.section
+          animate={{ opacity: 1, y: 0 }}
+          className="home-screen__hero-grid"
+          initial={{ opacity: 0, y: 18 }}
+          transition={sectionTransition}
+        >
           <RecordSummaryCard summary={summary} />
 
-          <section className="home-screen__card">
+          <motion.section
+            animate={{ opacity: 1, y: 0 }}
+            className="home-screen__card"
+            initial={{ opacity: 0, y: 20 }}
+            transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.08 }}
+          >
             <div className="home-screen__card-head">
               <p className="home-screen__eyebrow">Consistency</p>
               <h2 className="home-screen__section-title">継続利用</h2>
@@ -53,11 +74,21 @@ export function HomeScreen(): JSX.Element {
             <p className="home-screen__support-copy">
               連続して記録できています。今日も入力を続けて、日々の推移を安定して残しましょう。
             </p>
-          </section>
-        </section>
+          </motion.section>
+        </motion.section>
 
-        <section className="home-screen__grid">
-          <section className="home-screen__card">
+        <motion.section
+          animate={{ opacity: 1, y: 0 }}
+          className="home-screen__grid"
+          initial={{ opacity: 0, y: 18 }}
+          transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.12 }}
+        >
+          <motion.section
+            animate={{ opacity: 1, y: 0 }}
+            className="home-screen__card"
+            initial={{ opacity: 0, y: 20 }}
+            transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.16 }}
+          >
             <div className="home-screen__card-head">
               <p className="home-screen__eyebrow">Insights</p>
               <h2 className="home-screen__section-title">分析結果</h2>
@@ -65,16 +96,30 @@ export function HomeScreen(): JSX.Element {
 
             <div className="home-screen__insight-list">
               {insights.map((insight) => (
-                <article className="home-screen__insight-card" key={insight.label}>
-                  <p>{insight.label}</p>
+                <motion.article
+                  animate={{ opacity: 1, y: 0 }}
+                  className="home-screen__insight-card"
+                  initial={{ opacity: 0, y: 14 }}
+                  key={insight.label}
+                  transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.22 }}
+                >
+                  <div className="home-screen__insight-label-row">
+                    <p>{insight.label}</p>
+                    <span className="home-screen__insight-dot" />
+                  </div>
                   <strong>{insight.value}</strong>
                   <span>{insight.description}</span>
-                </article>
+                </motion.article>
               ))}
             </div>
-          </section>
+          </motion.section>
 
-          <section className="home-screen__card">
+          <motion.section
+            animate={{ opacity: 1, y: 0 }}
+            className="home-screen__card"
+            initial={{ opacity: 0, y: 20 }}
+            transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.2 }}
+          >
             <div className="home-screen__card-head">
               <p className="home-screen__eyebrow">Activity</p>
               <h2 className="home-screen__section-title">最近の利用状況</h2>
@@ -83,9 +128,19 @@ export function HomeScreen(): JSX.Element {
             <div className="home-screen__usage-chart">
               {usageBars.map((bar) => (
                 <div className="home-screen__usage-bar" key={bar.label}>
-                  <div
-                    className="home-screen__usage-fill"
-                    style={{ height: `${bar.value}%` }}
+                  <motion.div
+                    className={bar.hasRecord ? 'home-screen__usage-fill' : 'home-screen__usage-fill home-screen__usage-fill--empty'}
+                    initial={{ height: 0 }}
+                    animate={{
+                      height: bar.hasRecord
+                        ? Math.max(8, Math.round((bar.value / 100) * chartHeight))
+                        : 0,
+                    }}
+                    transition={
+                      reduceMotion
+                        ? { duration: 0 }
+                        : { duration: 0.8, ease: 'easeOut' as const }
+                    }
                   />
                   <span>{bar.label}</span>
                 </div>
@@ -94,18 +149,24 @@ export function HomeScreen(): JSX.Element {
 
             <div className="home-screen__recent-list">
               {recentMeals.map((meal) => (
-                <article className="home-screen__recent-item" key={meal.id}>
+                <motion.article
+                  animate={{ opacity: 1, y: 0 }}
+                  className="home-screen__recent-item"
+                  initial={{ opacity: 0, y: 12 }}
+                  key={meal.id}
+                  transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.26 }}
+                >
                   <div>
                     <strong>{meal.name}</strong>
                     <p>{meal.time}</p>
                   </div>
                   <span>{meal.kcal} kcal</span>
-                </article>
+                </motion.article>
               ))}
             </div>
-          </section>
-        </section>
-      </main>
+          </motion.section>
+        </motion.section>
+      </motion.main>
 
       <AppBottomNav currentPath="/app" />
     </div>

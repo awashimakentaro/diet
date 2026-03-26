@@ -36,7 +36,6 @@ function buildMacroSummary(
     label,
     current,
     target,
-    remaining: current - target,
     tone,
     progress,
   };
@@ -55,7 +54,6 @@ export function buildNutritionSummary(
   return {
     kcal: totals.kcal,
     goalKcal: mockGoal.totals.kcal,
-    leftKcal: mockGoal.totals.kcal - totals.kcal,
     macros: [
       buildMacroSummary(
         'Protein (P)',

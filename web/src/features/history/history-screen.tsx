@@ -19,6 +19,7 @@
  * - components/history-* と app-bottom-nav.tsx を利用する。
  */
 
+import { motion, useReducedMotion } from 'framer-motion';
 import type { JSX } from 'react';
 
 import { AppBottomNav } from '@/components/app-bottom-nav';
@@ -31,6 +32,7 @@ import { HistoryMealEditorPanel } from './components/history-meal-editor-panel';
 import { useHistoryScreen } from './use-history-screen';
 
 export function HistoryScreen(): JSX.Element {
+  const reduceMotion = useReducedMotion();
   const {
     meals,
     summary,
@@ -51,25 +53,49 @@ export function HistoryScreen(): JSX.Element {
     handleUpdateMeal,
     handleSaveMeal,
   } = useHistoryScreen();
+  const sectionTransition = reduceMotion
+    ? { duration: 0 }
+    : { duration: 0.45, ease: 'easeOut' as const };
 
   return (
     <div className="history-screen">
       <AppTopBar />
 
-      <main className="history-screen__main">
+      <motion.main
+        animate={{ opacity: 1, y: 0 }}
+        className="history-screen__main"
+        initial={{ opacity: 0, y: 18 }}
+        transition={sectionTransition}
+      >
         <div className="history-screen__layout">
-          <aside className="history-screen__summary-pane">
+          <motion.aside
+            animate={{ opacity: 1, y: 0 }}
+            className="history-screen__summary-pane"
+            initial={{ opacity: 0, y: 20 }}
+            transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.06 }}
+          >
             <RecordSummaryCard summary={summary} />
-          </aside>
+          </motion.aside>
 
-          <section className="history-screen__content-pane">
-            <HistoryDateChip
-              onSelectDate={handleSelectDateKey}
-              onSelectToday={handleSelectToday}
-              onShiftDate={handleShiftDate}
-              selectedDateLabel={selectedDateLabel}
-              selectedDateValue={selectedDateValue}
-            />
+          <motion.section
+            animate={{ opacity: 1, y: 0 }}
+            className="history-screen__content-pane"
+            initial={{ opacity: 0, y: 24 }}
+            transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.1 }}
+          >
+            <motion.div
+              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 14 }}
+              transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.14 }}
+            >
+              <HistoryDateChip
+                onSelectDate={handleSelectDateKey}
+                onSelectToday={handleSelectToday}
+                onShiftDate={handleShiftDate}
+                selectedDateLabel={selectedDateLabel}
+                selectedDateValue={selectedDateValue}
+              />
+            </motion.div>
 
             {feedbackMessage !== null ? (
               <p className={feedbackTone === 'error' ? 'history-screen__feedback history-screen__feedback--error' : 'history-screen__feedback'}>
@@ -78,21 +104,30 @@ export function HistoryScreen(): JSX.Element {
             ) : null}
 
             <section className="history-screen__list">
-              {meals.map((meal) => (
-                <HistoryEntryCard
+              {meals.map((meal, index) => (
+                <motion.div
+                  animate={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, y: 18 }}
                   key={meal.id}
-                  isSaved={savedMealIds.includes(meal.id)}
-                  isSaving={savingMealId === meal.id}
-                  meal={meal}
-                  onEdit={handleOpenEditMeal}
-                  onDelete={handleDeleteMeal}
-                  onSave={handleSaveMeal}
-                />
+                  transition={{
+                    ...sectionTransition,
+                    delay: reduceMotion ? 0 : 0.18 + index * 0.03,
+                  }}
+                >
+                  <HistoryEntryCard
+                    isSaved={savedMealIds.includes(meal.id)}
+                    isSaving={savingMealId === meal.id}
+                    meal={meal}
+                    onEdit={handleOpenEditMeal}
+                    onDelete={handleDeleteMeal}
+                    onSave={handleSaveMeal}
+                  />
+                </motion.div>
               ))}
             </section>
-          </section>
+          </motion.section>
         </div>
-      </main>
+      </motion.main>
 
       {editingMeal !== null ? (
         <HistoryMealEditorPanel

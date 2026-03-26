@@ -109,6 +109,18 @@ export function RecordEditorPanel({
           </div>
 
           <div className="record-screen__field-group">
+            <label className="record-screen__field-label" htmlFor="recorded-date">
+              記録する日付
+            </label>
+            <input
+              className="record-screen__date-input"
+              id="recorded-date"
+              type="date"
+              {...form.register('recordedDate')}
+            />
+          </div>
+
+          <div className="record-screen__field-group">
             <label className="record-screen__field-label">内訳の詳細</label>
 
             {hasSummary ? (

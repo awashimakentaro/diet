@@ -30,6 +30,7 @@ export const recordFoodItemSchema = z.object({
 
 export const recordFormSchema = z.object({
   prompt: z.string().trim(),
+  recordedDate: z.string().trim().min(1),
   mealName: z.string().trim(),
   items: z.array(recordFoodItemSchema).min(1),
 });

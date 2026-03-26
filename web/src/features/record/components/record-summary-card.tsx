@@ -17,13 +17,13 @@
  * - use-record-screen.ts の DailySummary 構造に依存する。
  */
 
+import { motion, useReducedMotion } from 'framer-motion';
 import type { JSX } from 'react';
 
 type MacroSummary = {
   label: string;
   current: number;
   target: number;
-  remaining: number;
   tone: 'protein' | 'fat' | 'carbs';
   progress: number;
 };
@@ -31,7 +31,6 @@ type MacroSummary = {
 export type NutritionSummary = {
   kcal: number;
   goalKcal: number;
-  leftKcal: number;
   macros: MacroSummary[];
 };
 
@@ -42,8 +41,19 @@ type RecordSummaryCardProps = {
 export function RecordSummaryCard({
   summary,
 }: RecordSummaryCardProps): JSX.Element {
+  const reduceMotion = useReducedMotion();
+
   return (
-    <section className="record-screen__summary-card">
+    <motion.section
+      animate={{ opacity: 1, y: 0 }}
+      className="record-screen__summary-card"
+      initial={{ opacity: 0, y: 16 }}
+      transition={
+        reduceMotion
+          ? { duration: 0 }
+          : { duration: 0.55, ease: 'easeOut' as const }
+      }
+    >
       <div className="record-screen__summary-head">
         <div>
           <p className="record-screen__eyebrow">Nutrition Status</p>
@@ -52,7 +62,6 @@ export function RecordSummaryCard({
             <span>/ {summary.goalKcal} kcal</span>
           </div>
         </div>
-        <div className="record-screen__left-pill">LEFT: {summary.leftKcal}</div>
       </div>
 
       <div className="record-screen__macro-list">
@@ -63,18 +72,23 @@ export function RecordSummaryCard({
               <div className="record-screen__macro-values">
                 <strong>{macro.current}</strong>
                 <span>/ {macro.target}</span>
-                <em>{macro.remaining}</em>
               </div>
             </div>
             <div className="record-screen__track">
-              <div
+              <motion.div
                 className={`record-screen__fill record-screen__fill--${macro.tone}`}
-                style={{ width: `${macro.progress}%` }}
+                initial={{ width: 0 }}
+                animate={{ width: `${macro.progress}%` }}
+                transition={
+                  reduceMotion
+                    ? { duration: 0 }
+                    : { duration: 0.7, ease: 'easeOut' as const }
+                }
               />
             </div>
           </article>
         ))}
       </div>
-    </section>
+    </motion.section>
   );
 }

@@ -2,11 +2,11 @@
  * web/src/features/summary/list-recent-meals.ts
  *
  * 【責務】
- * Home 画面用に直近の meals を少数件取得する。
+ * Home 画面用に今日の meals を少数件取得する。
  *
  * 【使用されるエージェント / 処理フロー】
  * - Home 画面から呼ばれる。
- * - user_id をもとに meals を新しい順で取得する。
+ * - user_id と今日の日付範囲をもとに meals を新しい順で取得する。
  *
  * 【やらないこと】
  * - UI 描画
@@ -18,6 +18,7 @@
  */
 
 import { getSupabaseBrowserClient } from '@/lib/supabase';
+import { getTodayKey, getUtcRangeForDateKey } from '@/lib/web-date';
 
 type HomeRecentMeal = {
   id: string;
@@ -52,10 +53,15 @@ export async function listRecentMeals(limit: number): Promise<HomeRecentMeal[]> 
     return [];
   }
 
+  const todayKey = getTodayKey();
+  const { start, end } = getUtcRangeForDateKey(todayKey);
+
   const { data, error } = await client
     .from('meals')
     .select('id,menu_name,timestamp,total')
     .eq('user_id', userId)
+    .gte('timestamp', start)
+    .lt('timestamp', end)
     .order('timestamp', { ascending: false })
     .limit(limit);
 

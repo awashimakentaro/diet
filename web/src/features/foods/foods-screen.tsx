@@ -19,6 +19,7 @@
  * - components/foods-* と app-bottom-nav.tsx を利用する。
  */
 
+import { motion, useReducedMotion } from 'framer-motion';
 import type { JSX } from 'react';
 
 import { AppBottomNav } from '@/components/app-bottom-nav';
@@ -29,6 +30,7 @@ import { FoodsSearchBar } from './components/foods-search-bar';
 import { useFoodsScreen } from './use-foods-screen';
 
 export function FoodsScreen(): JSX.Element {
+  const reduceMotion = useReducedMotion();
   const {
     visibleEntries,
     searchTerm,
@@ -39,17 +41,31 @@ export function FoodsScreen(): JSX.Element {
     handleDeleteEntry,
     handleReuseEntry,
   } = useFoodsScreen();
+  const sectionTransition = reduceMotion
+    ? { duration: 0 }
+    : { duration: 0.45, ease: 'easeOut' as const };
 
   return (
     <div className="foods-screen">
       <AppTopBar />
 
-      <main className="foods-screen__main">
-        <FoodsSearchBar
-          onAddFood={handleAddFood}
-          onSearchChange={handleSearchChange}
-          searchTerm={searchTerm}
-        />
+      <motion.main
+        animate={{ opacity: 1, y: 0 }}
+        className="foods-screen__main"
+        initial={{ opacity: 0, y: 18 }}
+        transition={sectionTransition}
+      >
+        <motion.div
+          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 20 }}
+          transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.06 }}
+        >
+          <FoodsSearchBar
+            onAddFood={handleAddFood}
+            onSearchChange={handleSearchChange}
+            searchTerm={searchTerm}
+          />
+        </motion.div>
 
         {feedbackMessage !== null ? (
           <p className="foods-screen__feedback">{feedbackMessage}</p>
@@ -57,23 +73,37 @@ export function FoodsScreen(): JSX.Element {
 
         <section className="foods-screen__list">
           {visibleEntries.length === 0 ? (
-            <div className="foods-screen__empty">
+            <motion.div
+              animate={{ opacity: 1, y: 0 }}
+              className="foods-screen__empty"
+              initial={{ opacity: 0, y: 20 }}
+              transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.1 }}
+            >
               <h2>一致する食品がありません</h2>
               <p>検索語を変えてもう一度試してください。</p>
-            </div>
+            </motion.div>
           ) : (
-            visibleEntries.map((entry) => (
-              <FoodLibraryCard
-                entry={entry}
-                isSaving={savingEntryId === entry.id}
+            visibleEntries.map((entry, index) => (
+              <motion.div
+                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 18 }}
                 key={entry.id}
-                onDelete={handleDeleteEntry}
-                onReuse={handleReuseEntry}
-              />
+                transition={{
+                  ...sectionTransition,
+                  delay: reduceMotion ? 0 : 0.12 + index * 0.03,
+                }}
+              >
+                <FoodLibraryCard
+                  entry={entry}
+                  isSaving={savingEntryId === entry.id}
+                  onDelete={handleDeleteEntry}
+                  onReuse={handleReuseEntry}
+                />
+              </motion.div>
             ))
           )}
         </section>
-      </main>
+      </motion.main>
 
       <AppBottomNav currentPath="/app/foods" />
     </div>
