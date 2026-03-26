@@ -14,39 +14,28 @@
  * - 永続化
  *
  * 【他ファイルとの関係】
- * - web-formatters.ts の表示用関数に依存する。
+ * - web-diet-schema.ts の WebMeal 型に依存する。
  */
 
 import { Bookmark, Pencil, Trash2 } from 'lucide-react';
 import type { JSX } from 'react';
 
 import type { WebMeal } from '@/domain/web-diet-schema';
-import { formatTimeLabel } from '@/lib/web-formatters';
 
 type HistoryEntryCardProps = {
   meal: WebMeal;
+  isSaving: boolean;
+  isSaved: boolean;
+  onEdit: (mealId: string) => void;
   onDelete: (mealId: string) => void;
   onSave: (mealId: string) => void;
 };
 
-function getSourceLabel(source: WebMeal['source']): string {
-  if (source === 'image') {
-    return 'image';
-  }
-
-  if (source === 'manual') {
-    return 'manual';
-  }
-
-  if (source === 'library') {
-    return 'library';
-  }
-
-  return 'text';
-}
-
 export function HistoryEntryCard({
   meal,
+  isSaving,
+  isSaved,
+  onEdit,
   onDelete,
   onSave,
 }: HistoryEntryCardProps): JSX.Element {
@@ -57,9 +46,6 @@ export function HistoryEntryCard({
       <div className="history-screen__card-head">
         <div className="history-screen__meal-meta">
           <h2>{meal.menuName}</h2>
-          <p>
-            {formatTimeLabel(meal.recordedAt)} <span>•</span> {getSourceLabel(meal.source)}
-          </p>
         </div>
         <div className="history-screen__kcal-box">
           <strong>{meal.totals.kcal}</strong>
@@ -67,21 +53,45 @@ export function HistoryEntryCard({
         </div>
       </div>
 
-      <div className="history-screen__item-row">
-        <span>{firstItem?.name ?? meal.menuName}</span>
-        <div>
-          <span>{firstItem?.amount ?? '-'}</span>
-          <strong>{firstItem?.kcal ?? meal.totals.kcal} kcal</strong>
+      <p className="history-screen__macro-line">
+        <span className="history-screen__macro-token">P {meal.totals.protein}g</span>
+        <span className="history-screen__macro-separator">•</span>
+        <span className="history-screen__macro-token">F {meal.totals.fat}g</span>
+        <span className="history-screen__macro-separator">•</span>
+        <span className="history-screen__macro-token">C {meal.totals.carbs}g</span>
+      </p>
+
+      {meal.items.length > 0 ? (
+        <div className="history-screen__item-list">
+          {meal.items.slice(0, 3).map((item) => (
+            <div className="history-screen__item-row" key={item.id}>
+              <span>{item.name}</span>
+              <div>
+                <strong>{item.kcal} kcal</strong>
+              </div>
+            </div>
+          ))}
         </div>
-      </div>
+      ) : (
+        <div className="history-screen__item-row">
+          <span>{firstItem?.name ?? meal.menuName}</span>
+          <div>
+            <strong>{firstItem?.kcal ?? meal.totals.kcal} kcal</strong>
+          </div>
+        </div>
+      )}
 
       <div className="history-screen__actions">
-        <button className="history-screen__action" type="button">
+        <button
+          className="history-screen__action history-screen__action--edit"
+          onClick={() => onEdit(meal.id)}
+          type="button"
+        >
           <Pencil size={14} strokeWidth={1.9} />
           <span>編集</span>
         </button>
         <button
-          className="history-screen__action"
+          className="history-screen__action history-screen__action--delete"
           onClick={() => onDelete(meal.id)}
           type="button"
         >
@@ -90,11 +100,26 @@ export function HistoryEntryCard({
         </button>
         <button
           className="history-screen__action history-screen__action--primary"
+          disabled={isSaving || isSaved}
           onClick={() => onSave(meal.id)}
           type="button"
         >
-          <Bookmark size={14} strokeWidth={1.9} />
-          <span>保存</span>
+          {isSaved ? (
+            <>
+              <Bookmark size={14} strokeWidth={1.9} />
+              <span>保存済み</span>
+            </>
+          ) : isSaving ? (
+            <>
+              <span className="history-screen__action-spinner" />
+              <span>保存中...</span>
+            </>
+          ) : (
+            <>
+              <Bookmark size={14} strokeWidth={1.9} />
+              <span>保存</span>
+            </>
+          )}
         </button>
       </div>
     </article>

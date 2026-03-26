@@ -37,9 +37,11 @@ export function RecordScreen(): JSX.Element {
     itemFields,
     workspaceMode,
     isAnalyzing,
+    isSaving,
     promptGuideMessage,
     draftTotals,
     feedbackMessage,
+    feedbackTone,
     handleApplyPrompt,
     handleOpenManualInput,
     handleCloseManualInput,
@@ -64,8 +66,11 @@ export function RecordScreen(): JSX.Element {
             <RecordEditorPanel
               mode={workspaceMode}
               draftTotals={draftTotals}
+              feedbackMessage={feedbackMessage}
+              feedbackTone={feedbackTone}
               form={form}
               isAnalyzing={isAnalyzing}
+              isSaving={isSaving}
               itemFields={itemFields}
               onAddItem={handleAddItem}
               onApplyPrompt={handleApplyPrompt}

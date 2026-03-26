@@ -4,31 +4,27 @@
  * web/src/features/foods/use-foods-screen.ts
  *
  * 【責務】
- * Foods 画面の検索・ローカル一覧操作 state をまとめる。
+ * Foods 画面の検索・一覧操作 state をまとめる。
  *
  * 【使用されるエージェント / 処理フロー】
  * - foods-screen.tsx から呼ばれる。
- * - mockLibraryEntries をベースに表示用データを整形する。
+ * - foods テーブルの取得結果を検索条件で絞り込み、表示用に整形する。
  *
  * 【やらないこと】
- * - API 通信
- * - 永続化
  * - JSX 描画
  *
  * 【他ファイルとの関係】
- * - web/src/data/mock-diet-data.ts の食品ライブラリデータを利用する。
+ * - list-food-library-entries.ts と delete-food-library-entry.ts を利用する。
  * - components 配下へ state とハンドラを渡す。
  */
 
+import useSWR from 'swr';
 import { useMemo, useState } from 'react';
 
-import { mockLibraryEntries } from '@/data/mock-diet-data';
 import type { WebLibraryEntry } from '@/domain/web-diet-schema';
 
-const MOCK_ADDED_AT: Record<string, string> = {
-  'library-1': '2026/01/27',
-  'library-2': '2026/01/23',
-};
+import { deleteFoodLibraryEntry } from './delete-food-library-entry';
+import { listFoodLibraryEntries } from './list-food-library-entries';
 
 export type UseFoodsScreenResult = {
   visibleEntries: Array<WebLibraryEntry & { addedAt: string }>;
@@ -62,25 +58,22 @@ function includesKeyword(entry: WebLibraryEntry, keyword: string): boolean {
 export function useFoodsScreen(): UseFoodsScreenResult {
   const [searchTerm, setSearchTerm] = useState('');
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
-  const [hiddenEntryIds, setHiddenEntryIds] = useState<string[]>([]);
+  const { data, mutate } = useSWR('/foods/library', listFoodLibraryEntries, {
+    fallbackData: [],
+  });
 
   const visibleEntries = useMemo(() => {
     const keyword = searchTerm.trim().toLowerCase();
+    const entries = data ?? [];
 
-    return mockLibraryEntries
-      .filter((entry) => hiddenEntryIds.includes(entry.id) === false)
-      .filter((entry) => {
+    return entries.filter((entry) => {
         if (keyword.length === 0) {
           return true;
         }
 
         return includesKeyword(entry, keyword);
-      })
-      .map((entry) => ({
-        ...entry,
-        addedAt: MOCK_ADDED_AT[entry.id] ?? '2026/01/27',
-      }));
-  }, [hiddenEntryIds, searchTerm]);
+      });
+  }, [data, searchTerm]);
 
   function handleSearchChange(value: string): void {
     setSearchTerm(value);
@@ -90,13 +83,22 @@ export function useFoodsScreen(): UseFoodsScreenResult {
     setFeedbackMessage('食品追加フォームの接続は次に行います。');
   }
 
-  function handleDeleteEntry(entryId: string): void {
-    setHiddenEntryIds((current) => current.concat(entryId));
-    setFeedbackMessage('食品カードをローカルで非表示にしました。');
+  async function handleDeleteEntry(entryId: string): Promise<void> {
+    try {
+      await deleteFoodLibraryEntry(entryId);
+      await mutate();
+      setFeedbackMessage('食品カードを削除しました。');
+    } catch (error) {
+      setFeedbackMessage(
+        error instanceof Error
+          ? error.message
+          : '食品カードを削除できませんでした。',
+      );
+    }
   }
 
   function handleReuseEntry(entryId: string): void {
-    const targetEntry = mockLibraryEntries.find((entry) => entry.id === entryId);
+    const targetEntry = (data ?? []).find((entry) => entry.id === entryId);
 
     if (!targetEntry) {
       return;

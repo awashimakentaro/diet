@@ -23,17 +23,32 @@ import type { JSX } from 'react';
 
 import { AppBottomNav } from '@/components/app-bottom-nav';
 import { AppTopBar } from '@/components/app-top-bar';
+import { RecordSummaryCard } from '@/features/record/components/record-summary-card';
 
 import { HistoryDateChip } from './components/history-date-chip';
 import { HistoryEntryCard } from './components/history-entry-card';
+import { HistoryMealEditorPanel } from './components/history-meal-editor-panel';
 import { useHistoryScreen } from './use-history-screen';
 
 export function HistoryScreen(): JSX.Element {
   const {
     meals,
+    summary,
+    selectedDateValue,
     selectedDateLabel,
     feedbackMessage,
+    feedbackTone,
+    editingMeal,
+    isSavingEdit,
+    savingMealId,
+    savedMealIds,
+    handleSelectDateKey,
+    handleShiftDate,
+    handleSelectToday,
     handleDeleteMeal,
+    handleOpenEditMeal,
+    handleCloseEditMeal,
+    handleUpdateMeal,
     handleSaveMeal,
   } = useHistoryScreen();
 
@@ -42,23 +57,51 @@ export function HistoryScreen(): JSX.Element {
       <AppTopBar />
 
       <main className="history-screen__main">
-        <HistoryDateChip selectedDateLabel={selectedDateLabel} />
+        <div className="history-screen__layout">
+          <aside className="history-screen__summary-pane">
+            <RecordSummaryCard summary={summary} />
+          </aside>
 
-        {feedbackMessage !== null ? (
-          <p className="history-screen__feedback">{feedbackMessage}</p>
-        ) : null}
-
-        <section className="history-screen__list">
-          {meals.map((meal) => (
-            <HistoryEntryCard
-              key={meal.id}
-              meal={meal}
-              onDelete={handleDeleteMeal}
-              onSave={handleSaveMeal}
+          <section className="history-screen__content-pane">
+            <HistoryDateChip
+              onSelectDate={handleSelectDateKey}
+              onSelectToday={handleSelectToday}
+              onShiftDate={handleShiftDate}
+              selectedDateLabel={selectedDateLabel}
+              selectedDateValue={selectedDateValue}
             />
-          ))}
-        </section>
+
+            {feedbackMessage !== null ? (
+              <p className={feedbackTone === 'error' ? 'history-screen__feedback history-screen__feedback--error' : 'history-screen__feedback'}>
+                {feedbackMessage}
+              </p>
+            ) : null}
+
+            <section className="history-screen__list">
+              {meals.map((meal) => (
+                <HistoryEntryCard
+                  key={meal.id}
+                  isSaved={savedMealIds.includes(meal.id)}
+                  isSaving={savingMealId === meal.id}
+                  meal={meal}
+                  onEdit={handleOpenEditMeal}
+                  onDelete={handleDeleteMeal}
+                  onSave={handleSaveMeal}
+                />
+              ))}
+            </section>
+          </section>
+        </div>
       </main>
+
+      {editingMeal !== null ? (
+        <HistoryMealEditorPanel
+          isSaving={isSavingEdit}
+          meal={editingMeal}
+          onClose={handleCloseEditMeal}
+          onSave={(values) => handleUpdateMeal(editingMeal.id, values)}
+        />
+      ) : null}
 
       <AppBottomNav currentPath="/app/history" />
     </div>

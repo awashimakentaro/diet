@@ -9,10 +9,9 @@
  * 【使用されるエージェント / 処理フロー】
  * - features/record/record-screen.tsx から呼ばれる。
  * - use-record-form.ts の RHF 設定と field array を利用する。
+ * - 解析取得は request-record-analysis.ts、保存は save-record-meal.ts へ委譲する。
  *
  * 【やらないこと】
- * - 永続化
- * - API 通信
  * - JSX 描画
  *
  * 【他ファイルとの関係】
@@ -29,6 +28,7 @@ import {
   type RecordFormValues,
 } from './record-form-schema';
 import { requestRecordAnalysis } from './request-record-analysis';
+import { saveRecordMeal } from './save-record-meal';
 import { useRecordForm } from './use-record-form';
 
 function createEmptyItem(): RecordFoodItemValues {
@@ -57,12 +57,14 @@ function buildMealNameFromPrompt(prompt: string): string {
 }
 
 type WorkspaceMode = 'idle' | 'manual' | 'generated';
+type FeedbackTone = 'info' | 'error';
 
 export type UseRecordScreenResult = {
   form: ReturnType<typeof useRecordForm>;
   itemFields: ReturnType<typeof useFieldArray<RecordFormValues, 'items'>>['fields'];
   workspaceMode: WorkspaceMode;
   isAnalyzing: boolean;
+  isSaving: boolean;
   promptGuideMessage: string | null;
   draftTotals: {
     kcal: number;
@@ -71,6 +73,7 @@ export type UseRecordScreenResult = {
     carbs: number;
   };
   feedbackMessage: string | null;
+  feedbackTone: FeedbackTone;
   handleApplyPrompt: () => void;
   handleOpenManualInput: () => void;
   handleCloseManualInput: () => void;
@@ -84,7 +87,10 @@ export function useRecordScreen(): UseRecordScreenResult {
   const form = useRecordForm();
   const [workspaceMode, setWorkspaceMode] = useState<WorkspaceMode>('idle');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+  const [feedbackTone, setFeedbackTone] = useState<FeedbackTone>('info');
+  const [draftOriginalText, setDraftOriginalText] = useState('');
   const { fields, append, remove, replace } = useFieldArray({
     control: form.control,
     name: 'items',
@@ -122,6 +128,7 @@ export function useRecordScreen(): UseRecordScreenResult {
 
     if (trimmedPrompt.length === 0) {
       setFeedbackMessage('食事内容を入力すると、下の編集欄へ下書きを反映できます。');
+      setFeedbackTone('error');
       return;
     }
 
@@ -141,6 +148,13 @@ export function useRecordScreen(): UseRecordScreenResult {
         draft,
         mode: shouldAppend ? 'append' : 'replace',
       });
+      setDraftOriginalText((current) => {
+        if (shouldAppend && current.trim().length > 0) {
+          return `${current}\n${trimmedPrompt}`;
+        }
+
+        return trimmedPrompt;
+      });
 
       setWorkspaceMode('generated');
       setFeedbackMessage(
@@ -149,6 +163,7 @@ export function useRecordScreen(): UseRecordScreenResult {
             ? 'AI が推定した食品候補を既存カードへ追加しました。'
             : 'AI が推定した栄養情報を下書きカードへ反映しました。'),
       );
+      setFeedbackTone(draft.warnings[0] ? 'error' : 'info');
     } catch (error) {
       if (form.getValues('mealName').trim().length === 0) {
         form.setValue('mealName', buildMealNameFromPrompt(trimmedPrompt));
@@ -158,6 +173,13 @@ export function useRecordScreen(): UseRecordScreenResult {
         const firstToken = trimmedPrompt.split(/[、,\s]+/).filter(Boolean)[0] ?? '';
         form.setValue('items.0.name', firstToken);
       }
+      setDraftOriginalText((current) => {
+        if (current.trim().length > 0) {
+          return `${current}\n${trimmedPrompt}`;
+        }
+
+        return trimmedPrompt;
+      });
 
       setWorkspaceMode('generated');
       setFeedbackMessage(
@@ -165,6 +187,7 @@ export function useRecordScreen(): UseRecordScreenResult {
           ? error.message
           : '解析に失敗したため、簡易的な下書きを表示しています。',
       );
+      setFeedbackTone('error');
     } finally {
       setIsAnalyzing(false);
     }
@@ -172,21 +195,27 @@ export function useRecordScreen(): UseRecordScreenResult {
 
   function handlePhotoRecord(): void {
     setFeedbackMessage(null);
+    setFeedbackTone('info');
   }
 
   function handleOpenManualInput(): void {
     setWorkspaceMode('manual');
+    setDraftOriginalText('');
     setFeedbackMessage(null);
+    setFeedbackTone('info');
   }
 
   function handleCloseManualInput(): void {
     setWorkspaceMode('idle');
+    setDraftOriginalText('');
     setFeedbackMessage(null);
+    setFeedbackTone('info');
   }
 
   function handleAddItem(): void {
     append(createEmptyItem());
     setFeedbackMessage(null);
+    setFeedbackTone('info');
   }
 
   function handleRemoveItem(index: number): void {
@@ -196,10 +225,52 @@ export function useRecordScreen(): UseRecordScreenResult {
 
     remove(index);
     setFeedbackMessage(null);
+    setFeedbackTone('info');
   }
 
-  function handleConfirmDraft(): void {
-    setFeedbackMessage('この内容で確定する準備ができました。保存処理は次に接続します。');
+  async function handleConfirmDraft(): Promise<void> {
+    const values = {
+      mealName: form.getValues('mealName'),
+      items: form.getValues('items'),
+    };
+    const hasAnyInput =
+      values.mealName.trim().length > 0
+      || values.items.some(
+        (item) => item.name.trim().length > 0 || item.amount.trim().length > 0,
+      );
+
+    if (!hasAnyInput) {
+      setFeedbackMessage('入力がありません。食品カードを1件以上入力してください。');
+      setFeedbackTone('error');
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      await saveRecordMeal({
+        values,
+        originalText: draftOriginalText,
+        source: workspaceMode === 'generated' ? 'text' : 'manual',
+      });
+
+      form.setValue('prompt', '', { shouldDirty: false });
+      form.setValue('mealName', '', { shouldDirty: false });
+      replace([createEmptyItem()]);
+      setDraftOriginalText('');
+      setWorkspaceMode('idle');
+      setFeedbackMessage('履歴に保存しました。');
+      setFeedbackTone('info');
+    } catch (error) {
+      setFeedbackMessage(
+        error instanceof Error
+          ? error.message
+          : '履歴へ保存できませんでした。',
+      );
+      setFeedbackTone('error');
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   return {
@@ -207,9 +278,11 @@ export function useRecordScreen(): UseRecordScreenResult {
     itemFields: fields,
     workspaceMode,
     isAnalyzing,
+    isSaving,
     promptGuideMessage,
     draftTotals,
     feedbackMessage,
+    feedbackTone,
     handleApplyPrompt,
     handleOpenManualInput,
     handleCloseManualInput,

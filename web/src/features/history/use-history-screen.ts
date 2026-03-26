@@ -8,69 +8,281 @@
  *
  * 【使用されるエージェント / 処理フロー】
  * - history-screen.tsx から呼ばれる。
- * - mockMeals をベースに表示用データを整形する。
+ * - Supabase から選択日履歴を取得し、削除操作を接続する。
  *
  * 【やらないこと】
- * - API 通信
- * - 永続化
  * - JSX 描画
  *
  * 【他ファイルとの関係】
- * - web/src/data/mock-diet-data.ts の履歴データを利用する。
+ * - list-history-meals.ts と delete-history-meal.ts を利用する。
  * - history-entry-card.tsx へ state とハンドラを渡す。
  */
 
+import useSWR from 'swr';
 import { useMemo, useState } from 'react';
 
-import { mockMeals } from '@/data/mock-diet-data';
+import { mockGoal } from '@/data/mock-diet-data';
 import type { WebMeal } from '@/domain/web-diet-schema';
+import type { NutritionSummary } from '@/features/record/components/record-summary-card';
+import { formatDateKey, getTodayKey, parseDateKey } from '@/lib/web-date';
+
+import { deleteHistoryMeal } from './delete-history-meal';
+import { listHistoryMeals } from './list-history-meals';
+import { saveHistoryMealToFoods } from './save-history-meal-to-foods';
+import { updateHistoryMeal } from './update-history-meal';
 
 export type UseHistoryScreenResult = {
   meals: WebMeal[];
+  summary: NutritionSummary;
+  selectedDateValue: string;
   selectedDateLabel: string;
   feedbackMessage: string | null;
+  feedbackTone: 'info' | 'error';
+  editingMeal: WebMeal | null;
+  isSavingEdit: boolean;
+  savingMealId: string | null;
+  savedMealIds: string[];
   badgeCount: number;
+  handleSelectDateKey: (dateKey: string) => void;
+  handleShiftDate: (days: number) => void;
+  handleSelectToday: () => void;
   handleDeleteMeal: (mealId: string) => void;
+  handleOpenEditMeal: (mealId: string) => void;
+  handleCloseEditMeal: () => void;
+  handleUpdateMeal: (
+    mealId: string,
+    values: {
+      mealName: string;
+      items: Array<{
+        name: string;
+        amount: string;
+        kcal: string;
+        protein: string;
+        fat: string;
+        carbs: string;
+      }>;
+    },
+  ) => Promise<void>;
   handleSaveMeal: (mealId: string) => void;
 };
 
-function getDateKey(value: string): string {
-  return value.slice(0, 10);
-}
-
 export function useHistoryScreen(): UseHistoryScreenResult {
-  const [hiddenMealIds, setHiddenMealIds] = useState<string[]>([]);
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
-
-  const selectedDateKey = getDateKey(mockMeals[0]?.recordedAt ?? new Date().toISOString());
+  const [feedbackTone, setFeedbackTone] = useState<'info' | 'error'>('info');
+  const [editingMealId, setEditingMealId] = useState<string | null>(null);
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
+  const [savingMealId, setSavingMealId] = useState<string | null>(null);
+  const [savedMealIds, setSavedMealIds] = useState<string[]>([]);
+  const [selectedDateKey, setSelectedDateKey] = useState(getTodayKey());
+  const { data, mutate } = useSWR(
+    `/history/meals/${selectedDateKey}`,
+    () => listHistoryMeals(selectedDateKey),
+    {
+      fallbackData: [],
+    },
+  );
 
   const meals = useMemo(() => {
-    return mockMeals.filter((meal) => {
-      return hiddenMealIds.includes(meal.id) === false && getDateKey(meal.recordedAt) === selectedDateKey;
-    });
-  }, [hiddenMealIds, selectedDateKey]);
+    return data ?? [];
+  }, [data]);
+  const selectedDateLabel = useMemo(() => {
+    return new Intl.DateTimeFormat('ja-JP', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      weekday: 'short',
+    }).format(parseDateKey(selectedDateKey));
+  }, [selectedDateKey]);
+  const summary = useMemo(() => {
+    const totals = meals.reduce(
+      (accumulator, meal) => ({
+        kcal: accumulator.kcal + meal.totals.kcal,
+        protein: accumulator.protein + meal.totals.protein,
+        fat: accumulator.fat + meal.totals.fat,
+        carbs: accumulator.carbs + meal.totals.carbs,
+      }),
+      { kcal: 0, protein: 0, fat: 0, carbs: 0 },
+    );
+    const goal = mockGoal.totals;
+    const toProgress = (current: number, target: number): number => {
+      if (target <= 0) {
+        return 0;
+      }
 
-  function handleDeleteMeal(mealId: string): void {
-    setHiddenMealIds((current) => current.concat(mealId));
-    setFeedbackMessage('履歴カードをローカルで非表示にしました。');
+      return Math.min(100, Math.max(0, Math.round((current / target) * 100)));
+    };
+
+    return {
+      kcal: totals.kcal,
+      goalKcal: goal.kcal,
+      leftKcal: goal.kcal - totals.kcal,
+      macros: [
+        {
+          label: 'Protein (P)',
+          current: totals.protein,
+          target: goal.protein,
+          remaining: totals.protein - goal.protein,
+          tone: 'protein' as const,
+          progress: toProgress(totals.protein, goal.protein),
+        },
+        {
+          label: 'Fat (F)',
+          current: totals.fat,
+          target: goal.fat,
+          remaining: totals.fat - goal.fat,
+          tone: 'fat' as const,
+          progress: toProgress(totals.fat, goal.fat),
+        },
+        {
+          label: 'Carbs (C)',
+          current: totals.carbs,
+          target: goal.carbs,
+          remaining: totals.carbs - goal.carbs,
+          tone: 'carbs' as const,
+          progress: toProgress(totals.carbs, goal.carbs),
+        },
+      ],
+    };
+  }, [meals]);
+  const editingMeal = useMemo(() => {
+    if (editingMealId === null) {
+      return null;
+    }
+
+    return meals.find((meal) => meal.id === editingMealId) ?? null;
+  }, [editingMealId, meals]);
+
+  async function handleDeleteMeal(mealId: string): Promise<void> {
+    try {
+      await deleteHistoryMeal(mealId);
+      await mutate();
+      setFeedbackMessage('履歴から削除しました。');
+      setFeedbackTone('info');
+    } catch (error) {
+      setFeedbackMessage(
+        error instanceof Error
+          ? error.message
+          : '履歴を削除できませんでした。',
+      );
+      setFeedbackTone('error');
+    }
   }
 
-  function handleSaveMeal(mealId: string): void {
-    const targetMeal = mockMeals.find((meal) => meal.id === mealId);
+  function handleOpenEditMeal(mealId: string): void {
+    setEditingMealId(mealId);
+    setFeedbackMessage(null);
+    setFeedbackTone('info');
+  }
+
+  function handleCloseEditMeal(): void {
+    setEditingMealId(null);
+  }
+
+  async function handleUpdateMeal(
+    mealId: string,
+    values: {
+      mealName: string;
+      items: Array<{
+        name: string;
+        amount: string;
+        kcal: string;
+        protein: string;
+        fat: string;
+        carbs: string;
+      }>;
+    },
+  ): Promise<void> {
+    setIsSavingEdit(true);
+
+    try {
+      await updateHistoryMeal({
+        mealId,
+        mealName: values.mealName,
+        items: values.items,
+      });
+      await mutate();
+      setFeedbackMessage('履歴を更新しました。');
+      setFeedbackTone('info');
+      setEditingMealId(null);
+    } catch (error) {
+      setFeedbackMessage(
+        error instanceof Error
+          ? error.message
+          : '履歴を更新できませんでした。',
+      );
+      setFeedbackTone('error');
+    } finally {
+      setIsSavingEdit(false);
+    }
+  }
+
+  async function handleSaveMeal(mealId: string): Promise<void> {
+    if (savedMealIds.includes(mealId)) {
+      return;
+    }
+
+    const targetMeal = meals.find((meal) => meal.id === mealId);
 
     if (!targetMeal) {
       return;
     }
 
-    setFeedbackMessage(`「${targetMeal.menuName}」を保存候補としてマークしました。`);
+    try {
+      setSavingMealId(mealId);
+      await saveHistoryMealToFoods(targetMeal);
+      setSavedMealIds((current) => current.concat(mealId));
+      setFeedbackMessage(null);
+      setFeedbackTone('info');
+    } catch (error) {
+      setFeedbackMessage(
+        error instanceof Error
+          ? error.message
+          : '食品タブへの保存に失敗しました。',
+      );
+      setFeedbackTone('error');
+    } finally {
+      setSavingMealId(null);
+    }
+  }
+
+  function handleSelectDateKey(dateKey: string): void {
+    if (dateKey.trim().length === 0) {
+      return;
+    }
+
+    setSelectedDateKey(dateKey);
+    setFeedbackMessage(null);
+  }
+
+  function handleShiftDate(days: number): void {
+    const base = parseDateKey(selectedDateKey);
+    base.setDate(base.getDate() + days);
+    handleSelectDateKey(formatDateKey(base));
+  }
+
+  function handleSelectToday(): void {
+    handleSelectDateKey(getTodayKey());
   }
 
   return {
     meals,
-    selectedDateLabel: selectedDateKey,
+    summary,
+    selectedDateValue: selectedDateKey,
+    selectedDateLabel,
     feedbackMessage,
+    feedbackTone,
+    editingMeal,
+    isSavingEdit,
+    savingMealId,
+    savedMealIds,
     badgeCount: meals.length,
+    handleSelectDateKey,
+    handleShiftDate,
+    handleSelectToday,
     handleDeleteMeal,
+    handleOpenEditMeal,
+    handleCloseEditMeal,
+    handleUpdateMeal,
     handleSaveMeal,
   };
 }

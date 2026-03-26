@@ -35,6 +35,9 @@ type RecordEditorPanelProps = {
     carbs: number;
   };
   isAnalyzing: boolean;
+  isSaving: boolean;
+  feedbackMessage: string | null;
+  feedbackTone: 'info' | 'error';
   promptRegistration: UseFormRegisterReturn;
   onAddItem: () => void;
   onApplyPrompt: () => void | Promise<void>;
@@ -50,6 +53,9 @@ export function RecordEditorPanel({
   itemFields,
   draftTotals,
   isAnalyzing,
+  isSaving,
+  feedbackMessage,
+  feedbackTone,
   promptRegistration,
   onAddItem,
   onApplyPrompt,
@@ -61,6 +67,10 @@ export function RecordEditorPanel({
   const title = mode === 'generated' ? '解析結果を確認' : '食事内容を編集';
   const eyebrow = mode === 'generated' ? 'プロンプト結果' : '手動入力';
   const hasSummary = mode === 'generated';
+
+  const itemStackClassName = mode === 'generated'
+    ? 'record-screen__item-stack record-screen__item-stack--generated'
+    : 'record-screen__item-stack record-screen__item-stack--manual';
 
   return (
     <section className="record-screen__editor-shell">
@@ -122,7 +132,7 @@ export function RecordEditorPanel({
               </div>
             ) : null}
 
-            <div className={mode === 'generated' ? 'record-screen__item-stack record-screen__item-stack--generated' : 'record-screen__item-stack'}>
+            <div className={itemStackClassName}>
               {itemFields.map((field, index) => (
                 <article className="record-screen__item-card" key={field.id}>
                   <div className="record-screen__item-header">
@@ -215,20 +225,40 @@ export function RecordEditorPanel({
               onPhotoRecord={onPhotoRecord}
               promptRegistration={promptRegistration}
             />
+
+            {feedbackMessage !== null ? (
+              <p
+                className={
+                  feedbackTone === 'error'
+                    ? 'record-screen__feedback record-screen__feedback--error'
+                    : 'record-screen__feedback'
+                }
+              >
+                {feedbackMessage}
+              </p>
+            ) : null}
+
+            <button
+              className={isSaving ? 'record-screen__confirm-button record-screen__confirm-button--loading' : 'record-screen__confirm-button'}
+              disabled={isSaving}
+              onClick={onConfirm}
+              type="button"
+            >
+              {isSaving ? (
+                <>
+                  <span className="record-screen__loading-spinner record-screen__loading-spinner--inline" />
+                  <span>保存中です...</span>
+                </>
+              ) : (
+                <>
+                  <span>この内容で確定する</span>
+                  <CheckCircle2 size={20} strokeWidth={2.2} />
+                </>
+              )}
+            </button>
           </div>
         </div>
       </div>
-
-      <footer className="record-screen__confirm-bar">
-        <button
-          className="record-screen__confirm-button"
-          onClick={onConfirm}
-          type="button"
-        >
-          <span>この内容で確定する</span>
-          <CheckCircle2 size={20} strokeWidth={2.2} />
-        </button>
-      </footer>
     </section>
   );
 }
