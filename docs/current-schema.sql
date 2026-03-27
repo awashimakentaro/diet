@@ -63,3 +63,25 @@ CREATE TABLE public.notification_preferences (
   CONSTRAINT notification_preferences_pkey PRIMARY KEY (user_id),
   CONSTRAINT notification_preferences_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
 );
+CREATE TABLE public.user_profiles (
+  user_id uuid NOT NULL,
+  username text NOT NULL,
+  display_name text,
+  bio text,
+  avatar_url text,
+  gender text,
+  age integer,
+  height_cm numeric,
+  current_weight_kg numeric,
+  target_weight_kg numeric,
+  target_days integer,
+  activity_level text,
+  is_profile_public boolean NOT NULL DEFAULT false,
+  is_body_metrics_public boolean NOT NULL DEFAULT false,
+  is_goals_public boolean NOT NULL DEFAULT false,
+  created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
+  updated_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
+  CONSTRAINT user_profiles_pkey PRIMARY KEY (user_id),
+  CONSTRAINT user_profiles_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT user_profiles_username_key UNIQUE (username)
+);

@@ -2,13 +2,15 @@
  * web/src/features/settings/components/settings-profile-card.tsx
  *
  * 【責務】
- * 体格情報と自動計算カードを描画する。Premium UI で統一。
+ * 共有用プロフィール項目と体格情報、自動計算カードを描画する。
  */
 
 import {
   Calculator,
   Flame,
   Goal,
+  IdCard,
+  NotebookPen,
   Ruler,
   Save,
   Timer,
@@ -18,6 +20,9 @@ import {
 import type { ChangeEvent, JSX, ReactNode } from 'react';
 
 type ProfileValues = {
+  username: string;
+  displayName: string;
+  bio: string;
   age: string;
   heightCm: string;
   currentWeightKg: string;
@@ -44,9 +49,13 @@ type RowSpec = {
   label: string;
   suffix: string;
   icon: ReactNode;
+  inputMode?: 'text' | 'decimal';
 };
 
 const ROW_SPECS: RowSpec[] = [
+  { field: 'username', label: 'USERNAME', suffix: '', icon: <IdCard size={16} strokeWidth={2} />, inputMode: 'text' },
+  { field: 'displayName', label: '表示名', suffix: '', icon: <User size={16} strokeWidth={2} />, inputMode: 'text' },
+  { field: 'bio', label: 'ひとこと', suffix: '', icon: <NotebookPen size={16} strokeWidth={2} />, inputMode: 'text' },
   { field: 'age', label: '年齢', suffix: '歳', icon: <User size={16} strokeWidth={2} /> },
   { field: 'heightCm', label: '身長', suffix: 'cm', icon: <Ruler size={16} strokeWidth={2} /> },
   { field: 'currentWeightKg', label: '現在の体重', suffix: 'kg', icon: <Weight size={16} strokeWidth={2} /> },
@@ -109,13 +118,15 @@ export function SettingsProfileCard({
               <label className="profile-field__label">{row.label}</label>
               <div className="profile-field__input-wrapper">
                 <input
-                  className="profile-field__input"
-                  inputMode="decimal"
+                  className={row.inputMode === 'text' ? 'profile-field__input profile-field__input--text' : 'profile-field__input'}
+                  inputMode={row.inputMode ?? 'decimal'}
                   onChange={createChangeHandler(row.field)}
                   type="text"
                   value={values[row.field]}
                 />
-                <span className="profile-field__suffix">{row.suffix}</span>
+                {row.suffix.length > 0 ? (
+                  <span className="profile-field__suffix">{row.suffix}</span>
+                ) : null}
               </div>
             </div>
           ))}

@@ -54,6 +54,28 @@ model Goal {
   @@map("goals")
 }
 
+model UserProfile {
+  userId               String    @id @map("user_id") @db.Uuid
+  username             String    @unique
+  displayName          String?   @map("display_name")
+  bio                  String?
+  avatarUrl            String?   @map("avatar_url")
+  gender               String?
+  age                  Int?
+  heightCm             Decimal?  @map("height_cm") @db.Decimal
+  currentWeightKg      Decimal?  @map("current_weight_kg") @db.Decimal
+  targetWeightKg       Decimal?  @map("target_weight_kg") @db.Decimal
+  targetDays           Int?      @map("target_days")
+  activityLevel        String?   @map("activity_level")
+  isProfilePublic      Boolean   @default(false) @map("is_profile_public")
+  isBodyMetricsPublic  Boolean   @default(false) @map("is_body_metrics_public")
+  isGoalsPublic        Boolean   @default(false) @map("is_goals_public")
+  createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("user_profiles")
+}
+
 model Meal {
   id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId       String   @map("user_id") @db.Uuid

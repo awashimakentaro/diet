@@ -3161,6 +3161,11 @@ input {
   outline: none;
 }
 
+.profile-field__input--text {
+  width: 100%;
+  text-align: left;
+}
+
 .profile-field__suffix {
   color: var(--muted);
   font-size: 12px;
