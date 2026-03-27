@@ -29,6 +29,7 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import type { WebMeal } from '@/domain/web-diet-schema';
 import { RecordItemAddPanel } from '@/features/record/components/record-item-add-panel';
 import { requestRecordAnalysis } from '@/features/record/request-record-analysis';
+import { usePromptAttachments } from '@/features/record/use-prompt-attachments';
 
 type HistoryMealEditorFormValues = {
   mealName: string;
@@ -90,6 +91,7 @@ export function HistoryMealEditorPanel({
 }: HistoryMealEditorPanelProps): JSX.Element {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+  const { attachments, handleAttachmentChange, handleRemoveAttachment, setAttachments } = usePromptAttachments();
   const form = useForm<HistoryMealEditorFormValues>({
     defaultValues: buildDefaults(meal),
   });
@@ -102,6 +104,7 @@ export function HistoryMealEditorPanel({
     form.reset(buildDefaults(meal));
     replace(buildDefaults(meal).items);
     setFeedbackMessage(null);
+    setAttachments([]);
   }, [form, meal, replace]);
 
   async function handleSave(): Promise<void> {
@@ -278,6 +281,9 @@ export function HistoryMealEditorPanel({
             onApplyPrompt={handleApplyPrompt}
             onPhotoRecord={() => setFeedbackMessage('写真解析は次の接続で対応します。')}
             promptRegistration={form.register('prompt')}
+            attachments={attachments}
+            onAttachmentChange={handleAttachmentChange}
+            onRemoveAttachment={handleRemoveAttachment}
           />
 
           {feedbackMessage !== null ? (
