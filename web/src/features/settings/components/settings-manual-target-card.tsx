@@ -58,9 +58,10 @@ export function SettingsManualTargetCard({
 
   return (
     <section className="settings-screen__section">
-      <p className="settings-screen__section-label">手動目標設定</p>
+      <p className="eyebrow">手動目標設定</p>
 
-      <div className="settings-screen__card settings-screen__card--manual">
+
+      <div className="settings-screen__card settings-screen__card--manual app-card">
         <div className="settings-screen__target-grid">
           {INPUT_SPECS.map((input) => (
             <label className="settings-screen__metric-field" key={input.field}>
@@ -78,9 +79,10 @@ export function SettingsManualTargetCard({
           ))}
         </div>
 
-        <button className="settings-screen__primary-button" onClick={onSubmit} type="button">
+        <button className="app-btn app-btn--primary" onClick={onSubmit} type="button">
           設定を更新する
         </button>
+
       </div>
     </section>
   );

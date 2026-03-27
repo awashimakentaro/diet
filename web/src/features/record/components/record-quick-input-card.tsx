@@ -24,7 +24,7 @@ import { Camera, ImagePlus, PenLine, Send, X } from 'lucide-react';
 import { useId, type ChangeEvent, type JSX } from 'react';
 import type { UseFormRegisterReturn } from 'react-hook-form';
 
-import { usePromptAttachments } from '../use-prompt-attachments';
+import { type PromptAttachment } from '../use-prompt-attachments';
 
 type RecordQuickInputCardProps = {
   promptRegistration: UseFormRegisterReturn;
@@ -33,6 +33,9 @@ type RecordQuickInputCardProps = {
   onPhotoRecord: () => void;
   isAnalyzing: boolean;
   promptGuideMessage: string | null;
+  attachments: PromptAttachment[];
+  onAttachmentChange: (event: ChangeEvent<HTMLInputElement>) => boolean;
+  onRemoveAttachment: (attachmentId: string) => void;
 };
 
 export function RecordQuickInputCard({
@@ -42,22 +45,22 @@ export function RecordQuickInputCard({
   onPhotoRecord,
   isAnalyzing,
   promptGuideMessage,
+  attachments,
+  onAttachmentChange,
+  onRemoveAttachment,
 }: RecordQuickInputCardProps): JSX.Element {
   const fileInputId = useId();
   const cameraInputId = useId();
-  const {
-    attachments,
-    handleAttachmentChange,
-    handleRemoveAttachment,
-  } = usePromptAttachments();
+
 
   function handlePhotoChange(event: ChangeEvent<HTMLInputElement>): void {
-    const hasAttached = handleAttachmentChange(event);
+    const hasAttached = onAttachmentChange(event);
 
     if (hasAttached) {
       onPhotoRecord();
     }
   }
+
 
   return (
     <section className="record-screen__quick-card">
@@ -74,11 +77,12 @@ export function RecordQuickInputCard({
                 <button
                   aria-label={`${attachment.name} を削除`}
                   className="record-screen__attachment-remove"
-                  onClick={() => handleRemoveAttachment(attachment.id)}
+                  onClick={() => onRemoveAttachment(attachment.id)}
                   type="button"
                 >
                   <X size={12} strokeWidth={2.4} />
                 </button>
+
               </div>
             ))}
           </div>
@@ -95,8 +99,13 @@ export function RecordQuickInputCard({
           <textarea
             className="record-screen__prompt-input"
             placeholder="メッセージを入力"
+            rows={4}
+            style={{ height: '100px' }}
             {...promptRegistration}
           />
+
+
+
         </div>
 
         <div className="record-screen__prompt-toolbar">
@@ -141,13 +150,18 @@ export function RecordQuickInputCard({
 
           <button
             aria-label="入力内容を反映"
-            className="record-screen__prompt-submit"
+            className={isAnalyzing ? 'record-screen__prompt-submit record-screen__prompt-submit--loading' : 'record-screen__prompt-submit'}
             disabled={isAnalyzing}
             onClick={onApplyPrompt}
             type="button"
           >
-            <Send size={18} strokeWidth={2.1} />
+            {isAnalyzing ? (
+              <div className="loading-spinner loading-spinner--small" />
+            ) : (
+              <Send size={18} strokeWidth={2.1} />
+            )}
           </button>
+
         </div>
       </div>
     </section>

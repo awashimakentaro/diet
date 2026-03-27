@@ -2,24 +2,24 @@
  * web/src/features/settings/components/settings-profile-card.tsx
  *
  * 【責務】
- * 体格情報と自動計算カードを描画する。
- *
- * 【使用されるエージェント / 処理フロー】
- * - settings-screen.tsx から呼ばれる。
- * - 性別、体重、活動量、各ボタンの状態を受け取る。
- *
- * 【やらないこと】
- * - 永続化
- * - 認証操作
- * - 通知設定
- *
- * 【他ファイルとの関係】
- * - use-settings-screen.ts の profile state に依存する。
+ * 体格情報と自動計算カードを描画する。Premium UI で統一。
  */
 
-import type { ChangeEvent, JSX } from 'react';
+import {
+  Calculator,
+  Flame,
+  Goal,
+  Ruler,
+  Save,
+  Timer,
+  User,
+  Weight,
+} from 'lucide-react';
+import type { ChangeEvent, JSX, ReactNode } from 'react';
 
 type ProfileValues = {
+  age: string;
+  heightCm: string;
   currentWeightKg: string;
   targetWeightKg: string;
   targetDays: string;
@@ -43,18 +43,21 @@ type RowSpec = {
   field: keyof ProfileValues;
   label: string;
   suffix: string;
+  icon: ReactNode;
 };
 
 const ROW_SPECS: RowSpec[] = [
-  { field: 'currentWeightKg', label: '現在の体重', suffix: 'kg' },
-  { field: 'targetWeightKg', label: '目標の体重', suffix: 'kg' },
-  { field: 'targetDays', label: '目標達成日数', suffix: '日' },
+  { field: 'age', label: '年齢', suffix: '歳', icon: <User size={16} strokeWidth={2} /> },
+  { field: 'heightCm', label: '身長', suffix: 'cm', icon: <Ruler size={16} strokeWidth={2} /> },
+  { field: 'currentWeightKg', label: '現在の体重', suffix: 'kg', icon: <Weight size={16} strokeWidth={2} /> },
+  { field: 'targetWeightKg', label: '目標の体重', suffix: 'kg', icon: <Goal size={16} strokeWidth={2} /> },
+  { field: 'targetDays', label: '目標達成日数', suffix: '日', icon: <Timer size={16} strokeWidth={2} /> },
 ];
 
 const ACTIVITY_OPTIONS = [
-  { value: 'low', label: '低', caption: '座り仕事' },
-  { value: 'moderate', label: '中', caption: '立ち仕事' },
-  { value: 'high', label: '高', caption: '活発な運動' },
+  { value: 'low', label: '低', caption: '座り仕事', emoji: '🪑' },
+  { value: 'moderate', label: '中', caption: '立ち仕事', emoji: '🚶' },
+  { value: 'high', label: '高', caption: '活発な運動', emoji: '🏃' },
 ] as const;
 
 export function SettingsProfileCard({
@@ -75,66 +78,89 @@ export function SettingsProfileCard({
 
   return (
     <section className="settings-screen__section">
-      <p className="settings-screen__section-label">体格情報 + 自動計算</p>
+      <p className="eyebrow">体格情報 + 自動計算</p>
 
-      <div className="settings-screen__card settings-screen__card--profile">
-        <div className="settings-screen__segmented">
+      <div className="settings-screen__card settings-screen__card--profile app-card">
+        {/* Gender Segmented Control */}
+        <div className="profile-gender-picker">
           <button
-            className={gender === 'male' ? 'settings-screen__segmented-button settings-screen__segmented-button--active' : 'settings-screen__segmented-button'}
+            className={gender === 'male' ? 'profile-gender-picker__btn profile-gender-picker__btn--active' : 'profile-gender-picker__btn'}
             onClick={() => onGenderChange('male')}
             type="button"
           >
-            男性
+            <span className="profile-gender-picker__emoji">👨</span>
+            <span>男性</span>
           </button>
           <button
-            className={gender === 'female' ? 'settings-screen__segmented-button settings-screen__segmented-button--active' : 'settings-screen__segmented-button'}
+            className={gender === 'female' ? 'profile-gender-picker__btn profile-gender-picker__btn--active' : 'profile-gender-picker__btn'}
             onClick={() => onGenderChange('female')}
             type="button"
           >
-            女性
+            <span className="profile-gender-picker__emoji">👩</span>
+            <span>女性</span>
           </button>
         </div>
 
-        <div className="settings-screen__profile-rows">
+        {/* Profile Input Fields */}
+        <div className="profile-fields">
           {ROW_SPECS.map((row) => (
-            <label className="settings-screen__profile-row" key={row.field}>
-              <span>{row.label}</span>
-              <div className="settings-screen__profile-input">
+            <div className="profile-field" key={row.field}>
+              <div className="profile-field__icon">{row.icon}</div>
+              <label className="profile-field__label">{row.label}</label>
+              <div className="profile-field__input-wrapper">
                 <input
+                  className="profile-field__input"
                   inputMode="decimal"
                   onChange={createChangeHandler(row.field)}
                   type="text"
                   value={values[row.field]}
                 />
-                <em>{row.suffix}</em>
+                <span className="profile-field__suffix">{row.suffix}</span>
               </div>
-            </label>
+            </div>
           ))}
         </div>
 
-        <div className="settings-screen__activity-group">
-          <p>運動レベル</p>
-          <div className="settings-screen__activity-grid">
+        {/* Activity Level */}
+        <div className="profile-activity">
+          <p className="profile-activity__label">
+            <Flame size={14} strokeWidth={2.2} />
+            <span>運動レベル</span>
+          </p>
+
+          <div className="profile-activity__grid">
             {ACTIVITY_OPTIONS.map((option) => (
               <button
-                className={activityLevel === option.value ? 'settings-screen__activity-button settings-screen__activity-button--active' : 'settings-screen__activity-button'}
+                className={activityLevel === option.value ? 'profile-activity__btn profile-activity__btn--active' : 'profile-activity__btn'}
                 key={option.value}
                 onClick={() => onActivityChange(option.value)}
                 type="button"
               >
+                <span className="profile-activity__emoji">{option.emoji}</span>
                 <strong>{option.label}</strong>
-                <span>{option.caption}</span>
+                <span className="profile-activity__caption">{option.caption}</span>
               </button>
             ))}
           </div>
         </div>
 
-        <div className="settings-screen__split-actions">
-          <button className="settings-screen__secondary-button" onClick={onSaveProfile} type="button">
-            プロフィール保存
+        {/* Action Buttons */}
+        <div className="profile-actions">
+          <button
+            className="profile-actions__btn profile-actions__btn--calc"
+            onClick={onRunAutoCalculate}
+            type="button"
+          >
+            <Calculator size={16} strokeWidth={2.2} />
+            <span>目標を自動計算</span>
           </button>
-          <button className="settings-screen__accent-button" onClick={onRunAutoCalculate} type="button">
-            自動計算実行
+          <button
+            className="profile-actions__btn profile-actions__btn--save"
+            onClick={onSaveProfile}
+            type="button"
+          >
+            <Save size={16} strokeWidth={2.2} />
+            <span>プロフィールを保存</span>
           </button>
         </div>
       </div>

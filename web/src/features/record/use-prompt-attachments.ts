@@ -21,17 +21,20 @@
 
 import { useEffect, useState, type ChangeEvent } from 'react';
 
-type PromptAttachment = {
+export type PromptAttachment = {
   id: string;
   name: string;
   previewUrl: string;
 };
 
+
 type UsePromptAttachmentsResult = {
   attachments: PromptAttachment[];
   handleAttachmentChange: (event: ChangeEvent<HTMLInputElement>) => boolean;
   handleRemoveAttachment: (attachmentId: string) => void;
+  setAttachments: (attachments: PromptAttachment[]) => void;
 };
+
 
 function buildAttachments(files: FileList): PromptAttachment[] {
   return Array.from(files).map((file, index) => ({
@@ -81,5 +84,7 @@ export function usePromptAttachments(): UsePromptAttachmentsResult {
     attachments,
     handleAttachmentChange,
     handleRemoveAttachment,
+    setAttachments,
   };
 }
+

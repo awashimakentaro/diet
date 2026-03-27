@@ -45,9 +45,10 @@ export function SettingsNotificationCard({
 }: SettingsNotificationCardProps): JSX.Element {
   return (
     <section className="settings-screen__section">
-      <p className="settings-screen__section-label">通知設定</p>
+      <p className="eyebrow">通知設定</p>
 
-      <div className="settings-screen__card settings-screen__card--notification">
+
+      <div className="settings-screen__card settings-screen__card--notification app-card">
         <div className="settings-screen__toggle-row">
           <span>スマート過不足通知</span>
           <button
@@ -74,9 +75,10 @@ export function SettingsNotificationCard({
           ))}
         </div>
 
-        <button className="settings-screen__primary-button" onClick={onSave} type="button">
+        <button className="app-btn app-btn--primary" onClick={onSave} type="button">
           通知設定を保存
         </button>
+
       </div>
     </section>
   );

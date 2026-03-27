@@ -42,7 +42,8 @@ export function HistoryEntryCard({
   const firstItem = meal.items[0];
 
   return (
-    <article className="history-screen__card">
+    <article className="history-screen__card app-card">
+
       <div className="history-screen__card-head">
         <div className="history-screen__meal-meta">
           <h2>{meal.menuName}</h2>
@@ -53,13 +54,17 @@ export function HistoryEntryCard({
         </div>
       </div>
 
-      <p className="history-screen__macro-line">
-        <span className="history-screen__macro-token">P {meal.totals.protein}g</span>
-        <span className="history-screen__macro-separator">•</span>
-        <span className="history-screen__macro-token">F {meal.totals.fat}g</span>
-        <span className="history-screen__macro-separator">•</span>
-        <span className="history-screen__macro-token">C {meal.totals.carbs}g</span>
-      </p>
+      <div className="food-card__metrics">
+        <span className="food-card__macro food-card__macro--p">
+          P {meal.totals.protein}g
+        </span>
+        <span className="food-card__macro food-card__macro--f">
+          F {meal.totals.fat}g
+        </span>
+        <span className="food-card__macro food-card__macro--c">
+          C {meal.totals.carbs}g
+        </span>
+      </div>
 
       {meal.items.length > 0 ? (
         <div className="history-screen__item-list">
@@ -122,6 +127,8 @@ export function HistoryEntryCard({
           )}
         </button>
       </div>
+
+
     </article>
   );
 }

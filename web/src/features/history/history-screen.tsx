@@ -23,6 +23,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import type { JSX } from 'react';
 
 import { AppBottomNav } from '@/components/app-bottom-nav';
+import { HistoryScreenSkeleton } from '@/components/app-skeleton';
 import { AppTopBar } from '@/components/app-top-bar';
 import { RecordSummaryCard } from '@/features/record/components/record-summary-card';
 
@@ -52,6 +53,7 @@ export function HistoryScreen(): JSX.Element {
     handleCloseEditMeal,
     handleUpdateMeal,
     handleSaveMeal,
+    isLoading,
   } = useHistoryScreen();
   const sectionTransition = reduceMotion
     ? { duration: 0 }
@@ -61,73 +63,79 @@ export function HistoryScreen(): JSX.Element {
     <div className="history-screen">
       <AppTopBar />
 
-      <motion.main
-        animate={{ opacity: 1, y: 0 }}
-        className="history-screen__main"
-        initial={{ opacity: 0, y: 18 }}
-        transition={sectionTransition}
-      >
-        <div className="history-screen__layout">
-          <motion.aside
-            animate={{ opacity: 1, y: 0 }}
-            className="history-screen__summary-pane"
-            initial={{ opacity: 0, y: 20 }}
-            transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.06 }}
-          >
-            <RecordSummaryCard summary={summary} />
-          </motion.aside>
-
-          <motion.section
-            animate={{ opacity: 1, y: 0 }}
-            className="history-screen__content-pane"
-            initial={{ opacity: 0, y: 24 }}
-            transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.1 }}
-          >
-            <motion.div
+      {isLoading ? (
+        <main className="history-screen__main" style={{ opacity: 1 }}>
+          <HistoryScreenSkeleton />
+        </main>
+      ) : (
+        <motion.main
+          animate={{ opacity: 1, y: 0 }}
+          className="history-screen__main"
+          initial={{ opacity: 0, y: 18 }}
+          transition={sectionTransition}
+        >
+          <div className="history-screen__layout">
+            <motion.aside
               animate={{ opacity: 1, y: 0 }}
-              initial={{ opacity: 0, y: 14 }}
-              transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.14 }}
+              className="history-screen__summary-pane"
+              initial={{ opacity: 0, y: 20 }}
+              transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.06 }}
             >
-              <HistoryDateChip
-                onSelectDate={handleSelectDateKey}
-                onSelectToday={handleSelectToday}
-                onShiftDate={handleShiftDate}
-                selectedDateLabel={selectedDateLabel}
-                selectedDateValue={selectedDateValue}
-              />
-            </motion.div>
+              <RecordSummaryCard summary={summary} />
+            </motion.aside>
 
-            {feedbackMessage !== null ? (
-              <p className={feedbackTone === 'error' ? 'history-screen__feedback history-screen__feedback--error' : 'history-screen__feedback'}>
-                {feedbackMessage}
-              </p>
-            ) : null}
+            <motion.section
+              animate={{ opacity: 1, y: 0 }}
+              className="history-screen__content-pane"
+              initial={{ opacity: 0, y: 24 }}
+              transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.1 }}
+            >
+              <motion.div
+                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 14 }}
+                transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.14 }}
+              >
+                <HistoryDateChip
+                  onSelectDate={handleSelectDateKey}
+                  onSelectToday={handleSelectToday}
+                  onShiftDate={handleShiftDate}
+                  selectedDateLabel={selectedDateLabel}
+                  selectedDateValue={selectedDateValue}
+                />
+              </motion.div>
 
-            <section className="history-screen__list">
-              {meals.map((meal, index) => (
-                <motion.div
-                  animate={{ opacity: 1, y: 0 }}
-                  initial={{ opacity: 0, y: 18 }}
-                  key={meal.id}
-                  transition={{
-                    ...sectionTransition,
-                    delay: reduceMotion ? 0 : 0.18 + index * 0.03,
-                  }}
-                >
-                  <HistoryEntryCard
-                    isSaved={savedMealIds.includes(meal.id)}
-                    isSaving={savingMealId === meal.id}
-                    meal={meal}
-                    onEdit={handleOpenEditMeal}
-                    onDelete={handleDeleteMeal}
-                    onSave={handleSaveMeal}
-                  />
-                </motion.div>
-              ))}
-            </section>
-          </motion.section>
-        </div>
-      </motion.main>
+              {feedbackMessage !== null ? (
+                <p className={feedbackTone === 'error' ? 'history-screen__feedback history-screen__feedback--error' : 'history-screen__feedback'}>
+                  {feedbackMessage}
+                </p>
+              ) : null}
+
+              <section className="history-screen__list">
+                {meals.map((meal, index) => (
+                  <motion.div
+                    animate={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, y: 18 }}
+                    key={meal.id}
+                    transition={{
+                      ...sectionTransition,
+                      delay: reduceMotion ? 0 : 0.18 + index * 0.03,
+                    }}
+                  >
+                    <HistoryEntryCard
+                      isSaved={savedMealIds.includes(meal.id)}
+                      isSaving={savingMealId === meal.id}
+                      meal={meal}
+                      onEdit={handleOpenEditMeal}
+                      onDelete={handleDeleteMeal}
+                      onSave={handleSaveMeal}
+                    />
+                  </motion.div>
+                ))}
+              </section>
+            </motion.section>
+          </div>
+        </motion.main>
+      )}
 
       {editingMeal !== null ? (
         <HistoryMealEditorPanel

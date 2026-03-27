@@ -19,8 +19,7 @@
  * - use-history-screen.ts の選択日表示に依存する。
  */
 
-import { CalendarDays } from 'lucide-react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useRef, type JSX } from 'react';
 
 type HistoryDateChipProps = {
@@ -74,15 +73,15 @@ export function HistoryDateChip({
       <div className="history-screen__date-actions">
         <button
           aria-label="前日を表示"
-          className="history-screen__date-action"
+          className="app-btn app-btn--secondary history-screen__date-nav"
           onClick={() => onShiftDate(-1)}
           type="button"
         >
-          <ChevronLeft size={16} strokeWidth={2.3} />
+          <ChevronLeft size={18} strokeWidth={2.4} />
         </button>
 
         <button
-          className="history-screen__date-action history-screen__date-action--today"
+          className="app-btn app-btn--secondary history-screen__date-today"
           onClick={onSelectToday}
           type="button"
         >
@@ -91,14 +90,14 @@ export function HistoryDateChip({
 
         <button
           aria-label="翌日を表示"
-          className="history-screen__date-action"
+          className="app-btn app-btn--secondary history-screen__date-nav"
           onClick={() => onShiftDate(1)}
           type="button"
         >
-          <ChevronRight size={16} strokeWidth={2.3} />
+          <ChevronRight size={18} strokeWidth={2.4} />
         </button>
-
       </div>
+
 
       <input
         aria-label="履歴の日付を選択"

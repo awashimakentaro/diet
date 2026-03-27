@@ -19,10 +19,9 @@
  * - record-summary-card.tsx へ渡す NutritionSummary を返す。
  */
 
-import useSWR from 'swr';
 import { useEffect } from 'react';
+import useSWR from 'swr';
 
-import { mockGoal } from '@/data/mock-diet-data';
 import type { WebDailySummary } from '@/domain/web-diet-schema';
 import type { NutritionSummary } from '@/features/record/components/record-summary-card';
 import { formatDateKey, getTodayKey, parseDateKey } from '@/lib/web-date';
@@ -30,8 +29,8 @@ import { formatDateKey, getTodayKey, parseDateKey } from '@/lib/web-date';
 import { buildNutritionSummary } from '../summary/build-nutrition-summary';
 import { listDailySummary } from '../summary/list-daily-summary';
 import { listRecentMeals } from '../summary/list-recent-meals';
-import { recomputeRecentDailySummaries } from '../summary/recompute-recent-daily-summaries';
 import { listWeekDailySummaries } from '../summary/list-week-daily-summaries';
+import { recomputeRecentDailySummaries } from '../summary/recompute-recent-daily-summaries';
 
 type HomeInsight = {
   label: string;
@@ -53,6 +52,7 @@ export type UseHomeScreenResult = {
   insights: HomeInsight[];
   usageBars: HomeUsageBar[];
   recentMeals: HomeRecentMeal[];
+  isLoading: boolean;
 };
 
 function buildConsecutiveDays(summaries: WebDailySummary[]): number {
@@ -102,7 +102,7 @@ function buildInsights(
 
   const averageKcal = Math.round(
     recordedSummaries.reduce((sum, summary) => sum + summary.totals.kcal, 0)
-      / recordedSummaries.length,
+    / recordedSummaries.length,
   );
   const averageProtein = Math.round(
     (recordedSummaries.reduce((sum, summary) => sum + summary.totals.protein, 0)
@@ -133,10 +133,11 @@ function buildUsageBars(summaries: WebDailySummary[]): HomeUsageBar[] {
     );
 
     return {
-      label: new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(date),
+      label: new Intl.DateTimeFormat('ja-JP', { weekday: 'short' }).format(date),
       value: normalizedValue,
       hasRecord: summary.mealCount > 0,
     };
+
   });
 }
 
@@ -200,18 +201,18 @@ export function useHomeScreen(): UseHomeScreenResult {
   const todayKey = getTodayKey();
   const weekRange = getCurrentWeekRange(new Date());
   const weekDateKeys = buildWeekDateKeys(new Date());
-  const { data: todaySummary, mutate: mutateTodaySummary } = useSWR(
+  const { data: todaySummary, isLoading: isTodayLoading, mutate: mutateTodaySummary } = useSWR(
     `/summary/daily/${todayKey}`,
     () => listDailySummary(todayKey),
   );
-  const { data: weeklySummaries = [], mutate: mutateWeeklySummaries } = useSWR(
+  const { data: weeklySummaries = [], isLoading: isWeeklyLoading, mutate: mutateWeeklySummaries } = useSWR(
     `/summary/daily/week/${weekRange.startDateKey}-${weekRange.endDateKey}`,
     () => listWeekDailySummaries(weekRange),
     {
       fallbackData: [],
     },
   );
-  const { data: recentMeals = [] } = useSWR(
+  const { data: recentMeals = [], isLoading: isRecentLoading } = useSWR(
     '/summary/recent-meals/4',
     () => listRecentMeals(4),
     {
@@ -247,5 +248,6 @@ export function useHomeScreen(): UseHomeScreenResult {
     insights: buildInsights(weeklySummaries),
     usageBars: buildUsageBars(normalizedWeeklySummaries),
     recentMeals,
+    isLoading: isTodayLoading || isWeeklyLoading || isRecentLoading,
   };
 }

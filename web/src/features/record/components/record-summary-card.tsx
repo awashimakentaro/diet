@@ -20,6 +20,8 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import type { JSX } from 'react';
 
+import { PfcDonutChart } from './pfc-donut-chart';
+
 type MacroSummary = {
   label: string;
   current: number;
@@ -54,15 +56,30 @@ export function RecordSummaryCard({
           : { duration: 0.55, ease: 'easeOut' as const }
       }
     >
-      <div className="record-screen__summary-head">
-        <div>
-          <p className="record-screen__eyebrow">Nutrition Status</p>
-          <div className="record-screen__headline">
-            <strong>{summary.kcal}</strong>
-            <span>/ {summary.goalKcal} kcal</span>
+      <div className="record-screen__summary-layout">
+        <div className="record-screen__summary-content">
+          <div className="record-screen__summary-head">
+            <div>
+              <p className="record-screen__eyebrow">栄養状況</p>
+              <div className="record-screen__headline">
+                <strong>{summary.kcal}</strong>
+                <span>/ {summary.goalKcal} kcal</span>
+              </div>
+            </div>
           </div>
         </div>
+
+        <div className="record-screen__summary-chart">
+          <PfcDonutChart
+            carbs={summary.macros.find((m) => m.tone === 'carbs')?.current ?? 0}
+            fat={summary.macros.find((m) => m.tone === 'fat')?.current ?? 0}
+            protein={summary.macros.find((m) => m.tone === 'protein')?.current ?? 0}
+            size={80}
+          />
+        </div>
       </div>
+
+
 
       <div className="record-screen__macro-list">
         {summary.macros.map((macro) => (

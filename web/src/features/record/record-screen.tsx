@@ -44,6 +44,9 @@ export function RecordScreen(): JSX.Element {
     draftTotals,
     feedbackMessage,
     feedbackTone,
+    attachments,
+    handleAttachmentChange,
+    handleRemoveAttachment,
     handleApplyPrompt,
     handleOpenManualInput,
     handleCloseManualInput,
@@ -52,6 +55,7 @@ export function RecordScreen(): JSX.Element {
     handleRemoveItem,
     handleConfirmDraft,
   } = useRecordScreen();
+
   const isWorkspaceLoading = isAnalyzing && workspaceMode === 'idle';
   const sectionTransition = reduceMotion
     ? { duration: 0 }
@@ -87,6 +91,9 @@ export function RecordScreen(): JSX.Element {
               isAnalyzing={isAnalyzing}
               isSaving={isSaving}
               itemFields={itemFields}
+              attachments={attachments}
+              onAttachmentChange={handleAttachmentChange}
+              onRemoveAttachment={handleRemoveAttachment}
               onAddItem={handleAddItem}
               onApplyPrompt={handleApplyPrompt}
               onPhotoRecord={handlePhotoRecord}
@@ -95,18 +102,23 @@ export function RecordScreen(): JSX.Element {
               onRemoveItem={handleRemoveItem}
               promptRegistration={form.register('prompt')}
             />
+
           )}
         </motion.div>
       </motion.main>
 
       {workspaceMode === 'idle' ? (
         <motion.div
-          animate={{ opacity: 1, y: 0 }}
-          initial={{ opacity: 0, y: 18 }}
-          transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.12 }}
+          animate={{ opacity: 1 }}
+          initial={{ opacity: 0 }}
+          transition={sectionTransition}
         >
+
           <RecordQuickInputCard
             isAnalyzing={isAnalyzing}
+            attachments={attachments}
+            onAttachmentChange={handleAttachmentChange}
+            onRemoveAttachment={handleRemoveAttachment}
             onApplyPrompt={handleApplyPrompt}
             onOpenManualInput={handleOpenManualInput}
             onPhotoRecord={handlePhotoRecord}
@@ -114,6 +126,7 @@ export function RecordScreen(): JSX.Element {
             promptRegistration={form.register('prompt')}
           />
         </motion.div>
+
       ) : null}
 
       <AppBottomNav currentPath="/app/record" />

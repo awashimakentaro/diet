@@ -24,7 +24,7 @@ import { ArrowLeft, Camera, ImagePlus, PenLine, Plus, Sparkles, X } from 'lucide
 import { useId, useState, type ChangeEvent, type JSX } from 'react';
 import type { UseFormRegisterReturn } from 'react-hook-form';
 
-import { usePromptAttachments } from '../use-prompt-attachments';
+import { type PromptAttachment } from '../use-prompt-attachments';
 
 type AddPanelMode = 'closed' | 'chooser' | 'prompt';
 
@@ -34,6 +34,9 @@ type RecordItemAddPanelProps = {
   onAddManualItem: () => void;
   onApplyPrompt: () => void | Promise<void>;
   onPhotoRecord: () => void;
+  attachments: PromptAttachment[];
+  onAttachmentChange: (event: ChangeEvent<HTMLInputElement>) => boolean;
+  onRemoveAttachment: (attachmentId: string) => void;
 };
 
 export function RecordItemAddPanel({
@@ -42,15 +45,14 @@ export function RecordItemAddPanel({
   onAddManualItem,
   onApplyPrompt,
   onPhotoRecord,
+  attachments,
+  onAttachmentChange,
+  onRemoveAttachment,
 }: RecordItemAddPanelProps): JSX.Element {
   const fileInputId = useId();
   const cameraInputId = useId();
   const [mode, setMode] = useState<AddPanelMode>('closed');
-  const {
-    attachments,
-    handleAttachmentChange,
-    handleRemoveAttachment,
-  } = usePromptAttachments();
+
 
   function handleAddManualItem(): void {
     onAddManualItem();
@@ -63,12 +65,13 @@ export function RecordItemAddPanel({
   }
 
   function handlePhotoChange(event: ChangeEvent<HTMLInputElement>): void {
-    const hasAttached = handleAttachmentChange(event);
+    const hasAttached = onAttachmentChange(event);
 
     if (hasAttached) {
       onPhotoRecord();
     }
   }
+
 
   if (mode === 'closed') {
     return (
@@ -88,7 +91,7 @@ export function RecordItemAddPanel({
       <section className="record-screen__add-panel">
         <div className="record-screen__add-panel-head">
           <div>
-            <p className="record-screen__field-label">add item</p>
+            <p className="record-screen__field-label">食品を追加</p>
             <h3 className="record-screen__add-panel-title">食品の追加方法を選択</h3>
           </div>
 
@@ -135,7 +138,7 @@ export function RecordItemAddPanel({
     <section className="record-screen__add-panel record-screen__add-panel--prompt">
       <div className="record-screen__add-panel-head">
         <div>
-          <p className="record-screen__field-label">prompt add</p>
+          <p className="record-screen__field-label">プロンプト追加</p>
           <h3 className="record-screen__add-panel-title">プロンプトから食品を追加</h3>
         </div>
 
@@ -165,11 +168,12 @@ export function RecordItemAddPanel({
               <button
                 aria-label={`${attachment.name} を削除`}
                 className="record-screen__attachment-remove"
-                onClick={() => handleRemoveAttachment(attachment.id)}
+                onClick={() => onRemoveAttachment(attachment.id)}
                 type="button"
               >
                 <X size={12} strokeWidth={2.4} />
               </button>
+
             </div>
           ))}
         </div>

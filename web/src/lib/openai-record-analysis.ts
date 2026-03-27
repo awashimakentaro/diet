@@ -22,7 +22,8 @@ import type { RecordAnalysisResponse } from '@/features/record/record-analysis-s
 const OPENAI_ENDPOINT = 'https://api.openai.com/v1/chat/completions';
 const OPENAI_MODEL = 'gpt-4o-mini';
 const SYSTEM_PROMPT =
-  'You are a nutrition assistant. Respond ONLY with valid JSON matching this schema: {"menuName":"string","originalText":"string","warnings":["string"],"items":[{"name":"string","amount":"string","kcal":number,"protein":number,"fat":number,"carbs":number}]}. Numbers must be realistic, non-negative, and rounded to at most one decimal place.';
+  'You are a professional nutrition assistant specialized in Japanese cuisine. Respond ONLY with valid JSON matching this schema: {"menuName":"string","originalText":"string","warnings":["string"],"items":[{"name":"string","amount":"string","kcal":number,"protein":number,"fat":number,"carbs":number}]}. Instructions: 1. If the input is ambiguous, assume typical Japanese restaurant or home-cooked portion sizes. 2. Ensure kcal matches (Protein*4 + Fat*9 + Carbs*4) reasonably. 3. Round all numbers to one decimal place. 4. If an item is unknown, provide a best-effort estimate and add a warning. 5. Respond in Japanese for names and warnings.';
+
 
 type RawOpenAIResponse = {
   menuName?: string;
@@ -157,6 +158,7 @@ function parseOpenAIResponse(content: string): RawOpenAIResponse | null {
 function normalizeOpenAIResponse(
   prompt: string,
   raw: RawOpenAIResponse,
+  isVision: boolean,
 ): RecordAnalysisResponse | null {
   const normalizedItems = (raw.items ?? [])
     .map((item, index) => ({
@@ -178,23 +180,26 @@ function normalizeOpenAIResponse(
     originalText: raw.originalText?.trim() || prompt,
     items: normalizedItems,
     warnings: raw.warnings ?? [],
-    source: 'text',
+    source: isVision ? 'vision' : 'text',
   };
 }
 
 /**
- * prompt を解析して record 用レスポンスを返す。
+ * prompt と画像を解析して record 用レスポンスを返す。
  * 呼び出し元: app/api/record/analyze/route.ts
  * @param prompt ユーザー入力
+ * @param images Base64 形式の画像配列 (data:image/...)
  * @returns 解析済みレスポンス
  * @remarks OpenAI キー未設定時や失敗時は fallback を返す。
  */
 export async function analyzeRecordPrompt(
   prompt: string,
+  images?: string[],
 ): Promise<RecordAnalysisResponse> {
   const normalizedPrompt = prompt.trim();
+  const hasImages = Array.isArray(images) && images.length > 0;
 
-  if (normalizedPrompt.length === 0) {
+  if (normalizedPrompt.length === 0 && !hasImages) {
     return createFallbackRecordAnalysis(prompt);
   }
 
@@ -202,10 +207,26 @@ export async function analyzeRecordPrompt(
     process.env.OPENAI_API_KEY ?? process.env.NEXT_PUBLIC_OPENAI_API_KEY;
 
   if (!apiKey) {
-    return createFallbackRecordAnalysis(normalizedPrompt);
+    return createFallbackRecordAnalysis(normalizedPrompt || (hasImages ? '画像の解析' : ''));
   }
 
   try {
+    const userContent: any[] = [];
+    if (normalizedPrompt) {
+      userContent.push({ type: 'text', text: `分析対象の食事: ${normalizedPrompt}` });
+    } else {
+      userContent.push({ type: 'text', text: '添付された画像から食事内容を推測して解析してください。' });
+    }
+
+    if (hasImages) {
+      for (const base64 of images) {
+        userContent.push({
+          type: 'image_url',
+          image_url: { url: base64 },
+        });
+      }
+    }
+
     const response = await fetch(OPENAI_ENDPOINT, {
       method: 'POST',
       headers: {
@@ -219,7 +240,7 @@ export async function analyzeRecordPrompt(
           { role: 'system', content: SYSTEM_PROMPT },
           {
             role: 'user',
-            content: `分析対象の食事: ${normalizedPrompt}\nJSONのみで回答してください。`,
+            content: userContent,
           },
         ],
       }),
@@ -242,9 +263,10 @@ export async function analyzeRecordPrompt(
       return createFallbackRecordAnalysis(normalizedPrompt);
     }
 
-    return normalizeOpenAIResponse(normalizedPrompt, parsed)
+    return normalizeOpenAIResponse(normalizedPrompt, parsed, hasImages)
       ?? createFallbackRecordAnalysis(normalizedPrompt);
   } catch {
     return createFallbackRecordAnalysis(normalizedPrompt);
   }
 }
+

@@ -34,7 +34,8 @@ export async function POST(request: Request): Promise<Response> {
   try {
     const payload = await request.json();
     const parsed = recordAnalysisRequestSchema.parse(payload);
-    const draft = await analyzeRecordPrompt(parsed.prompt);
+    const draft = await analyzeRecordPrompt(parsed.prompt, parsed.images);
+
 
     return NextResponse.json(draft);
   } catch (error) {

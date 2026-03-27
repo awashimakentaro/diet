@@ -18,20 +18,20 @@
  * - history-entry-card.tsx へ state とハンドラを渡す。
  */
 
-import useSWR from 'swr';
 import { useEffect, useMemo, useState } from 'react';
+import useSWR from 'swr';
 
 import type { WebMeal } from '@/domain/web-diet-schema';
 import type { NutritionSummary } from '@/features/record/components/record-summary-card';
 import { formatDateKey, getTodayKey, parseDateKey } from '@/lib/web-date';
 
+import { buildNutritionSummary } from '../summary/build-nutrition-summary';
+import { listDailySummary } from '../summary/list-daily-summary';
+import { recomputeDailySummaryForDateKey } from '../summary/recompute-daily-summary';
 import { deleteHistoryMeal } from './delete-history-meal';
 import { listHistoryMeals } from './list-history-meals';
 import { saveHistoryMealToFoods } from './save-history-meal-to-foods';
 import { updateHistoryMeal } from './update-history-meal';
-import { buildNutritionSummary } from '../summary/build-nutrition-summary';
-import { listDailySummary } from '../summary/list-daily-summary';
-import { recomputeDailySummaryForDateKey } from '../summary/recompute-daily-summary';
 
 export type UseHistoryScreenResult = {
   meals: WebMeal[];
@@ -66,6 +66,7 @@ export type UseHistoryScreenResult = {
     },
   ) => Promise<void>;
   handleSaveMeal: (mealId: string) => void;
+  isLoading: boolean;
 };
 
 export function useHistoryScreen(): UseHistoryScreenResult {
@@ -76,14 +77,14 @@ export function useHistoryScreen(): UseHistoryScreenResult {
   const [savingMealId, setSavingMealId] = useState<string | null>(null);
   const [savedMealIds, setSavedMealIds] = useState<string[]>([]);
   const [selectedDateKey, setSelectedDateKey] = useState(getTodayKey());
-  const { data, mutate } = useSWR(
+  const { data, mutate, isLoading: isMealsLoading } = useSWR(
     `/history/meals/${selectedDateKey}`,
     () => listHistoryMeals(selectedDateKey),
     {
       fallbackData: [],
     },
   );
-  const { data: dailySummary, mutate: mutateDailySummary } = useSWR(
+  const { data: dailySummary, isLoading: isSummaryLoading, mutate: mutateDailySummary } = useSWR(
     `/summary/daily/${selectedDateKey}`,
     () => listDailySummary(selectedDateKey),
   );
@@ -255,5 +256,6 @@ export function useHistoryScreen(): UseHistoryScreenResult {
     handleCloseEditMeal,
     handleUpdateMeal,
     handleSaveMeal,
+    isLoading: isMealsLoading || isSummaryLoading,
   };
 }

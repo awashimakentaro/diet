@@ -56,23 +56,24 @@ export function buildNutritionSummary(
     goalKcal: mockGoal.totals.kcal,
     macros: [
       buildMacroSummary(
-        'Protein (P)',
+        'たんぱく質',
         totals.protein,
         mockGoal.totals.protein,
         'protein',
       ),
       buildMacroSummary(
-        'Fat (F)',
+        '脂質',
         totals.fat,
         mockGoal.totals.fat,
         'fat',
       ),
       buildMacroSummary(
-        'Carbs (C)',
+        '炭水化物',
         totals.carbs,
         mockGoal.totals.carbs,
         'carbs',
       ),
+
     ],
   };
 }

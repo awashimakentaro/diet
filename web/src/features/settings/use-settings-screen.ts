@@ -8,7 +8,7 @@
  *
  * 【使用されるエージェント / 処理フロー】
  * - settings-screen.tsx から呼ばれる。
- * - mockGoal / mockProfileSnapshot / mockNotificationSetting を初期値に使う。
+ * - mockGoal / mockProfileSnapshot を初期値に使う。
  *
  * 【やらないこと】
  * - API 通信
@@ -25,7 +25,6 @@ import { useState } from 'react';
 import { useWebAuth } from '@/app/provider';
 import {
   mockGoal,
-  mockNotificationSetting,
   mockProfileSnapshot,
 } from '@/data/mock-diet-data';
 
@@ -37,34 +36,31 @@ type ManualTargetValues = {
 };
 
 type ProfileValues = {
+  age: string;
+  heightCm: string;
   currentWeightKg: string;
   targetWeightKg: string;
   targetDays: string;
 };
 
+
 type ActivityLevel = 'low' | 'moderate' | 'high';
 type Gender = 'male' | 'female';
-type ReminderSlot = 'morning' | 'noon' | 'evening' | 'night';
 
 export type UseSettingsScreenResult = {
   manualTargets: ManualTargetValues;
   profileValues: ProfileValues;
   gender: Gender;
   activityLevel: ActivityLevel;
-  notificationsEnabled: boolean;
-  selectedReminder: ReminderSlot;
   accountEmail: string;
   feedbackMessage: string | null;
   handleManualTargetChange: (field: keyof ManualTargetValues, value: string) => void;
   handleProfileValueChange: (field: keyof ProfileValues, value: string) => void;
   handleGenderChange: (value: Gender) => void;
   handleActivityChange: (value: ActivityLevel) => void;
-  handleToggleNotifications: () => void;
-  handleReminderSelect: (value: ReminderSlot) => void;
   handleManualTargetSubmit: () => void;
   handleSaveProfile: () => void;
   handleRunAutoCalculate: () => void;
-  handleSaveNotifications: () => void;
   handleSignOut: () => Promise<void>;
 };
 
@@ -72,13 +68,8 @@ function toGenderValue(value: string): Gender {
   return value === 'female' ? 'female' : 'male';
 }
 
-function toReminderSlot(value: string): ReminderSlot {
-  if (value === 'noon' || value === 'evening' || value === 'night') {
-    return value;
-  }
 
-  return 'morning';
-}
+
 
 export function useSettingsScreen(): UseSettingsScreenResult {
   const { user, signOut } = useWebAuth();
@@ -90,14 +81,15 @@ export function useSettingsScreen(): UseSettingsScreenResult {
     carbs: String(mockGoal.totals.carbs),
   });
   const [profileValues, setProfileValues] = useState<ProfileValues>({
+    age: String(mockProfileSnapshot.age),
+    heightCm: String(mockProfileSnapshot.heightCm),
     currentWeightKg: String(mockProfileSnapshot.currentWeightKg.toFixed(1)),
     targetWeightKg: String(mockProfileSnapshot.targetWeightKg.toFixed(1)),
     targetDays: String(mockProfileSnapshot.targetWeeks * 7),
   });
+
   const [gender, setGender] = useState<Gender>(toGenderValue(mockProfileSnapshot.gender));
   const [activityLevel, setActivityLevel] = useState<ActivityLevel>(mockProfileSnapshot.activityLevel);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(mockNotificationSetting.enabled);
-  const [selectedReminder, setSelectedReminder] = useState<ReminderSlot>(toReminderSlot('night'));
 
   function handleManualTargetChange(field: keyof ManualTargetValues, value: string): void {
     setManualTargets((current) => ({ ...current, [field]: value }));
@@ -115,14 +107,6 @@ export function useSettingsScreen(): UseSettingsScreenResult {
     setActivityLevel(value);
   }
 
-  function handleToggleNotifications(): void {
-    setNotificationsEnabled((current) => !current);
-  }
-
-  function handleReminderSelect(value: ReminderSlot): void {
-    setSelectedReminder(value);
-  }
-
   function handleManualTargetSubmit(): void {
     setFeedbackMessage('手動目標のローカル更新を反映しました。');
   }
@@ -132,12 +116,56 @@ export function useSettingsScreen(): UseSettingsScreenResult {
   }
 
   function handleRunAutoCalculate(): void {
-    setFeedbackMessage(`自動計算を実行しました。性別 ${gender} / 活動量 ${activityLevel} を反映対象にしています。`);
+    const age = Number(profileValues.age);
+    const height = Number(profileValues.heightCm);
+    const weight = Number(profileValues.currentWeightKg);
+    const targetWeight = Number(profileValues.targetWeightKg);
+
+    if (isNaN(age) || isNaN(height) || isNaN(weight) || isNaN(targetWeight)) {
+      setFeedbackMessage('数値を正しく入力してください。');
+      return;
+    }
+
+    // BMR (Mifflin-St Jeor)
+    let bmr = 10 * weight + 6.25 * height - 5 * age;
+    bmr += gender === 'male' ? 5 : -161;
+
+    // TDEE
+    const multipliers: Record<ActivityLevel, number> = {
+      low: 1.2,
+      moderate: 1.55,
+      high: 1.75,
+    };
+    const tdee = bmr * multipliers[activityLevel];
+
+    // Target Calories
+    let targetKcal = tdee;
+    if (targetWeight < weight) {
+      targetKcal -= 500; // 減量
+    } else if (targetWeight > weight) {
+      targetKcal += 300; // 筋肉増強
+    }
+
+    targetKcal = Math.round(targetKcal);
+
+    // Macros
+    // Protein: 2.0g per kg of weight (Athlete/Gym standard)
+    const protein = Math.round(weight * 2.0);
+    // Fat: 25% of total calories
+    const fat = Math.round((targetKcal * 0.25) / 9);
+    // Carbs: Remainder
+    const carbs = Math.round((targetKcal - protein * 4 - fat * 9) / 4);
+
+    setManualTargets({
+      kcal: String(targetKcal),
+      protein: String(protein),
+      fat: String(fat),
+      carbs: String(carbs),
+    });
+
+    setFeedbackMessage('身体情報から最適な目標（減量・バルクアップ等）を自動計算しました。');
   }
 
-  function handleSaveNotifications(): void {
-    setFeedbackMessage(`通知設定を保存しました。現在は ${notificationsEnabled ? '有効' : '無効'} / ${selectedReminder} 枠を選択中です。`);
-  }
 
   async function handleSignOut(): Promise<void> {
     await signOut();
@@ -148,20 +176,15 @@ export function useSettingsScreen(): UseSettingsScreenResult {
     profileValues,
     gender,
     activityLevel,
-    notificationsEnabled,
-    selectedReminder,
     accountEmail: user?.email ?? 'guest@example.com',
     feedbackMessage,
     handleManualTargetChange,
     handleProfileValueChange,
     handleGenderChange,
     handleActivityChange,
-    handleToggleNotifications,
-    handleReminderSelect,
     handleManualTargetSubmit,
     handleSaveProfile,
     handleRunAutoCalculate,
-    handleSaveNotifications,
     handleSignOut,
   };
 }

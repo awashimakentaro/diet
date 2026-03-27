@@ -63,12 +63,11 @@ export default function AuthenticatedAppLayout({
 
   if (status === 'checking') {
     return (
-      <main className="auth-page">
-        <section className="auth-card auth-card--compact">
-          <p className="eyebrow">認証確認中</p>
-          <h1>セッションを確認しています</h1>
-          <p>ログイン状態を確認した後に、要求されたページへ遷移します。</p>
-        </section>
+      <main className="auth-page auth-page--loading">
+        <div className="auth-card auth-card--minimal">
+          <div className="loading-spinner" />
+          <p className="auth-loading-text">セッションを確認中...</p>
+        </div>
       </main>
     );
   }

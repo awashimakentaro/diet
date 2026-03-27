@@ -21,7 +21,9 @@ import { z } from 'zod';
 
 export const recordAnalysisRequestSchema = z.object({
   prompt: z.string().trim().min(1),
+  images: z.array(z.string()).optional(),
 });
+
 
 export const recordAnalysisItemSchema = z.object({
   name: z.string().trim().min(1),
@@ -37,7 +39,8 @@ export const recordAnalysisResponseSchema = z.object({
   originalText: z.string().trim(),
   items: z.array(recordAnalysisItemSchema).min(1),
   warnings: z.array(z.string()),
-  source: z.enum(['text', 'fallback']),
+  source: z.enum(['text', 'vision', 'fallback']),
+
 });
 
 export type RecordAnalysisRequest = z.infer<typeof recordAnalysisRequestSchema>;

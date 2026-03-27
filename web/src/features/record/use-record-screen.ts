@@ -22,6 +22,7 @@
 import { useMemo, useState } from 'react';
 import { useFieldArray, useWatch } from 'react-hook-form';
 
+import { fileToBase64 } from '@/utils/file-to-base64';
 import { applyRecordAnalysisToForm } from './apply-record-analysis';
 import {
   type RecordFoodItemValues,
@@ -29,6 +30,7 @@ import {
 } from './record-form-schema';
 import { requestRecordAnalysis } from './request-record-analysis';
 import { saveRecordMeal } from './save-record-meal';
+import { usePromptAttachments, type PromptAttachment } from './use-prompt-attachments';
 import { useRecordForm } from './use-record-form';
 
 function createEmptyItem(): RecordFoodItemValues {
@@ -75,6 +77,7 @@ export type UseRecordScreenResult = {
   isAnalyzing: boolean;
   isSaving: boolean;
   promptGuideMessage: string | null;
+  attachments: ReturnType<typeof usePromptAttachments>['attachments'];
   draftTotals: {
     kcal: number;
     protein: number;
@@ -87,6 +90,8 @@ export type UseRecordScreenResult = {
   handleOpenManualInput: () => void;
   handleCloseManualInput: () => void;
   handlePhotoRecord: () => void;
+  handleAttachmentChange: ReturnType<typeof usePromptAttachments>['handleAttachmentChange'];
+  handleRemoveAttachment: ReturnType<typeof usePromptAttachments>['handleRemoveAttachment'];
   handleAddItem: () => void;
   handleRemoveItem: (index: number) => void;
   handleConfirmDraft: () => void;
@@ -100,10 +105,12 @@ export function useRecordScreen(): UseRecordScreenResult {
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
   const [feedbackTone, setFeedbackTone] = useState<FeedbackTone>('info');
   const [draftOriginalText, setDraftOriginalText] = useState('');
+  const { attachments, handleAttachmentChange, handleRemoveAttachment, setAttachments } = usePromptAttachments() as any; // Temporary cast for setAttachments
   const { fields, append, remove, replace } = useFieldArray({
     control: form.control,
     name: 'items',
   });
+
   const prompt = useWatch({ control: form.control, name: 'prompt' });
   const items = useWatch({ control: form.control, name: 'items' });
 
@@ -144,7 +151,19 @@ export function useRecordScreen(): UseRecordScreenResult {
     setIsAnalyzing(true);
 
     try {
-      const draft = await requestRecordAnalysis({ prompt: trimmedPrompt });
+      const imageUrls = await Promise.all(
+        attachments.map(async (a: PromptAttachment) => {
+          const res = await fetch(a.previewUrl);
+          const blob = await res.blob();
+          return fileToBase64(blob);
+        }),
+      );
+
+      const draft = await requestRecordAnalysis({
+        prompt: trimmedPrompt,
+        images: imageUrls.length > 0 ? imageUrls : undefined,
+      });
+
       const shouldAppend =
         workspaceMode !== 'idle'
         && (form.getValues('mealName').trim().length > 0
@@ -168,9 +187,9 @@ export function useRecordScreen(): UseRecordScreenResult {
       setWorkspaceMode('generated');
       setFeedbackMessage(
         draft.warnings[0]
-          ?? (shouldAppend
-            ? 'AI が推定した食品候補を既存カードへ追加しました。'
-            : 'AI が推定した栄養情報を下書きカードへ反映しました。'),
+        ?? (shouldAppend
+          ? 'AI が推定した食品候補を既存カードへ追加しました。'
+          : 'AI が推定した栄養情報を下書きカードへ反映しました。'),
       );
       setFeedbackTone(draft.warnings[0] ? 'error' : 'info');
     } catch (error) {
@@ -291,6 +310,7 @@ export function useRecordScreen(): UseRecordScreenResult {
     isAnalyzing,
     isSaving,
     promptGuideMessage,
+    attachments,
     draftTotals,
     feedbackMessage,
     feedbackTone,
@@ -298,8 +318,11 @@ export function useRecordScreen(): UseRecordScreenResult {
     handleOpenManualInput,
     handleCloseManualInput,
     handlePhotoRecord,
+    handleAttachmentChange,
+    handleRemoveAttachment,
     handleAddItem,
     handleRemoveItem,
     handleConfirmDraft,
   };
 }
+

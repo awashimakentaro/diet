@@ -31,9 +31,10 @@ export function SettingsAccountCard({
 }: SettingsAccountCardProps): JSX.Element {
   return (
     <section className="settings-screen__section">
-      <p className="settings-screen__section-label">アカウント</p>
+      <p className="eyebrow">アカウント</p>
 
-      <div className="settings-screen__card settings-screen__card--account">
+
+      <div className="settings-screen__card settings-screen__card--account app-card">
         <div className="settings-screen__account-row">
           <div className="settings-screen__account-avatar">
             <BadgeCheck size={18} strokeWidth={2} />
@@ -45,7 +46,7 @@ export function SettingsAccountCard({
           </div>
         </div>
 
-        <button className="settings-screen__logout-button" onClick={onSignOut} type="button">
+        <button className="app-btn app-btn--secondary" onClick={onSignOut} type="button">
           ログアウト
         </button>
       </div>
