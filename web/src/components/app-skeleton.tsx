@@ -81,6 +81,16 @@ export function HomeScreenSkeleton(): JSX.Element {
                 </SkeletonCard>
 
                 <SkeletonCard>
+                    <SkeletonLine width="35%" height="10px" />
+                    <SkeletonLine width="45%" height="16px" style={{ marginTop: 8 }} />
+                    <div className="skeleton-row" style={{ marginTop: 16 }}>
+                        <SkeletonLine width="40%" height="48px" borderRadius="18px" />
+                        <SkeletonLine width="40%" height="48px" borderRadius="18px" />
+                    </div>
+                    <SkeletonLine width="100%" height="220px" borderRadius="24px" style={{ marginTop: 16 }} />
+                </SkeletonCard>
+
+                <SkeletonCard>
                     <SkeletonLine width="45%" height="10px" />
                     <SkeletonLine width="60%" height="16px" style={{ marginTop: 8 }} />
                     <div className="skeleton-bar-chart" style={{ marginTop: 16 }}>

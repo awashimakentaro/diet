@@ -34,5 +34,9 @@ export const paths = {
     settings: {
       getHref: () => '/app/settings',
     },
+    onboarding: {
+      getHref: (redirectTo?: string | null) =>
+        `/app/onboarding${redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : ''}`,
+    },
   },
 } as const;

@@ -85,3 +85,12 @@ CREATE TABLE public.user_profiles (
   CONSTRAINT user_profiles_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
   CONSTRAINT user_profiles_username_key UNIQUE (username)
 );
+CREATE TABLE public.user_weight_logs (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  recorded_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
+  current_weight_kg numeric NOT NULL,
+  target_weight_kg numeric,
+  CONSTRAINT user_weight_logs_pkey PRIMARY KEY (id),
+  CONSTRAINT user_weight_logs_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+);

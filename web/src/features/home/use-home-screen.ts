@@ -17,6 +17,7 @@
  * 【他ファイルとの関係】
  * - summary 配下の取得処理を利用する。
  * - record-summary-card.tsx へ渡す NutritionSummary を返す。
+ * - list-user-weight-logs.ts で体重推移用ログを取得する。
  */
 
 import { useEffect } from 'react';
@@ -31,6 +32,8 @@ import { listDailySummary } from '../summary/list-daily-summary';
 import { listRecentMeals } from '../summary/list-recent-meals';
 import { listWeekDailySummaries } from '../summary/list-week-daily-summaries';
 import { recomputeRecentDailySummaries } from '../summary/recompute-recent-daily-summaries';
+import { listCurrentGoal } from '../settings/list-current-goal';
+import { listUserWeightLogs, type UserWeightLogPoint } from './list-user-weight-logs';
 
 type HomeInsight = {
   label: string;
@@ -41,6 +44,7 @@ type HomeInsight = {
 type HomeUsageBar = {
   label: string;
   value: number;
+  kcal: number;
   hasRecord: boolean;
 };
 
@@ -52,6 +56,7 @@ export type UseHomeScreenResult = {
   insights: HomeInsight[];
   usageBars: HomeUsageBar[];
   recentMeals: HomeRecentMeal[];
+  weightLogs: UserWeightLogPoint[];
   isLoading: boolean;
 };
 
@@ -135,6 +140,7 @@ function buildUsageBars(summaries: WebDailySummary[]): HomeUsageBar[] {
     return {
       label: new Intl.DateTimeFormat('ja-JP', { weekday: 'short' }).format(date),
       value: normalizedValue,
+      kcal: Math.round(summary.totals.kcal),
       hasRecord: summary.mealCount > 0,
     };
 
@@ -219,6 +225,17 @@ export function useHomeScreen(): UseHomeScreenResult {
       fallbackData: [],
     },
   );
+  const { data: weightLogs = [], isLoading: isWeightLoading } = useSWR(
+    '/home/user-weight-logs/12',
+    () => listUserWeightLogs(12),
+    {
+      fallbackData: [],
+    },
+  );
+  const { data: goal, isLoading: isGoalLoading } = useSWR(
+    '/settings/current-goal',
+    () => listCurrentGoal(),
+  );
 
   useEffect(() => {
     if (recentMeals.length === 0 || weeklySummaries.length > 0) {
@@ -243,11 +260,12 @@ export function useHomeScreen(): UseHomeScreenResult {
   );
 
   return {
-    summary: buildNutritionSummary(todaySummary ?? null),
+    summary: buildNutritionSummary(todaySummary ?? null, goal ?? null),
     consecutiveDays: buildConsecutiveDays(weeklySummaries),
     insights: buildInsights(weeklySummaries),
     usageBars: buildUsageBars(normalizedWeeklySummaries),
     recentMeals,
-    isLoading: isTodayLoading || isWeeklyLoading || isRecentLoading,
+    weightLogs,
+    isLoading: isTodayLoading || isWeeklyLoading || isRecentLoading || isWeightLoading || isGoalLoading,
   };
 }

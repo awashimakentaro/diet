@@ -30,6 +30,8 @@ type SettingsManualTargetCardProps = {
   values: ManualTargetValues;
   onChange: (field: keyof ManualTargetValues, value: string) => void;
   onSubmit: () => void;
+  isSaving: boolean;
+  isSaved: boolean;
 };
 
 type InputSpec = {
@@ -49,6 +51,8 @@ export function SettingsManualTargetCard({
   values,
   onChange,
   onSubmit,
+  isSaving,
+  isSaved,
 }: SettingsManualTargetCardProps): JSX.Element {
   function createChangeHandler(field: keyof ManualTargetValues) {
     return (event: ChangeEvent<HTMLInputElement>): void => {
@@ -80,7 +84,8 @@ export function SettingsManualTargetCard({
         </div>
 
         <button className="app-btn app-btn--primary" onClick={onSubmit} type="button">
-          設定を更新する
+          {isSaving ? <span className="record-screen__loading-spinner record-screen__loading-spinner--inline" /> : null}
+          <span>{isSaving ? '保存中...' : isSaved ? '保存しました。' : '設定を更新する'}</span>
         </button>
 
       </div>

@@ -28,6 +28,7 @@ import {
 
 import { getSettingsGoal } from './get-settings-goal';
 import { getUserProfile } from './get-user-profile';
+import { calculateGoalFromProfile } from './calculate-goal-from-profile';
 import { saveSettingsGoal } from './save-settings-goal';
 import { saveUserProfile } from './save-user-profile';
 
@@ -52,6 +53,7 @@ type ProfileValues = {
 
 type ActivityLevel = 'low' | 'moderate' | 'high';
 type Gender = 'male' | 'female';
+type SettingsSaveAction = 'manual-goal' | 'profile' | 'auto-goal' | null;
 
 export type UseSettingsScreenResult = {
   manualTargets: ManualTargetValues;
@@ -59,7 +61,9 @@ export type UseSettingsScreenResult = {
   gender: Gender;
   activityLevel: ActivityLevel;
   accountEmail: string;
-  feedbackMessage: string | null;
+  isSaving: boolean;
+  activeSaveAction: SettingsSaveAction;
+  saveStatus: 'idle' | 'saving' | 'success' | 'error';
   handleManualTargetChange: (field: keyof ManualTargetValues, value: string) => void;
   handleProfileValueChange: (field: keyof ProfileValues, value: string) => void;
   handleGenderChange: (value: Gender) => void;
@@ -107,7 +111,9 @@ function toNumberOrNull(value: string): number | null {
 
 export function useSettingsScreen(): UseSettingsScreenResult {
   const { user, signOut } = useWebAuth();
-  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [activeSaveAction, setActiveSaveAction] = useState<SettingsSaveAction>(null);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [manualTargets, setManualTargets] = useState<ManualTargetValues>({
     kcal: String(mockGoal.totals.kcal),
     protein: String(mockGoal.totals.protein),
@@ -179,8 +185,6 @@ export function useSettingsScreen(): UseSettingsScreenResult {
         if (!isMounted) {
           return;
         }
-
-        setFeedbackMessage(error instanceof Error ? error.message : '設定の読込に失敗しました。');
       }
     }
 
@@ -214,15 +218,21 @@ export function useSettingsScreen(): UseSettingsScreenResult {
     const carbs = toNumberOrNull(manualTargets.carbs);
 
     if (kcal === null || protein === null || fat === null || carbs === null) {
-      setFeedbackMessage('目標値はすべて数値で入力してください。');
+      setActiveSaveAction('manual-goal');
+      setSaveStatus('error');
       return;
     }
 
     try {
+      setActiveSaveAction('manual-goal');
+      setIsSaving(true);
+      setSaveStatus('saving');
       await saveSettingsGoal({ kcal, protein, fat, carbs });
-      setFeedbackMessage('手動目標を DB に保存しました。');
-    } catch (error) {
-      setFeedbackMessage(error instanceof Error ? error.message : '目標値の保存に失敗しました。');
+      setSaveStatus('success');
+    } catch {
+      setSaveStatus('error');
+    } finally {
+      setIsSaving(false);
     }
   }
 
@@ -240,11 +250,15 @@ export function useSettingsScreen(): UseSettingsScreenResult {
       || targetWeightKg === null
       || targetDays === null
     ) {
-      setFeedbackMessage('プロフィールの数値を正しく入力してください。');
+      setActiveSaveAction('profile');
+      setSaveStatus('error');
       return;
     }
 
     try {
+      setActiveSaveAction('profile');
+      setIsSaving(true);
+      setSaveStatus('saving');
       await saveUserProfile({
         username: profileValues.username,
         displayName: profileValues.displayName,
@@ -257,9 +271,11 @@ export function useSettingsScreen(): UseSettingsScreenResult {
         targetDays,
         activityLevel,
       });
-      setFeedbackMessage('プロフィールを DB に保存しました。');
-    } catch (error) {
-      setFeedbackMessage(error instanceof Error ? error.message : 'プロフィールの保存に失敗しました。');
+      setSaveStatus('success');
+    } catch {
+      setSaveStatus('error');
+    } finally {
+      setIsSaving(false);
     }
   }
 
@@ -270,48 +286,31 @@ export function useSettingsScreen(): UseSettingsScreenResult {
     const targetWeight = Number(profileValues.targetWeightKg);
 
     if (isNaN(age) || isNaN(height) || isNaN(weight) || isNaN(targetWeight)) {
-      setFeedbackMessage('数値を正しく入力してください。');
+      setActiveSaveAction('auto-goal');
+      setSaveStatus('error');
       return;
     }
 
-    // BMR (Mifflin-St Jeor)
-    let bmr = 10 * weight + 6.25 * height - 5 * age;
-    bmr += gender === 'male' ? 5 : -161;
-
-    // TDEE
-    const multipliers: Record<ActivityLevel, number> = {
-      low: 1.2,
-      moderate: 1.55,
-      high: 1.75,
-    };
-    const tdee = bmr * multipliers[activityLevel];
-
-    // Target Calories
-    let targetKcal = tdee;
-    if (targetWeight < weight) {
-      targetKcal -= 500; // 減量
-    } else if (targetWeight > weight) {
-      targetKcal += 300; // 筋肉増強
-    }
-
-    targetKcal = Math.round(targetKcal);
-
-    // Macros
-    // Protein: 2.0g per kg of weight (Athlete/Gym standard)
-    const protein = Math.round(weight * 2.0);
-    // Fat: 25% of total calories
-    const fat = Math.round((targetKcal * 0.25) / 9);
-    // Carbs: Remainder
-    const carbs = Math.round((targetKcal - protein * 4 - fat * 9) / 4);
+    const goal = calculateGoalFromProfile({
+      age,
+      heightCm: height,
+      currentWeightKg: weight,
+      targetWeightKg: targetWeight,
+      gender,
+      activityLevel,
+    });
 
     setManualTargets({
-      kcal: String(targetKcal),
-      protein: String(protein),
-      fat: String(fat),
-      carbs: String(carbs),
+      kcal: String(goal.kcal),
+      protein: String(goal.protein),
+      fat: String(goal.fat),
+      carbs: String(goal.carbs),
     });
 
     try {
+      setActiveSaveAction('auto-goal');
+      setIsSaving(true);
+      setSaveStatus('saving');
       await saveUserProfile({
         username: profileValues.username,
         displayName: profileValues.displayName,
@@ -325,14 +324,16 @@ export function useSettingsScreen(): UseSettingsScreenResult {
         activityLevel,
       });
       await saveSettingsGoal({
-        kcal: targetKcal,
-        protein,
-        fat,
-        carbs,
+        kcal: goal.kcal,
+        protein: goal.protein,
+        fat: goal.fat,
+        carbs: goal.carbs,
       });
-      setFeedbackMessage('身体情報から目標を計算し、プロフィールと目標値を DB に保存しました。');
-    } catch (error) {
-      setFeedbackMessage(error instanceof Error ? error.message : '自動計算結果の保存に失敗しました。');
+      setSaveStatus('success');
+    } catch {
+      setSaveStatus('error');
+    } finally {
+      setIsSaving(false);
     }
   }
 
@@ -347,7 +348,9 @@ export function useSettingsScreen(): UseSettingsScreenResult {
     gender,
     activityLevel,
     accountEmail: user?.email ?? 'guest@example.com',
-    feedbackMessage,
+    isSaving,
+    activeSaveAction,
+    saveStatus,
     handleManualTargetChange,
     handleProfileValueChange,
     handleGenderChange,

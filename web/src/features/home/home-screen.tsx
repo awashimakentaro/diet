@@ -21,7 +21,7 @@
  */
 
 import { motion, useReducedMotion } from 'framer-motion';
-import type { JSX } from 'react';
+import { useState, type JSX } from 'react';
 
 import { AppBottomNav } from '@/components/app-bottom-nav';
 import { HomeScreenSkeleton } from '@/components/app-skeleton';
@@ -29,11 +29,13 @@ import { AppTopBar } from '@/components/app-top-bar';
 import { RecordSummaryCard } from '@/features/record/components/record-summary-card';
 
 import { TutorialOverlay } from './components/tutorial-overlay';
+import { WeightTrendChart } from './components/weight-trend-chart';
 import { useHomeScreen } from './use-home-screen';
 
 
 export function HomeScreen(): JSX.Element {
-  const { summary, consecutiveDays, insights, usageBars, recentMeals, isLoading } = useHomeScreen();
+  const { summary, consecutiveDays, insights, usageBars, weightLogs, isLoading } = useHomeScreen();
+  const [selectedWeightLogId, setSelectedWeightLogId] = useState<string | null>(null);
   const chartHeight = 136;
   const reduceMotion = useReducedMotion();
   const sectionTransition = reduceMotion
@@ -62,119 +64,144 @@ export function HomeScreen(): JSX.Element {
             initial={{ opacity: 0, y: 18 }}
             transition={sectionTransition}
           >
-            <RecordSummaryCard summary={summary} />
+            <div className="home-screen__hero-stack">
+              <RecordSummaryCard summary={summary} />
 
-            <motion.section
-              animate={{ opacity: 1, y: 0 }}
-              className="home-screen__card"
-              initial={{ opacity: 0, y: 20 }}
-              transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.08 }}
-            >
-              <div className="home-screen__card-head">
-                <p className="home-screen__eyebrow">コンスタンス</p>
-                <h2 className="home-screen__section-title">継続利用</h2>
-              </div>
+              <motion.section
+                animate={{ opacity: 1, y: 0 }}
+                className="home-screen__card"
+                initial={{ opacity: 0, y: 20 }}
+                transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.16 }}
+              >
+                <div className="home-screen__card-head">
+                  <p className="home-screen__eyebrow">インサイト</p>
+                  <h2 className="home-screen__section-title">分析結果</h2>
+                </div>
 
-              <div className="home-screen__streak">
-                <strong>{consecutiveDays}</strong>
-                <span>日間連続</span>
-              </div>
+                <div className="home-screen__insight-list">
+                  {insights.map((insight) => (
+                    <motion.article
+                      animate={{ opacity: 1, y: 0 }}
+                      className="home-screen__insight-card"
+                      initial={{ opacity: 0, y: 14 }}
+                      key={insight.label}
+                      transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.22 }}
+                    >
+                      <div className="home-screen__insight-label-row">
+                        <p>{insight.label}</p>
+                        <span className="home-screen__insight-dot" />
+                      </div>
+                      <strong>{insight.value}</strong>
+                      <span>{insight.description}</span>
+                    </motion.article>
+                  ))}
+                </div>
+              </motion.section>
+            </div>
 
-              <p className="home-screen__support-copy">
-                連続して記録できています。今日も入力を続けて、日々の推移を安定して残しましょう。
-              </p>
-            </motion.section>
-          </motion.section>
+            <div className="home-screen__side-stack">
+              <motion.section
+                animate={{ opacity: 1, y: 0 }}
+                className="home-screen__card home-screen__card--weight"
+                initial={{ opacity: 0, y: 20 }}
+                transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.08 }}
+              >
+                <div className="home-screen__card-head">
+                  <p className="home-screen__eyebrow">Body Progress</p>
+                  <h2 className="home-screen__section-title">体重推移</h2>
+                </div>
 
-          <motion.section
-            animate={{ opacity: 1, y: 0 }}
-            className="home-screen__grid"
-            initial={{ opacity: 0, y: 18 }}
-            transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.12 }}
-          >
-            <motion.section
-              animate={{ opacity: 1, y: 0 }}
-              className="home-screen__card"
-              initial={{ opacity: 0, y: 20 }}
-              transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.16 }}
-            >
-              <div className="home-screen__card-head">
-                <p className="home-screen__eyebrow">インサイト</p>
-                <h2 className="home-screen__section-title">分析結果</h2>
-              </div>
-
-              <div className="home-screen__insight-list">
-                {insights.map((insight) => (
-                  <motion.article
-                    animate={{ opacity: 1, y: 0 }}
-                    className="home-screen__insight-card"
-                    initial={{ opacity: 0, y: 14 }}
-                    key={insight.label}
-                    transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.22 }}
-                  >
-                    <div className="home-screen__insight-label-row">
-                      <p>{insight.label}</p>
-                      <span className="home-screen__insight-dot" />
-                    </div>
-                    <strong>{insight.value}</strong>
-                    <span>{insight.description}</span>
-                  </motion.article>
-                ))}
-              </div>
-            </motion.section>
-
-            <motion.section
-              animate={{ opacity: 1, y: 0 }}
-              className="home-screen__card"
-              initial={{ opacity: 0, y: 20 }}
-              transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.2 }}
-            >
-              <div className="home-screen__card-head">
-                <p className="home-screen__eyebrow">アクティビティ</p>
-                <h2 className="home-screen__section-title">最近の利用状況</h2>
-              </div>
-
-
-              <div className="home-screen__usage-chart">
-                {usageBars.map((bar) => (
-                  <div className="home-screen__usage-bar" key={bar.label}>
-                    <motion.div
-                      className={bar.hasRecord ? 'home-screen__usage-fill' : 'home-screen__usage-fill home-screen__usage-fill--empty'}
-                      initial={{ height: 0 }}
-                      animate={{
-                        height: bar.hasRecord
-                          ? Math.max(8, Math.round((bar.value / 100) * chartHeight))
-                          : 0,
-                      }}
-                      transition={
-                        reduceMotion
-                          ? { duration: 0 }
-                          : { duration: 0.8, ease: 'easeOut' as const }
-                      }
-                    />
-                    <span>{bar.label}</span>
+                <div className="home-screen__weight-summary">
+                  <div>
+                    <span>最新体重</span>
+                    <strong>{weightLogs.at(-1)?.currentWeightKg ?? '--'} kg</strong>
                   </div>
-                ))}
-              </div>
-
-              <div className="home-screen__recent-list">
-                {recentMeals.map((meal) => (
-                  <motion.article
-                    animate={{ opacity: 1, y: 0 }}
-                    className="home-screen__recent-item"
-                    initial={{ opacity: 0, y: 12 }}
-                    key={meal.id}
-                    transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.26 }}
-                  >
-                    <div>
-                      <strong>{meal.name}</strong>
-                      <p>{meal.time}</p>
+                  <div>
+                    <span>目標体重</span>
+                    <strong>{weightLogs.at(-1)?.targetWeightKg ?? '--'} kg</strong>
+                  </div>
+                  {weightLogs.length > 0 ? (
+                    <div className="home-screen__weight-summary-slot">
+                      <WeightTrendChart
+                        onSelectPoint={setSelectedWeightLogId}
+                        points={weightLogs}
+                        selectedPointId={selectedWeightLogId ?? weightLogs.at(-1)?.id ?? null}
+                        variant="callout"
+                      />
                     </div>
-                    <span>{meal.kcal} kcal</span>
-                  </motion.article>
-                ))}
+                  ) : null}
+                </div>
+                <WeightTrendChart
+                  onSelectPoint={setSelectedWeightLogId}
+                  points={weightLogs}
+                  selectedPointId={selectedWeightLogId ?? weightLogs.at(-1)?.id ?? null}
+                />
+              </motion.section>
+
+              <div className="home-screen__side-row">
+                <motion.section
+                  animate={{ opacity: 1, y: 0 }}
+                  className="home-screen__card"
+                  initial={{ opacity: 0, y: 20 }}
+                  transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.16 }}
+                >
+                  <div className="home-screen__card-head">
+                    <p className="home-screen__eyebrow">コンスタンス</p>
+                    <h2 className="home-screen__section-title">継続利用</h2>
+                  </div>
+
+                  <div className="home-screen__streak">
+                    <strong>{consecutiveDays}</strong>
+                    <span>日間連続</span>
+                  </div>
+
+                  <p className="home-screen__support-copy">
+                    連続して記録できています。今日も入力を続けて、日々の推移を安定して残しましょう。
+                  </p>
+                </motion.section>
+
+                <motion.section
+                  animate={{ opacity: 1, y: 0 }}
+                  className="home-screen__card"
+                  initial={{ opacity: 0, y: 20 }}
+                  transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.2 }}
+                >
+                  <div className="home-screen__card-head">
+                    <p className="home-screen__eyebrow">アクティビティ</p>
+                    <h2 className="home-screen__section-title">曜日ごとの摂取カロリー</h2>
+                  </div>
+
+                  <p className="home-screen__activity-copy">
+                    今週の各曜日でどれだけ摂取したかを kcal ベースで表示しています。
+                  </p>
+
+                  <div className="home-screen__usage-chart">
+                    {usageBars.map((bar) => (
+                      <div className="home-screen__usage-bar" key={bar.label}>
+                        <strong className="home-screen__usage-kcal">
+                          {bar.hasRecord ? `${bar.kcal} kcal` : '-'}
+                        </strong>
+                        <motion.div
+                          className={bar.hasRecord ? 'home-screen__usage-fill' : 'home-screen__usage-fill home-screen__usage-fill--empty'}
+                          initial={{ height: 0 }}
+                          animate={{
+                            height: bar.hasRecord
+                              ? Math.max(8, Math.round((bar.value / 100) * chartHeight))
+                              : 0,
+                          }}
+                          transition={
+                            reduceMotion
+                              ? { duration: 0 }
+                              : { duration: 0.8, ease: 'easeOut' as const }
+                          }
+                        />
+                        <span>{bar.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </motion.section>
               </div>
-            </motion.section>
+            </div>
           </motion.section>
         </motion.main>
       )}

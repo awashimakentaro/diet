@@ -26,7 +26,9 @@ export function SettingsScreen(): JSX.Element {
     gender,
     activityLevel,
     accountEmail,
-    feedbackMessage,
+    isSaving,
+    activeSaveAction,
+    saveStatus,
     handleManualTargetChange,
     handleProfileValueChange,
     handleGenderChange,
@@ -63,6 +65,8 @@ export function SettingsScreen(): JSX.Element {
               transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.1 }}
             >
               <SettingsManualTargetCard
+                isSaved={activeSaveAction === 'manual-goal' && saveStatus === 'success'}
+                isSaving={activeSaveAction === 'manual-goal' && isSaving}
                 onChange={handleManualTargetChange}
                 onSubmit={handleManualTargetSubmit}
                 values={manualTargets}
@@ -77,6 +81,10 @@ export function SettingsScreen(): JSX.Element {
               <SettingsProfileCard
                 activityLevel={activityLevel}
                 gender={gender}
+                isSavedAuto={activeSaveAction === 'auto-goal' && saveStatus === 'success'}
+                isSavedProfile={activeSaveAction === 'profile' && saveStatus === 'success'}
+                isSavingAuto={activeSaveAction === 'auto-goal' && isSaving}
+                isSavingProfile={activeSaveAction === 'profile' && isSaving}
                 onActivityChange={handleActivityChange}
                 onGenderChange={handleGenderChange}
                 onRunAutoCalculate={handleRunAutoCalculate}
@@ -101,9 +109,6 @@ export function SettingsScreen(): JSX.Element {
               <SettingsAccountCard email={accountEmail} onSignOut={handleSignOut} />
             </motion.div>
 
-            {feedbackMessage !== null ? (
-              <p className="settings-screen__feedback">{feedbackMessage}</p>
-            ) : null}
           </motion.div>
         </div>
       </motion.main>

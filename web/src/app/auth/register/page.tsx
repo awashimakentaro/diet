@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 import { AuthLayout } from '@/app/auth/components/auth-layout';
 import { RegisterForm } from '@/features/auth/components/register-form';
+import { paths } from '@/config/paths';
 
 function normalizeRedirectTo(candidate: string | null): string {
   if (candidate === null || candidate.startsWith('/app/') === false) {
@@ -21,7 +22,7 @@ function RegisterPageContent(): JSX.Element {
 
   return (
     <AuthLayout>
-      <RegisterForm onSuccess={() => router.replace(redirectTo)} />
+      <RegisterForm onSuccess={() => router.replace(paths.app.onboarding.getHref(redirectTo))} />
     </AuthLayout>
   );
 }

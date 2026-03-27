@@ -14,10 +14,12 @@
  * - 自動計算
  *
  * 【他ファイルとの関係】
- * - getSupabaseBrowserClient を利用する。
+ * - getSupabaseBrowserClient と append-user-weight-log.ts を利用する。
  */
 
 import { getSupabaseBrowserClient } from '@/lib/supabase';
+
+import { appendUserWeightLog } from './append-user-weight-log';
 
 type Gender = 'male' | 'female';
 type ActivityLevel = 'low' | 'moderate' | 'high';
@@ -95,4 +97,10 @@ export async function saveUserProfile({
 
     throw new Error(error.message);
   }
+
+  await appendUserWeightLog({
+    userId,
+    currentWeightKg,
+    targetWeightKg,
+  });
 }

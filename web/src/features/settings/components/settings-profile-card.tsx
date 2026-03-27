@@ -37,6 +37,10 @@ type SettingsProfileCardProps = {
   gender: Gender;
   values: ProfileValues;
   activityLevel: ActivityLevel;
+  isSavingProfile: boolean;
+  isSavedProfile: boolean;
+  isSavingAuto: boolean;
+  isSavedAuto: boolean;
   onGenderChange: (value: Gender) => void;
   onValueChange: (field: keyof ProfileValues, value: string) => void;
   onActivityChange: (value: ActivityLevel) => void;
@@ -73,6 +77,10 @@ export function SettingsProfileCard({
   gender,
   values,
   activityLevel,
+  isSavingProfile,
+  isSavedProfile,
+  isSavingAuto,
+  isSavedAuto,
   onGenderChange,
   onValueChange,
   onActivityChange,
@@ -162,16 +170,16 @@ export function SettingsProfileCard({
             onClick={onRunAutoCalculate}
             type="button"
           >
-            <Calculator size={16} strokeWidth={2.2} />
-            <span>目標を自動計算</span>
+            {isSavingAuto ? <span className="record-screen__loading-spinner record-screen__loading-spinner--inline" /> : <Calculator size={16} strokeWidth={2.2} />}
+            <span>{isSavingAuto ? '保存中...' : isSavedAuto ? '保存しました。' : '目標を自動計算'}</span>
           </button>
           <button
             className="profile-actions__btn profile-actions__btn--save"
             onClick={onSaveProfile}
             type="button"
           >
-            <Save size={16} strokeWidth={2.2} />
-            <span>プロフィールを保存</span>
+            {isSavingProfile ? <span className="record-screen__loading-spinner record-screen__loading-spinner--inline" /> : <Save size={16} strokeWidth={2.2} />}
+            <span>{isSavingProfile ? '保存中...' : isSavedProfile ? '保存しました。' : 'プロフィールを保存'}</span>
           </button>
         </div>
       </div>

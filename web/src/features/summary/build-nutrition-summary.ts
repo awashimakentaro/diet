@@ -18,9 +18,10 @@
  * - record-summary-card.tsx の NutritionSummary 型を返す。
  */
 
-import { mockGoal } from '@/data/mock-diet-data';
 import type { WebDailySummary } from '@/domain/web-diet-schema';
+import type { WebGoal } from '@/domain/web-diet-schema';
 import type { NutritionSummary } from '@/features/record/components/record-summary-card';
+import { mockGoal } from '@/data/mock-diet-data';
 
 function buildMacroSummary(
   label: string,
@@ -43,6 +44,7 @@ function buildMacroSummary(
 
 export function buildNutritionSummary(
   dailySummary: WebDailySummary | null,
+  goal: WebGoal | null = null,
 ): NutritionSummary {
   const totals = dailySummary?.totals ?? {
     kcal: 0,
@@ -50,27 +52,28 @@ export function buildNutritionSummary(
     fat: 0,
     carbs: 0,
   };
+  const activeGoal = goal ?? mockGoal;
 
   return {
     kcal: totals.kcal,
-    goalKcal: mockGoal.totals.kcal,
+    goalKcal: activeGoal.totals.kcal,
     macros: [
       buildMacroSummary(
         'たんぱく質',
         totals.protein,
-        mockGoal.totals.protein,
+        activeGoal.totals.protein,
         'protein',
       ),
       buildMacroSummary(
         '脂質',
         totals.fat,
-        mockGoal.totals.fat,
+        activeGoal.totals.fat,
         'fat',
       ),
       buildMacroSummary(
         '炭水化物',
         totals.carbs,
-        mockGoal.totals.carbs,
+        activeGoal.totals.carbs,
         'carbs',
       ),
 

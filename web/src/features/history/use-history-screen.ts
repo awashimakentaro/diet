@@ -26,6 +26,7 @@ import type { NutritionSummary } from '@/features/record/components/record-summa
 import { formatDateKey, getTodayKey, parseDateKey } from '@/lib/web-date';
 
 import { buildNutritionSummary } from '../summary/build-nutrition-summary';
+import { listCurrentGoal } from '../settings/list-current-goal';
 import { listDailySummary } from '../summary/list-daily-summary';
 import { recomputeDailySummaryForDateKey } from '../summary/recompute-daily-summary';
 import { deleteHistoryMeal } from './delete-history-meal';
@@ -88,6 +89,10 @@ export function useHistoryScreen(): UseHistoryScreenResult {
     `/summary/daily/${selectedDateKey}`,
     () => listDailySummary(selectedDateKey),
   );
+  const { data: goal, isLoading: isGoalLoading } = useSWR(
+    '/settings/current-goal',
+    () => listCurrentGoal(),
+  );
 
   const meals = useMemo(() => {
     return data ?? [];
@@ -100,7 +105,7 @@ export function useHistoryScreen(): UseHistoryScreenResult {
       weekday: 'short',
     }).format(parseDateKey(selectedDateKey));
   }, [selectedDateKey]);
-  const summary = useMemo(() => buildNutritionSummary(dailySummary ?? null), [dailySummary]);
+  const summary = useMemo(() => buildNutritionSummary(dailySummary ?? null, goal ?? null), [dailySummary, goal]);
   const editingMeal = useMemo(() => {
     if (editingMealId === null) {
       return null;
@@ -256,6 +261,6 @@ export function useHistoryScreen(): UseHistoryScreenResult {
     handleCloseEditMeal,
     handleUpdateMeal,
     handleSaveMeal,
-    isLoading: isMealsLoading || isSummaryLoading,
+  isLoading: isMealsLoading || isSummaryLoading || isGoalLoading,
   };
 }

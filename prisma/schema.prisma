@@ -76,6 +76,16 @@ model UserProfile {
   @@map("user_profiles")
 }
 
+model UserWeightLog {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String   @map("user_id") @db.Uuid
+  recordedAt      DateTime @default(now()) @map("recorded_at") @db.Timestamptz(6)
+  currentWeightKg Decimal  @map("current_weight_kg") @db.Decimal
+  targetWeightKg  Decimal? @map("target_weight_kg") @db.Decimal
+
+  @@map("user_weight_logs")
+}
+
 model Meal {
   id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId       String   @map("user_id") @db.Uuid
