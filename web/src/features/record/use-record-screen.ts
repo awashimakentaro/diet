@@ -141,9 +141,10 @@ export function useRecordScreen(): UseRecordScreenResult {
 
   async function handleApplyPrompt(): Promise<void> {
     const trimmedPrompt = prompt.trim();
+    const hasAttachments = attachments.length > 0;
 
-    if (trimmedPrompt.length === 0) {
-      setFeedbackMessage('食事内容を入力すると、下の編集欄へ下書きを反映できます。');
+    if (trimmedPrompt.length === 0 && !hasAttachments) {
+      setFeedbackMessage('食事内容または写真を追加すると、下の編集欄へ下書きを反映できます。');
       setFeedbackTone('error');
       return;
     }
@@ -178,7 +179,7 @@ export function useRecordScreen(): UseRecordScreenResult {
       });
       setDraftOriginalText((current) => {
         if (shouldAppend && current.trim().length > 0) {
-          return `${current}\n${trimmedPrompt}`;
+          return trimmedPrompt.length > 0 ? `${current}\n${trimmedPrompt}` : current;
         }
 
         return trimmedPrompt;
@@ -189,19 +190,26 @@ export function useRecordScreen(): UseRecordScreenResult {
         draft.warnings[0]
         ?? (shouldAppend
           ? 'AI が推定した食品候補を既存カードへ追加しました。'
-          : 'AI が推定した栄養情報を下書きカードへ反映しました。'),
+          : hasAttachments
+            ? 'AI が写真から推定した栄養情報を下書きカードへ反映しました。'
+            : 'AI が推定した栄養情報を下書きカードへ反映しました。'),
       );
       setFeedbackTone(draft.warnings[0] ? 'error' : 'info');
+      setAttachments([]);
     } catch (error) {
-      if (form.getValues('mealName').trim().length === 0) {
+      if (trimmedPrompt.length > 0 && form.getValues('mealName').trim().length === 0) {
         form.setValue('mealName', buildMealNameFromPrompt(trimmedPrompt));
       }
 
-      if (form.getValues('items.0.name').trim().length === 0) {
+      if (trimmedPrompt.length > 0 && form.getValues('items.0.name').trim().length === 0) {
         const firstToken = trimmedPrompt.split(/[、,\s]+/).filter(Boolean)[0] ?? '';
         form.setValue('items.0.name', firstToken);
       }
       setDraftOriginalText((current) => {
+        if (trimmedPrompt.length === 0) {
+          return current;
+        }
+
         if (current.trim().length > 0) {
           return `${current}\n${trimmedPrompt}`;
         }
@@ -216,6 +224,9 @@ export function useRecordScreen(): UseRecordScreenResult {
           : '解析に失敗したため、簡易的な下書きを表示しています。',
       );
       setFeedbackTone('error');
+      if (hasAttachments) {
+        setAttachments([]);
+      }
     } finally {
       setIsAnalyzing(false);
     }
@@ -325,4 +336,3 @@ export function useRecordScreen(): UseRecordScreenResult {
     handleConfirmDraft,
   };
 }
-

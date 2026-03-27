@@ -56,7 +56,7 @@ export function RecordScreen(): JSX.Element {
     handleConfirmDraft,
   } = useRecordScreen();
 
-  const isWorkspaceLoading = isAnalyzing && workspaceMode === 'idle';
+  const isWorkspaceLoading = isAnalyzing;
   const sectionTransition = reduceMotion
     ? { duration: 0 }
     : { duration: 0.45, ease: 'easeOut' as const };
@@ -107,7 +107,7 @@ export function RecordScreen(): JSX.Element {
         </motion.div>
       </motion.main>
 
-      {workspaceMode === 'idle' ? (
+      {workspaceMode === 'idle' && !isAnalyzing ? (
         <motion.div
           animate={{ opacity: 1 }}
           initial={{ opacity: 0 }}

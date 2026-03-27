@@ -19,10 +19,17 @@
 
 import { z } from 'zod';
 
-export const recordAnalysisRequestSchema = z.object({
-  prompt: z.string().trim().min(1),
-  images: z.array(z.string()).optional(),
-});
+export const recordAnalysisRequestSchema = z
+  .object({
+    prompt: z.string().trim(),
+    images: z.array(z.string()).optional(),
+  })
+  .refine(
+    (value) => value.prompt.length > 0 || (value.images?.length ?? 0) > 0,
+    {
+      message: 'prompt または images のどちらかが必要です。',
+    },
+  );
 
 
 export const recordAnalysisItemSchema = z.object({
