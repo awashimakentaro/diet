@@ -6,7 +6,7 @@
  *
  * 【使用されるエージェント / 処理フロー】
  * - use-account-sheet.ts から呼ばれる。
- * - username / 表示名 / ひとこと / アイコン設定だけを upsert する。
+ * - username / 表示名 / ひとことだけを upsert する。
  *
  * 【やらないこと】
  * - 体格情報の更新
@@ -24,7 +24,6 @@ type SaveAccountProfileParams = {
   username: string;
   displayName: string;
   bio: string;
-  avatarValue: string | null;
 };
 
 function normalizeUsername(value: string): string {
@@ -35,7 +34,6 @@ export async function saveAccountProfile({
   username,
   displayName,
   bio,
-  avatarValue,
 }: SaveAccountProfileParams): Promise<void> {
   const client = getSupabaseBrowserClient();
   const { data: userData, error: userError } = await client.auth.getUser();
@@ -61,7 +59,6 @@ export async function saveAccountProfile({
     username: normalizedUsername,
     display_name: displayName.trim() || null,
     bio: bio.trim() || null,
-    avatar_url: avatarValue,
   };
 
   const { error } = await client.from('user_profiles').upsert(payload, {

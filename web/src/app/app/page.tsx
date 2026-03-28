@@ -1,11 +1,12 @@
 /**
- * web/app/app/page.tsx
+ * web/src/app/app/page.tsx
  *
  * 【責務】
  * `/app` の Home 画面入口として、ダッシュボード UI を配置する。
  *
- * 【使用箇所】
- * - `http://localhost:3000/app`
+ * 【使用されるエージェント / 処理フロー】
+ * - `/app` ルートで呼ばれる。
+ * - web/src/features/home/home-screen.tsx を描画する。
  *
  * 【やらないこと】
  * - 詳細な UI 構築
@@ -20,12 +21,6 @@ import type { JSX } from 'react';
 
 import { HomeScreen } from '@/features/home/home-screen';
 
-/**
- * Home 画面を描画する。
- * 呼び出し元: Next.js `/app` ルート。
- * @returns Home 画面 JSX
- * @remarks 副作用は存在しない。
- */
 export default function AppHomePage(): JSX.Element {
   return <HomeScreen />;
 }

@@ -30,21 +30,19 @@ type AccountFormValues = {
   username: string;
   displayName: string;
   bio: string;
-  avatarValue: string | null;
 };
 
 export type UseAccountSheetResult = {
   email: string;
-  avatarValue: string | null;
   isOpen: boolean;
   isLoadingProfile: boolean;
   isSaving: boolean;
+  saveStatus: 'idle' | 'saving' | 'success' | 'error';
   feedbackMessage: string | null;
   values: AccountFormValues;
   openSheet: () => void;
   closeSheet: () => void;
   handleValueChange: (field: keyof AccountFormValues, value: string) => void;
-  handleAvatarSelect: (value: string) => void;
   handleSave: () => Promise<void>;
   handleSignOut: () => Promise<void>;
 };
@@ -60,12 +58,12 @@ export function useAccountSheet(): UseAccountSheetResult {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
   const [values, setValues] = useState<AccountFormValues>({
     username: sanitizeEmailPrefix(user?.email),
     displayName: '',
     bio: '',
-    avatarValue: 'emoji:🍽️',
   });
 
   useEffect(() => {
@@ -88,7 +86,6 @@ export function useAccountSheet(): UseAccountSheetResult {
           username: profile.username,
           displayName: profile.display_name ?? '',
           bio: profile.bio ?? '',
-          avatarValue: profile.avatar_url ?? 'emoji:🍽️',
         });
       } catch (error) {
         if (!isMounted) {
@@ -112,6 +109,7 @@ export function useAccountSheet(): UseAccountSheetResult {
 
   function openSheet(): void {
     setFeedbackMessage(null);
+    setSaveStatus('idle');
     setIsOpen(true);
   }
 
@@ -120,25 +118,23 @@ export function useAccountSheet(): UseAccountSheetResult {
   }
 
   function handleValueChange(field: keyof AccountFormValues, value: string): void {
+    setSaveStatus('idle');
     setValues((current) => ({ ...current, [field]: value }));
-  }
-
-  function handleAvatarSelect(value: string): void {
-    setValues((current) => ({ ...current, avatarValue: value }));
   }
 
   async function handleSave(): Promise<void> {
     try {
       setIsSaving(true);
+      setSaveStatus('saving');
       setFeedbackMessage(null);
       await saveAccountProfile({
         username: values.username,
         displayName: values.displayName,
         bio: values.bio,
-        avatarValue: values.avatarValue,
       });
-      setFeedbackMessage('保存しました。');
+      setSaveStatus('success');
     } catch (error) {
+      setSaveStatus('error');
       setFeedbackMessage(error instanceof Error ? error.message : '保存に失敗しました。');
     } finally {
       setIsSaving(false);
@@ -152,16 +148,15 @@ export function useAccountSheet(): UseAccountSheetResult {
 
   return {
     email: user?.email ?? 'guest@example.com',
-    avatarValue: values.avatarValue,
     isOpen,
     isLoadingProfile,
     isSaving,
+    saveStatus,
     feedbackMessage,
     values,
     openSheet,
     closeSheet,
     handleValueChange,
-    handleAvatarSelect,
     handleSave,
     handleSignOut,
   };

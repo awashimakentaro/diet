@@ -117,7 +117,7 @@ export function PfcDonutChart({
                     pointerEvents: 'none'
                 }}
             >
-                <p style={{ fontSize: '10px', color: 'var(--slate-400)', margin: 0 }}>P:F:C</p>
+                <p style={{ fontSize: '10px', color: 'var(--slate-400)', margin: 0 }}>P</p>
                 <p style={{ fontSize: '14px', fontWeight: 'bold', color: 'var(--slate-800)', margin: 0 }}>
                     {Math.round(pRatio * 100)}%
                 </p>

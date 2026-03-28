@@ -21,32 +21,28 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, LogOut, Save, UserRound } from 'lucide-react';
+import { ArrowRight, LogOut, Save } from 'lucide-react';
 import type { ChangeEvent, JSX } from 'react';
 
 import { AccountAvatarBadge } from './account-avatar-badge';
 
 type AccountSheetProps = {
   email: string;
-  avatarValue: string | null;
   isOpen: boolean;
   isLoadingProfile: boolean;
   isSaving: boolean;
+  saveStatus: 'idle' | 'saving' | 'success' | 'error';
   feedbackMessage: string | null;
   values: {
     username: string;
     displayName: string;
     bio: string;
-    avatarValue: string | null;
   };
   onClose: () => void;
   onValueChange: (field: 'username' | 'displayName' | 'bio', value: string) => void;
-  onAvatarSelect: (value: string) => void;
   onSave: () => Promise<void>;
   onSignOut: () => Promise<void>;
 };
-
-const AVATAR_OPTIONS = ['emoji:🍽️', 'emoji:🥗', 'emoji:🔥', 'emoji:🏃', 'emoji:💪', 'emoji:🌿'] as const;
 
 const FIELD_SPECS = [
   { field: 'username', label: 'USERNAME', placeholder: 'diet_runner' },
@@ -54,21 +50,16 @@ const FIELD_SPECS = [
   { field: 'bio', label: 'ひとこと', placeholder: '脂質を抑えて減量中' },
 ] as const;
 
-function getAvatarLabel(value: string): string {
-  return value.slice('emoji:'.length);
-}
-
 export function AccountSheet({
   email,
-  avatarValue,
   isOpen,
   isLoadingProfile,
   isSaving,
+  saveStatus,
   feedbackMessage,
   values,
   onClose,
   onValueChange,
-  onAvatarSelect,
   onSave,
   onSignOut,
 }: AccountSheetProps): JSX.Element | null {
@@ -107,7 +98,7 @@ export function AccountSheet({
               <div>
                 <p className="account-sheet__eyebrow">ACCOUNT</p>
                 <h2>アカウントを編集</h2>
-                <p className="account-sheet__copy">トップバーのアイコンと公開プロフィールの基本情報をここで更新できます。</p>
+                <p className="account-sheet__copy">トップバーに連動する公開プロフィールの基本情報をここで更新できます。</p>
               </div>
 
               <button className="account-sheet__close" onClick={onClose} type="button">
@@ -116,32 +107,12 @@ export function AccountSheet({
             </div>
 
             <div className="account-sheet__hero">
-              <AccountAvatarBadge avatarValue={avatarValue} fallbackEmail={email} size="large" />
+              <AccountAvatarBadge size="large" />
               <div className="account-sheet__hero-copy">
                 <strong>{values.displayName.trim() || '表示名を設定'}</strong>
                 <span>{email}</span>
               </div>
             </div>
-
-            <section className="account-sheet__section">
-              <div className="account-sheet__section-head">
-                <UserRound size={16} strokeWidth={2.1} />
-                <span>アイコンを選ぶ</span>
-              </div>
-
-              <div className="account-sheet__avatar-grid">
-                {AVATAR_OPTIONS.map((option) => (
-                  <button
-                    className={values.avatarValue === option ? 'account-sheet__avatar-option account-sheet__avatar-option--active' : 'account-sheet__avatar-option'}
-                    key={option}
-                    onClick={() => onAvatarSelect(option)}
-                    type="button"
-                  >
-                    {getAvatarLabel(option)}
-                  </button>
-                ))}
-              </div>
-            </section>
 
             <section className="account-sheet__section">
               <div className="account-sheet__section-head">
@@ -166,7 +137,7 @@ export function AccountSheet({
 
             <div className="account-sheet__footer">
               <div className="account-sheet__feedback">
-                {isLoadingProfile ? '読み込み中...' : feedbackMessage ?? ' '}
+                {isLoadingProfile ? '読み込み中...' : saveStatus === 'error' ? feedbackMessage ?? '保存に失敗しました。' : ' '}
               </div>
 
               <div className="account-sheet__actions">
@@ -190,7 +161,7 @@ export function AccountSheet({
                   type="button"
                 >
                   {isSaving ? <span className="record-screen__loading-spinner record-screen__loading-spinner--inline" /> : <Save size={16} strokeWidth={2.1} />}
-                  <span>{isSaving ? '保存中...' : '変更を保存'}</span>
+                  <span>{isSaving ? '保存中...' : saveStatus === 'success' ? '保存しました。' : '変更を保存'}</span>
                 </button>
               </div>
             </div>

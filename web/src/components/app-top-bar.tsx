@@ -21,8 +21,10 @@
 
 'use client';
 
+import Link from 'next/link';
 import type { JSX } from 'react';
 
+import { paths } from '@/config/paths';
 import { AccountAvatarBadge } from '@/features/account/account-avatar-badge';
 import { AccountSheet } from '@/features/account/account-sheet';
 import { useAccountSheet } from '@/features/account/use-account-sheet';
@@ -30,16 +32,15 @@ import { useAccountSheet } from '@/features/account/use-account-sheet';
 export function AppTopBar(): JSX.Element {
   const {
     email,
-    avatarValue,
     isOpen,
     isLoadingProfile,
     isSaving,
+    saveStatus,
     feedbackMessage,
     values,
     openSheet,
     closeSheet,
     handleValueChange,
-    handleAvatarSelect,
     handleSave,
     handleSignOut,
   } = useAccountSheet();
@@ -48,7 +49,9 @@ export function AppTopBar(): JSX.Element {
     <>
       <header className="app-top-bar">
         <div className="app-top-bar__brand">
-          <h1>PFC TRACKER</h1>
+          <Link className="app-top-bar__brand-link" href={paths.app.root.getHref()}>
+            <h1>PFC TRACKER</h1>
+          </Link>
         </div>
 
         <button
@@ -57,22 +60,17 @@ export function AppTopBar(): JSX.Element {
           onClick={openSheet}
           type="button"
         >
-          <AccountAvatarBadge avatarValue={avatarValue} fallbackEmail={email} />
-          <span className="app-top-bar__account-copy">
-            <strong>{values.displayName.trim() || 'Account'}</strong>
-            <small>{values.username.trim() || 'profile'}</small>
-          </span>
+          <AccountAvatarBadge />
         </button>
       </header>
 
       <AccountSheet
-        avatarValue={avatarValue}
         email={email}
         feedbackMessage={feedbackMessage}
         isLoadingProfile={isLoadingProfile}
         isOpen={isOpen}
         isSaving={isSaving}
-        onAvatarSelect={handleAvatarSelect}
+        saveStatus={saveStatus}
         onClose={closeSheet}
         onSave={handleSave}
         onSignOut={handleSignOut}
