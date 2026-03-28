@@ -19,8 +19,10 @@
  */
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 import { useWebAuth } from '@/app/provider';
+import { paths } from '@/config/paths';
 import {
   mockGoal,
   mockProfileSnapshot,
@@ -62,6 +64,7 @@ export type UseSettingsScreenResult = {
   activityLevel: ActivityLevel;
   accountEmail: string;
   isSaving: boolean;
+  isSigningOut: boolean;
   activeSaveAction: SettingsSaveAction;
   saveStatus: 'idle' | 'saving' | 'success' | 'error';
   handleManualTargetChange: (field: keyof ManualTargetValues, value: string) => void;
@@ -110,8 +113,10 @@ function toNumberOrNull(value: string): number | null {
 }
 
 export function useSettingsScreen(): UseSettingsScreenResult {
+  const router = useRouter();
   const { user, signOut } = useWebAuth();
   const [isSaving, setIsSaving] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
   const [activeSaveAction, setActiveSaveAction] = useState<SettingsSaveAction>(null);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [manualTargets, setManualTargets] = useState<ManualTargetValues>({
@@ -339,7 +344,13 @@ export function useSettingsScreen(): UseSettingsScreenResult {
 
 
   async function handleSignOut(): Promise<void> {
-    await signOut();
+    try {
+      setIsSigningOut(true);
+      await signOut();
+      router.replace(paths.home.getHref());
+    } finally {
+      setIsSigningOut(false);
+    }
   }
 
   return {
@@ -349,6 +360,7 @@ export function useSettingsScreen(): UseSettingsScreenResult {
     activityLevel,
     accountEmail: user?.email ?? 'guest@example.com',
     isSaving,
+    isSigningOut,
     activeSaveAction,
     saveStatus,
     handleManualTargetChange,

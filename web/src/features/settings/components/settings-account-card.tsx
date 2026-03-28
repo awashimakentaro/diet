@@ -22,12 +22,14 @@ import type { JSX } from 'react';
 
 type SettingsAccountCardProps = {
   email: string;
+  isSigningOut: boolean;
   onOpenTutorial: () => void;
   onSignOut: () => void;
 };
 
 export function SettingsAccountCard({
   email,
+  isSigningOut,
   onOpenTutorial,
   onSignOut,
 }: SettingsAccountCardProps): JSX.Element {
@@ -51,8 +53,15 @@ export function SettingsAccountCard({
           使い方を見る
         </button>
 
-        <button className="app-btn app-btn--secondary" onClick={onSignOut} type="button">
-          ログアウト
+        <button className="app-btn app-btn--secondary" disabled={isSigningOut} onClick={onSignOut} type="button">
+          {isSigningOut ? (
+            <>
+              <span className="record-screen__loading-spinner record-screen__loading-spinner--inline" />
+              <span>ログアウト中...</span>
+            </>
+          ) : (
+            'ログアウト'
+          )}
         </button>
       </div>
     </section>

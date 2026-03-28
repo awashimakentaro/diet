@@ -81,6 +81,217 @@ body {
   background: var(--background);
 }
 
+.landing-screen {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(219, 234, 254, 0.72), transparent 28%),
+    linear-gradient(180deg, #fcfdff 0%, #f7f9fc 100%);
+}
+
+.landing-screen__hero,
+.landing-screen__section {
+  width: min(calc(100% - 32px), 1200px);
+  margin: 0 auto;
+}
+
+.landing-screen__hero {
+  padding: 28px 0 48px;
+}
+
+.landing-screen__topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 36px;
+}
+
+.landing-screen__brand {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.landing-screen__brand-mark {
+  color: #101828;
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+}
+
+.landing-screen__auth-actions,
+.landing-screen__hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.landing-screen__auth-link,
+.landing-screen__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 18px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.landing-screen__auth-link--secondary,
+.landing-screen__cta--secondary {
+  border: 1px solid #dbe4f0;
+  background: rgba(255, 255, 255, 0.88);
+  color: #334155;
+}
+
+.landing-screen__auth-link--primary,
+.landing-screen__cta--primary {
+  background: linear-gradient(135deg, var(--blue-500), var(--blue-700));
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+}
+
+.landing-screen__hero-grid {
+  display: grid;
+  gap: 24px;
+}
+
+.landing-screen__hero-copy,
+.landing-screen__hero-card {
+  padding: 32px;
+  border: 1px solid rgba(219, 234, 254, 0.88);
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
+}
+
+.landing-screen__eyebrow {
+  margin: 0 0 12px;
+  color: #4f7cff;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+}
+
+.landing-screen__hero-copy h1,
+.landing-screen__section-head h2,
+.landing-screen__step-copy h3,
+.landing-screen__hero-card-copy strong {
+  margin: 0;
+  font-family: var(--font-heading);
+  color: #101828;
+}
+
+.landing-screen__hero-copy h1 {
+  font-size: clamp(2.3rem, 6vw, 4.6rem);
+  line-height: 0.98;
+  letter-spacing: -0.08em;
+}
+
+.landing-screen__lead {
+  margin: 18px 0 0;
+  max-width: 620px;
+  color: #475467;
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+.landing-screen__hero-actions {
+  margin-top: 28px;
+}
+
+.landing-screen__hero-card {
+  display: grid;
+  gap: 20px;
+  align-content: start;
+}
+
+.landing-screen__hero-card-copy {
+  display: grid;
+  gap: 8px;
+}
+
+.landing-screen__hero-card-copy p,
+.landing-screen__step-copy p {
+  margin: 0;
+  color: #4f7cff;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+}
+
+.landing-screen__hero-card-copy strong {
+  font-size: 1.4rem;
+  letter-spacing: -0.05em;
+}
+
+.landing-screen__hero-card-copy span,
+.landing-screen__step-copy span {
+  color: #667085;
+  font-size: 0.94rem;
+  line-height: 1.7;
+}
+
+.landing-screen__hero-image,
+.landing-screen__step-image {
+  width: 100%;
+  border-radius: 24px;
+  object-fit: cover;
+  background: #f8fafc;
+}
+
+.landing-screen__hero-image {
+  min-height: 260px;
+}
+
+.landing-screen__section {
+  padding: 0 0 56px;
+}
+
+.landing-screen__section-head {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.landing-screen__section-head h2 {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  letter-spacing: -0.06em;
+}
+
+.landing-screen__steps {
+  display: grid;
+  gap: 18px;
+}
+
+.landing-screen__step-card {
+  display: grid;
+  gap: 18px;
+  padding: 24px;
+  border: 1px solid rgba(219, 234, 254, 0.88);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.05);
+}
+
+.landing-screen__step-copy {
+  display: grid;
+  gap: 10px;
+}
+
+.landing-screen__step-copy h3 {
+  font-size: 1.4rem;
+  letter-spacing: -0.04em;
+}
+
+.landing-screen__step-image {
+  min-height: 220px;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -898,6 +1109,15 @@ input {
 }
 
 @media (min-width: 768px) {
+  .landing-screen__hero-grid {
+    grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.85fr);
+    align-items: start;
+  }
+
+  .landing-screen__steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .skeleton-hero-grid {
     grid-template-columns: 2fr 1fr;
   }

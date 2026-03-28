@@ -20,8 +20,10 @@
  */
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 import { useWebAuth } from '@/app/provider';
+import { paths } from '@/config/paths';
 import { getUserProfile } from '@/features/settings/get-user-profile';
 
 import { saveAccountProfile } from './save-account-profile';
@@ -55,6 +57,7 @@ function sanitizeEmailPrefix(email: string | undefined): string {
 }
 
 export function useAccountSheet(): UseAccountSheetResult {
+  const router = useRouter();
   const { user, signOut } = useWebAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
@@ -148,6 +151,7 @@ export function useAccountSheet(): UseAccountSheetResult {
       setIsSigningOut(true);
       await signOut();
       setIsOpen(false);
+      router.replace(paths.home.getHref());
     } finally {
       setIsSigningOut(false);
     }

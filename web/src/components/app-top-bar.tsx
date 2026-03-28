@@ -52,7 +52,7 @@ export function AppTopBar(): JSX.Element {
     <>
       <header className="app-top-bar">
         <div className="app-top-bar__brand">
-          <Link className="app-top-bar__brand-link" href={paths.home.getHref()}>
+          <Link className="app-top-bar__brand-link" href={paths.app.root.getHref()}>
             <h1>PFC TRACKER</h1>
           </Link>
         </div>

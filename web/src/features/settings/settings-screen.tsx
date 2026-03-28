@@ -8,11 +8,12 @@
  */
 
 import { motion, useReducedMotion } from 'framer-motion';
-import { useState, type JSX } from 'react';
+import { type JSX } from 'react';
+import { useRouter } from 'next/navigation';
 
 import { AppBottomNav } from '@/components/app-bottom-nav';
 import { AppTopBar } from '@/components/app-top-bar';
-import { TutorialOverlay } from '@/features/home/components/tutorial-overlay';
+import { paths } from '@/config/paths';
 
 import { SettingsAccountCard } from './components/settings-account-card';
 import { SettingsManualTargetCard } from './components/settings-manual-target-card';
@@ -20,7 +21,7 @@ import { SettingsProfileCard } from './components/settings-profile-card';
 import { useSettingsScreen } from './use-settings-screen';
 
 export function SettingsScreen(): JSX.Element {
-  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+  const router = useRouter();
   const reduceMotion = useReducedMotion();
   const {
     manualTargets,
@@ -29,6 +30,7 @@ export function SettingsScreen(): JSX.Element {
     activityLevel,
     accountEmail,
     isSaving,
+    isSigningOut,
     activeSaveAction,
     saveStatus,
     handleManualTargetChange,
@@ -46,7 +48,6 @@ export function SettingsScreen(): JSX.Element {
 
   return (
     <div className="settings-screen">
-      <TutorialOverlay isOpen={isTutorialOpen} onClose={() => setIsTutorialOpen(false)} />
       <AppTopBar />
 
       <motion.main
@@ -111,7 +112,8 @@ export function SettingsScreen(): JSX.Element {
             >
               <SettingsAccountCard
                 email={accountEmail}
-                onOpenTutorial={() => setIsTutorialOpen(true)}
+                isSigningOut={isSigningOut}
+                onOpenTutorial={() => router.push(paths.home.getHref())}
                 onSignOut={handleSignOut}
               />
             </motion.div>
