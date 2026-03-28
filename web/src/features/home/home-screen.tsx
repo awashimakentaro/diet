@@ -28,7 +28,6 @@ import { HomeScreenSkeleton } from '@/components/app-skeleton';
 import { AppTopBar } from '@/components/app-top-bar';
 import { RecordSummaryCard } from '@/features/record/components/record-summary-card';
 
-import { TutorialOverlay } from './components/tutorial-overlay';
 import { WeightTrendChart } from './components/weight-trend-chart';
 import { useHomeScreen } from './use-home-screen';
 
@@ -44,7 +43,6 @@ export function HomeScreen(): JSX.Element {
 
   return (
     <div className="home-screen">
-      <TutorialOverlay />
       <AppTopBar />
 
       {isLoading ? (

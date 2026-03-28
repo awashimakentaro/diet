@@ -23,6 +23,7 @@ export type UserProfileRow = {
   username: string;
   display_name: string | null;
   bio: string | null;
+  avatar_url: string | null;
   gender: string | null;
   age: number | null;
   height_cm: number | string | null;
@@ -52,6 +53,7 @@ export async function getUserProfile(): Promise<UserProfileRow | null> {
       'username',
       'display_name',
       'bio',
+      'avatar_url',
       'gender',
       'age',
       'height_cm',

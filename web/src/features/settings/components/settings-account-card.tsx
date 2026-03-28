@@ -2,7 +2,7 @@
  * web/src/features/settings/components/settings-account-card.tsx
  *
  * 【責務】
- * アカウント情報とログアウトボタンを描画する。
+ * アカウント情報、使い方導線、ログアウトボタンを描画する。
  *
  * 【使用されるエージェント / 処理フロー】
  * - settings-screen.tsx から呼ばれる。
@@ -22,17 +22,18 @@ import type { JSX } from 'react';
 
 type SettingsAccountCardProps = {
   email: string;
+  onOpenTutorial: () => void;
   onSignOut: () => void;
 };
 
 export function SettingsAccountCard({
   email,
+  onOpenTutorial,
   onSignOut,
 }: SettingsAccountCardProps): JSX.Element {
   return (
     <section className="settings-screen__section">
       <p className="eyebrow">アカウント</p>
-
 
       <div className="settings-screen__card settings-screen__card--account app-card">
         <div className="settings-screen__account-row">
@@ -45,6 +46,10 @@ export function SettingsAccountCard({
             <strong>{email}</strong>
           </div>
         </div>
+
+        <button className="app-btn app-btn--secondary" onClick={onOpenTutorial} type="button">
+          使い方を見る
+        </button>
 
         <button className="app-btn app-btn--secondary" onClick={onSignOut} type="button">
           ログアウト

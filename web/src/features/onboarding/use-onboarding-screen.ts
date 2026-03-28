@@ -4,11 +4,11 @@
  * web/src/features/onboarding/use-onboarding-screen.ts
  *
  * 【責務】
- * オンボーディング画面のステップ管理、プロフィール入力、保存処理をまとめる。
+ * オンボーディング画面のプロフィール入力 state と保存処理をまとめる。
  *
  * 【使用されるエージェント / 処理フロー】
  * - onboarding-screen.tsx から呼ばれる。
- * - 使い方説明の次にプロフィールを保存し、初期 goals を生成する。
+ * - 共通チュートリアル表示後にプロフィールを保存し、初期 goals を生成する。
  *
  * 【やらないこと】
  * - JSX 描画
@@ -48,17 +48,11 @@ type UseOnboardingScreenParams = {
 };
 
 type UseOnboardingScreenResult = {
-  step: 0 | 1;
-  introStep: number;
   profileValues: OnboardingProfileValues;
   gender: Gender;
   activityLevel: ActivityLevel;
   feedbackMessage: string | null;
   isSubmitting: boolean;
-  handleStartProfileSetup: () => void;
-  handleBackToIntro: () => void;
-  handlePreviousIntroStep: () => void;
-  handleNextIntroStep: (stepCount: number) => void;
   handleProfileValueChange: (field: keyof OnboardingProfileValues, value: string) => void;
   handleGenderChange: (value: Gender) => void;
   handleActivityChange: (value: ActivityLevel) => void;
@@ -85,8 +79,6 @@ export function useOnboardingScreen({
 }: UseOnboardingScreenParams): UseOnboardingScreenResult {
   const router = useRouter();
   const { user } = useWebAuth();
-  const [step, setStep] = useState<0 | 1>(0);
-  const [introStep, setIntroStep] = useState(0);
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [gender, setGender] = useState<Gender>('male');
@@ -141,27 +133,6 @@ export function useOnboardingScreen({
       isMounted = false;
     };
   }, [redirectTo, router, user?.email, user?.id]);
-
-  function handleStartProfileSetup(): void {
-    setStep(1);
-  }
-
-  function handleBackToIntro(): void {
-    setStep(0);
-  }
-
-  function handlePreviousIntroStep(): void {
-    setIntroStep((current) => Math.max(0, current - 1));
-  }
-
-  function handleNextIntroStep(stepCount: number): void {
-    if (introStep >= stepCount - 1) {
-      setStep(1);
-      return;
-    }
-
-    setIntroStep((current) => current + 1);
-  }
 
   function handleProfileValueChange(field: keyof OnboardingProfileValues, value: string): void {
     setProfileValues((current) => ({ ...current, [field]: value }));
@@ -229,17 +200,11 @@ export function useOnboardingScreen({
   }
 
   return {
-    step,
-    introStep,
     profileValues,
     gender,
     activityLevel,
     feedbackMessage,
     isSubmitting,
-    handleStartProfileSetup,
-    handleBackToIntro,
-    handlePreviousIntroStep,
-    handleNextIntroStep,
     handleProfileValueChange,
     handleGenderChange,
     handleActivityChange,

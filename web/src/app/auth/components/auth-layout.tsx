@@ -25,7 +25,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
   useEffect(() => {//ログイン済みの人がlogin or register にきた場合元の場所にredrectする
     if (status === 'signed-in' && user !== null) {
       router.replace(
-        `${redirectTo ? `${decodeURIComponent(redirectTo)}` : paths.app.record.getHref()}`,
+        `${redirectTo ? `${decodeURIComponent(redirectTo)}` : paths.app.root.getHref()}`,
       );
     }
   }, [status, user, router, redirectTo]);

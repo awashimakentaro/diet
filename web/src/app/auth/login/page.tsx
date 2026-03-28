@@ -12,7 +12,7 @@ function LoginPageContent(): JSX.Element {
 
   return (
     <AuthLayout>
-      <LoginForm onSuccess={() => router.replace(paths.app.record.getHref())} />
+      <LoginForm onSuccess={() => router.replace(paths.app.root.getHref())} />
     </AuthLayout>
   );
 }

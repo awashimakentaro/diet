@@ -2,7 +2,19 @@
  * web/src/features/home/components/tutorial-overlay.tsx
  *
  * 【責務】
- * 初回利用者向けのチュートリアル画面（オーバーレイ）を表示する。
+ * アプリ共通の使い方チュートリアルをオーバーレイで表示する。
+ *
+ * 【使用されるエージェント / 処理フロー】
+ * - onboarding-screen.tsx や settings-screen.tsx から呼ばれる。
+ * - 共有ステップ定義に沿って解説を順送り表示する。
+ *
+ * 【やらないこと】
+ * - localStorage 管理
+ * - プロフィール保存
+ * - 画面遷移
+ *
+ * 【他ファイルとの関係】
+ * - web/src/styles/globals.css の tutorial-overlay 系クラスに依存する。
  */
 
 'use client';
@@ -19,8 +31,8 @@ type TutorialStep = {
 
 const TUTORIAL_STEPS: TutorialStep[] = [
     {
-        title: 'PFC Tracker へようこそ！',
-        description: '理想の体型への第一歩を踏み出しましょう。AI があなたの食事管理を強力にサポートします。',
+        title: '最初の2分で、食事管理の土台を整える。',
+        description: 'まずは使い方をざっと確認して、次にプロフィールを入力します。入力が終わると、そのまま記録画面から始められます。',
         image: '/tutorial/step1.png',
     },
     {
@@ -35,17 +47,22 @@ const TUTORIAL_STEPS: TutorialStep[] = [
     },
 ];
 
-export function TutorialOverlay(): JSX.Element | null {
+type TutorialOverlayProps = {
+    isOpen: boolean;
+    onClose: () => void;
+};
+
+export function TutorialOverlay({
+    isOpen,
+    onClose,
+}: TutorialOverlayProps): JSX.Element | null {
     const [currentStep, setCurrentStep] = useState(0);
-    const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        // チュートリアル済みのフラグを確認（localStorage）
-        const hasSeenTutorial = localStorage.getItem('pfc_tutorial_completed');
-        if (!hasSeenTutorial) {
-            setIsVisible(true);
+        if (isOpen) {
+            setCurrentStep(0);
         }
-    }, []);
+    }, [isOpen]);
 
     const handleNext = () => {
         if (currentStep < TUTORIAL_STEPS.length - 1) {
@@ -56,11 +73,10 @@ export function TutorialOverlay(): JSX.Element | null {
     };
 
     const handleComplete = () => {
-        setIsVisible(false);
-        localStorage.setItem('pfc_tutorial_completed', 'true');
+        onClose();
     };
 
-    if (!isVisible) return null;
+    if (!isOpen) return null;
 
     const step = TUTORIAL_STEPS[currentStep];
 

@@ -8,10 +8,11 @@
  */
 
 import { motion, useReducedMotion } from 'framer-motion';
-import type { JSX } from 'react';
+import { useState, type JSX } from 'react';
 
 import { AppBottomNav } from '@/components/app-bottom-nav';
 import { AppTopBar } from '@/components/app-top-bar';
+import { TutorialOverlay } from '@/features/home/components/tutorial-overlay';
 
 import { SettingsAccountCard } from './components/settings-account-card';
 import { SettingsManualTargetCard } from './components/settings-manual-target-card';
@@ -19,6 +20,7 @@ import { SettingsProfileCard } from './components/settings-profile-card';
 import { useSettingsScreen } from './use-settings-screen';
 
 export function SettingsScreen(): JSX.Element {
+  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   const reduceMotion = useReducedMotion();
   const {
     manualTargets,
@@ -44,6 +46,7 @@ export function SettingsScreen(): JSX.Element {
 
   return (
     <div className="settings-screen">
+      <TutorialOverlay isOpen={isTutorialOpen} onClose={() => setIsTutorialOpen(false)} />
       <AppTopBar />
 
       <motion.main
@@ -106,7 +109,11 @@ export function SettingsScreen(): JSX.Element {
               initial={{ opacity: 0, y: 14 }}
               transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.14 }}
             >
-              <SettingsAccountCard email={accountEmail} onSignOut={handleSignOut} />
+              <SettingsAccountCard
+                email={accountEmail}
+                onOpenTutorial={() => setIsTutorialOpen(true)}
+                onSignOut={handleSignOut}
+              />
             </motion.div>
 
           </motion.div>

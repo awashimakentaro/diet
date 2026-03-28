@@ -2,11 +2,11 @@
  * web/src/components/app-top-bar.tsx
  *
  * 【責務】
- * Web アプリ共通のトップバーを描画する。
+ * Web アプリ共通のトップバーとアカウント編集シートの起動導線を描画する。
  *
  * 【使用されるエージェント / 処理フロー】
  * - record / history / foods / settings 画面から呼ばれる。
- * - app/provider.tsx の認証状態からユーザー表示とログアウト操作を組み立てる。
+ * - account/use-account-sheet.ts の state を受け取り、アカウント表示と編集シートを組み立てる。
  *
  * 【やらないこと】
  * - 認証処理
@@ -14,56 +14,71 @@
  * - ページ固有の状態管理
  *
  * 【他ファイルとの関係】
- * - web/src/app/provider.tsx の useWebAuth を利用する。
+ * - web/src/features/account/use-account-sheet.ts を利用する。
+ * - web/src/features/account/account-sheet.tsx を利用する。
  * - web/src/styles/globals.css の app-top-bar 系クラスに依存する。
  */
 
 'use client';
 
-import { LogOut } from 'lucide-react';
 import type { JSX } from 'react';
 
-import { useWebAuth } from '@/app/provider';
-
-function getUserInitial(email: string | undefined): string {
-  if (!email) {
-    return 'G';
-  }
-
-  return email.slice(0, 1).toUpperCase();
-}
+import { AccountAvatarBadge } from '@/features/account/account-avatar-badge';
+import { AccountSheet } from '@/features/account/account-sheet';
+import { useAccountSheet } from '@/features/account/use-account-sheet';
 
 export function AppTopBar(): JSX.Element {
-  const { signOut, user } = useWebAuth();
-  const userInitial = getUserInitial(user?.email);
+  const {
+    email,
+    avatarValue,
+    isOpen,
+    isLoadingProfile,
+    isSaving,
+    feedbackMessage,
+    values,
+    openSheet,
+    closeSheet,
+    handleValueChange,
+    handleAvatarSelect,
+    handleSave,
+    handleSignOut,
+  } = useAccountSheet();
 
   return (
-    <header className="app-top-bar">
-      <div className="app-top-bar__brand">
-        <h1>PFC TRACKER</h1>
-      </div>
-
-      <div className="app-top-bar__actions">
-        <div
-          aria-label={user?.email ?? 'guest user'}
-          className="app-top-bar__avatar"
-          role="img"
-          title={user?.email ?? 'guest user'}
-        >
-          {userInitial}
+    <>
+      <header className="app-top-bar">
+        <div className="app-top-bar__brand">
+          <h1>PFC TRACKER</h1>
         </div>
 
         <button
-          aria-label="ログアウト"
-          className="app-top-bar__logout"
-          onClick={() => {
-            void signOut();
-          }}
+          aria-label="アカウントを編集"
+          className="app-top-bar__avatar-button"
+          onClick={openSheet}
           type="button"
         >
-          <LogOut size={16} strokeWidth={2.2} />
+          <AccountAvatarBadge avatarValue={avatarValue} fallbackEmail={email} />
+          <span className="app-top-bar__account-copy">
+            <strong>{values.displayName.trim() || 'Account'}</strong>
+            <small>{values.username.trim() || 'profile'}</small>
+          </span>
         </button>
-      </div>
-    </header>
+      </header>
+
+      <AccountSheet
+        avatarValue={avatarValue}
+        email={email}
+        feedbackMessage={feedbackMessage}
+        isLoadingProfile={isLoadingProfile}
+        isOpen={isOpen}
+        isSaving={isSaving}
+        onAvatarSelect={handleAvatarSelect}
+        onClose={closeSheet}
+        onSave={handleSave}
+        onSignOut={handleSignOut}
+        onValueChange={handleValueChange}
+        values={values}
+      />
+    </>
   );
 }
