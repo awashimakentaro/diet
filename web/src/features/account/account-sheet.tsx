@@ -31,6 +31,7 @@ type AccountSheetProps = {
   isOpen: boolean;
   isLoadingProfile: boolean;
   isSaving: boolean;
+  isSigningOut: boolean;
   saveStatus: 'idle' | 'saving' | 'success' | 'error';
   feedbackMessage: string | null;
   values: {
@@ -55,6 +56,7 @@ export function AccountSheet({
   isOpen,
   isLoadingProfile,
   isSaving,
+  isSigningOut,
   saveStatus,
   feedbackMessage,
   values,
@@ -143,18 +145,19 @@ export function AccountSheet({
               <div className="account-sheet__actions">
                 <button
                   className="account-sheet__secondary-action"
+                  disabled={isSigningOut}
                   onClick={() => {
                     void onSignOut();
                   }}
                   type="button"
                 >
-                  <LogOut size={16} strokeWidth={2.1} />
-                  <span>ログアウト</span>
+                  {isSigningOut ? <span className="record-screen__loading-spinner record-screen__loading-spinner--inline" /> : <LogOut size={16} strokeWidth={2.1} />}
+                  <span>{isSigningOut ? 'ログアウト中...' : 'ログアウト'}</span>
                 </button>
 
                 <button
                   className="account-sheet__primary-action"
-                  disabled={isSaving || isLoadingProfile}
+                  disabled={isSaving || isLoadingProfile || isSigningOut}
                   onClick={() => {
                     void onSave();
                   }}

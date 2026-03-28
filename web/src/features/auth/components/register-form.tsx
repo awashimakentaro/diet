@@ -82,7 +82,14 @@
           disabled={form.formState.isSubmitting}
           type="submit"
         >
-          {form.formState.isSubmitting ? '送信中...' : 'アカウントを作成する'}
+          {form.formState.isSubmitting ? (
+            <>
+              <span className="record-screen__loading-spinner record-screen__loading-spinner--inline" />
+              <span>送信中...</span>
+            </>
+          ) : (
+            'アカウントを作成する'
+          )}
         </button>
       </form>
     );

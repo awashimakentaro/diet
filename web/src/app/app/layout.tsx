@@ -24,6 +24,7 @@ import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 
 import { useWebAuth } from '@/app/provider';
+import { paths } from '@/config/paths';
 
 type AuthenticatedAppLayoutProps = {
   children: ReactNode;
@@ -57,7 +58,7 @@ export default function AuthenticatedAppLayout({
 
   useEffect(() => {
     if (status === 'signed-out') {
-      router.replace(`/?redirect=${encodeURIComponent(redirectPath)}`);
+      router.replace(paths.auth.login.getHref(redirectPath));
     }
   }, [redirectPath, router, status]);
 

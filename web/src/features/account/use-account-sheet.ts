@@ -37,6 +37,7 @@ export type UseAccountSheetResult = {
   isOpen: boolean;
   isLoadingProfile: boolean;
   isSaving: boolean;
+  isSigningOut: boolean;
   saveStatus: 'idle' | 'saving' | 'success' | 'error';
   feedbackMessage: string | null;
   values: AccountFormValues;
@@ -58,6 +59,7 @@ export function useAccountSheet(): UseAccountSheetResult {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
   const [values, setValues] = useState<AccountFormValues>({
@@ -142,8 +144,13 @@ export function useAccountSheet(): UseAccountSheetResult {
   }
 
   async function handleSignOut(): Promise<void> {
-    await signOut();
-    setIsOpen(false);
+    try {
+      setIsSigningOut(true);
+      await signOut();
+      setIsOpen(false);
+    } finally {
+      setIsSigningOut(false);
+    }
   }
 
   return {
@@ -151,6 +158,7 @@ export function useAccountSheet(): UseAccountSheetResult {
     isOpen,
     isLoadingProfile,
     isSaving,
+    isSigningOut,
     saveStatus,
     feedbackMessage,
     values,
