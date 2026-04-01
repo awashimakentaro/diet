@@ -1,11 +1,11 @@
 /**
- * web/src/features/settings/get-user-profile.ts
+ * web/src/features/settings/api/get-user-profile.ts
  *
  * 【責務】
  * 現在ログイン中ユーザーの user_profiles を 1 件取得する。
  *
  * 【使用されるエージェント / 処理フロー】
- * - use-settings-screen.ts から呼ばれる。
+ * - use-settings-screen.ts などから呼ばれる。
  * - Supabase の user_profiles を参照して Settings 初期値を返す。
  *
  * 【やらないこと】

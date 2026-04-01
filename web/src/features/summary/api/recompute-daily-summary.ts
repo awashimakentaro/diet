@@ -1,5 +1,5 @@
 /**
- * web/src/features/summary/recompute-daily-summary.ts
+ * web/src/features/summary/api/recompute-daily-summary.ts
  *
  * 【責務】
  * 指定日付の meals から daily_summaries を再計算して upsert する。
@@ -20,7 +20,7 @@
 import { getSupabaseBrowserClient } from '@/lib/supabase';
 import { getUtcRangeForDateKey } from '@/lib/web-date';
 
-import { isDailySummarySchemaMissing } from './is-daily-summary-schema-missing';
+import { isDailySummarySchemaMissing } from '../is-daily-summary-schema-missing';
 
 type MealRow = {
   foods: Array<{
@@ -121,17 +121,12 @@ export async function recomputeDailySummaryForDateKey(dateKey: string): Promise<
     meal_count: meals.length,
     top_foods: buildTopFoods(meals),
   };
-  const { error: upsertError } = await client
-    .from('daily_summaries')
-    .upsert(payload, {
-      onConflict: 'user_id,date',
-    });
 
-  if (upsertError) {
-    if (isDailySummarySchemaMissing(upsertError.message)) {
-      return;
-    }
+  const { error: upsertError } = await client.from('daily_summaries').upsert(payload, {
+    onConflict: 'user_id,date',
+  });
 
+  if (upsertError && !isDailySummarySchemaMissing(upsertError.message)) {
     throw new Error(upsertError.message);
   }
 }

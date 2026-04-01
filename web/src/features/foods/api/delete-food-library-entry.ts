@@ -1,5 +1,5 @@
 /**
- * web/src/features/foods/delete-food-library-entry.ts
+ * web/src/features/foods/api/delete-food-library-entry.ts
  *
  * 【責務】
  * foods テーブルから指定エントリを削除する。
@@ -10,8 +10,7 @@
  *
  * 【やらないこと】
  * - UI 描画
- * - 一覧再取得
- * - ルート遷移
+ * - 画面遷移
  *
  * 【他ファイルとの関係】
  * - getSupabaseBrowserClient を利用する。

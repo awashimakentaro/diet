@@ -1,5 +1,5 @@
 /**
- * web/src/features/history/save-history-meal-to-foods.ts
+ * web/src/features/history/api/save-history-meal-to-foods.ts
  *
  * 【責務】
  * History の Meal を foods テーブルへ再利用用エントリとして保存する。

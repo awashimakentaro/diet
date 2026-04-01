@@ -1,5 +1,5 @@
 /**
- * web/src/features/foods/create-meal-from-library-entry.ts
+ * web/src/features/foods/api/create-meal-from-library-entry.ts
  *
  * 【責務】
  * Foods のライブラリエントリを meals テーブルへ「今日食べた」記録として保存する。
@@ -17,15 +17,15 @@
  * - web-diet-schema.ts の WebLibraryEntry 型を受け取る。
  * - getSupabaseBrowserClient を利用する。
  * - prune-old-meals.ts を利用して保持期限外履歴を削除する。
- * - recompute-daily-summary.ts を利用して日次集計を更新する。
+ * - summary/api/recompute-daily-summary.ts を利用して日次集計を更新する。
  */
 
 import type { WebLibraryEntry } from '@/domain/web-diet-schema';
 import { getSupabaseBrowserClient } from '@/lib/supabase';
 import { getTodayKey } from '@/lib/web-date';
 
-import { pruneOldMealsForCurrentUser } from '../history/prune-old-meals';
-import { recomputeDailySummaryForDateKey } from '../summary/recompute-daily-summary';
+import { pruneOldMealsForCurrentUser } from '../../history/prune-old-meals';
+import { recomputeDailySummaryForDateKey } from '../../summary/api/recompute-daily-summary';
 
 export async function createMealFromLibraryEntry(entry: WebLibraryEntry): Promise<void> {
   const client = getSupabaseBrowserClient();

@@ -1,37 +1,38 @@
 /**
- * web/src/features/history/update-history-meal.ts
+ * web/src/features/foods/api/update-food-library-entry.ts
  *
  * 【責務】
- * History 画面の編集内容を meals テーブルへ更新保存する。
+ * foods テーブルの既存エントリを更新する。
  *
  * 【使用されるエージェント / 処理フロー】
- * - use-history-screen.ts から呼ばれる。
- * - 編集フォーム値を Supabase 更新 payload に変換して保存する。
+ * - use-foods-screen.ts から呼ばれる。
+ * - 編集フォーム値を foods の update payload へ変換して保存する。
  *
  * 【やらないこと】
  * - UI 描画
- * - フォーム状態管理
- * - ルート遷移
+ * - form state 管理
  *
  * 【他ファイルとの関係】
- * - getSupabaseBrowserClient を利用して認証ユーザーの meals を更新する。
+ * - getSupabaseBrowserClient を利用する。
  */
 
+import type { RecordFormValues } from '@/features/record/record-form-schema';
 import { getSupabaseBrowserClient } from '@/lib/supabase';
 
-type HistoryEditableItem = {
-  name: string;
-  amount: string;
-  kcal: string;
-  protein: string;
-  fat: string;
-  carbs: string;
+type UpdateFoodLibraryEntryParams = {
+  entryId: string;
+  mealName: string;
+  items: RecordFormValues['items'];
 };
 
-type UpdateHistoryMealParams = {
-  mealId: string;
-  mealName: string;
-  items: HistoryEditableItem[];
+type FoodItemPayload = {
+  id: string;
+  name: string;
+  amount: string;
+  kcal: number;
+  protein: number;
+  fat: number;
+  carbs: number;
 };
 
 function toNumber(value: string): number {
@@ -39,11 +40,19 @@ function toNumber(value: string): number {
   return Number.isFinite(parsed) ? Math.round(parsed * 10) / 10 : 0;
 }
 
-function buildItems(items: HistoryEditableItem[]) {
+function createItemId(index: number): string {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+    return crypto.randomUUID();
+  }
+
+  return `food-item-${Date.now()}-${index + 1}`;
+}
+
+function buildItems(items: RecordFormValues['items']): FoodItemPayload[] {
   return items
     .filter((item) => item.name.trim().length > 0)
     .map((item, index) => ({
-      id: `history-item-${Date.now()}-${index + 1}`,
+      id: createItemId(index),
       name: item.name.trim(),
       amount: item.amount.trim() || '1人前',
       kcal: toNumber(item.kcal),
@@ -53,7 +62,7 @@ function buildItems(items: HistoryEditableItem[]) {
     }));
 }
 
-function buildTotals(items: Array<{ kcal: number; protein: number; fat: number; carbs: number }>) {
+function buildTotals(items: FoodItemPayload[]) {
   return items.reduce(
     (totals, item) => ({
       kcal: totals.kcal + item.kcal,
@@ -65,11 +74,11 @@ function buildTotals(items: Array<{ kcal: number; protein: number; fat: number; 
   );
 }
 
-export async function updateHistoryMeal({
-  mealId,
+export async function updateFoodLibraryEntry({
+  entryId,
   mealName,
   items,
-}: UpdateHistoryMealParams): Promise<void> {
+}: UpdateFoodLibraryEntryParams): Promise<void> {
   const client = getSupabaseBrowserClient();
   const { data: userData, error: userError } = await client.auth.getUser();
 
@@ -86,19 +95,24 @@ export async function updateHistoryMeal({
   const normalizedItems = buildItems(items);
 
   if (normalizedItems.length === 0) {
-    throw new Error('食品カードを1件以上入力してください。');
+    throw new Error('食品を1件以上入力してください。');
   }
 
-  const normalizedMealName = mealName.trim() || normalizedItems[0].name;
   const totals = buildTotals(normalizedItems);
+  const payload = {
+    name: mealName.trim() || normalizedItems[0]?.name || '名称未設定',
+    amount: normalizedItems[0]?.amount || '1人前',
+    calories: totals.kcal,
+    protein: totals.protein,
+    fat: totals.fat,
+    carbs: totals.carbs,
+    items: normalizedItems,
+  };
+
   const { error } = await client
-    .from('meals')
-    .update({
-      menu_name: normalizedMealName,
-      foods: normalizedItems,
-      total: totals,
-    })
-    .eq('id', mealId)
+    .from('foods')
+    .update(payload)
+    .eq('id', entryId)
     .eq('user_id', userId);
 
   if (error) {

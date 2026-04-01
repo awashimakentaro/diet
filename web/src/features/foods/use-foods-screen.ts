@@ -14,7 +14,7 @@
  * - JSX 描画
  *
  * 【他ファイルとの関係】
- * - list-food-library-entries.ts と delete-food-library-entry.ts を利用する。
+ * - api/list-food-library-entries.ts と api/delete-food-library-entry.ts を利用する。
  * - components 配下へ state とハンドラを渡す。
  */
 
@@ -26,10 +26,10 @@ import type { WebLibraryEntry } from '@/domain/web-diet-schema';
 import { formatDateKey } from '@/lib/web-date';
 import type { RecordFormValues } from '@/features/record/record-form-schema';
 
-import { createMealFromLibraryEntry } from './create-meal-from-library-entry';
-import { deleteFoodLibraryEntry } from './delete-food-library-entry';
-import { listFoodLibraryEntries } from './list-food-library-entries';
-import { updateFoodLibraryEntry } from './update-food-library-entry';
+import { createMealFromLibraryEntry } from './api/create-meal-from-library-entry';
+import { deleteFoodLibraryEntry } from './api/delete-food-library-entry';
+import { listFoodLibraryEntries } from './api/list-food-library-entries';
+import { updateFoodLibraryEntry } from './api/update-food-library-entry';
 
 export type UseFoodsScreenResult = {
   visibleEntries: Array<WebLibraryEntry & { addedAt: string }>;

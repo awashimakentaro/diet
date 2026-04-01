@@ -1,5 +1,5 @@
 /**
- * web/src/features/settings/get-settings-goal.ts
+ * web/src/features/settings/api/get-settings-goal.ts
  *
  * 【責務】
  * 現在ログイン中ユーザーの goals を 1 件取得する。

@@ -1,5 +1,5 @@
 /**
- * web/src/features/settings/save-user-profile.ts
+ * web/src/features/settings/api/save-user-profile.ts
  *
  * 【責務】
  * Settings 画面のプロフィール入力を user_profiles テーブルへ upsert 保存する。

@@ -1,5 +1,5 @@
 /**
- * web/src/features/summary/list-week-daily-summaries.ts
+ * web/src/features/summary/api/list-week-daily-summaries.ts
  *
  * 【責務】
  * 指定した週の daily_summaries を取得する。
@@ -20,8 +20,8 @@
 import type { WebDailySummary } from '@/domain/web-diet-schema';
 import { getSupabaseBrowserClient } from '@/lib/supabase';
 
-import { isDailySummarySchemaMissing } from './is-daily-summary-schema-missing';
-import { mapWebDailySummaryRow } from './map-web-daily-summary-row';
+import { isDailySummarySchemaMissing } from '../is-daily-summary-schema-missing';
+import { mapWebDailySummaryRow } from '../map-web-daily-summary-row';
 
 type ListWeekDailySummariesParams = {
   startDateKey: string;

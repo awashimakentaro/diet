@@ -1,5 +1,5 @@
 /**
- * web/src/features/record/save-record-meal.ts
+ * web/src/features/record/api/save-record-meal.ts
  *
  * 【責務】
  * Record 画面の現在フォーム内容を Meal として Supabase へ保存する。
@@ -11,20 +11,19 @@
  * 【やらないこと】
  * - UI 描画
  * - 画面遷移
- * - 履歴一覧の再取得
  *
  * 【他ファイルとの関係】
  * - getSupabaseBrowserClient と record-form-schema.ts の型を利用する。
  * - prune-old-meals.ts を利用して保持期限外履歴を削除する。
- * - recompute-daily-summary.ts を利用して日次集計を更新する。
+ * - summary/api/recompute-daily-summary.ts を利用して日次集計を更新する。
  */
 
 import { getSupabaseBrowserClient } from '@/lib/supabase';
 import { parseDateKey } from '@/lib/web-date';
 
-import { pruneOldMealsForCurrentUser } from '../history/prune-old-meals';
-import { recomputeDailySummaryForDateKey } from '../summary/recompute-daily-summary';
-import type { RecordFormValues } from './record-form-schema';
+import { pruneOldMealsForCurrentUser } from '../../history/prune-old-meals';
+import { recomputeDailySummaryForDateKey } from '../../summary/api/recompute-daily-summary';
+import type { RecordFormValues } from '../record-form-schema';
 
 type SaveRecordMealParams = {
   values: Pick<RecordFormValues, 'recordedDate' | 'mealName' | 'items'>;
@@ -129,12 +128,12 @@ export async function saveRecordMeal({
   try {
     await recomputeDailySummaryForDateKey(values.recordedDate);
   } catch {
-    // Summary recompute failure should not block current save.
+    // Summary recompute failure should not block meal save.
   }
 
   try {
     await pruneOldMealsForCurrentUser();
   } catch {
-    // Retention cleanup failure should not block current save.
+    // Retention cleanup failure should not block meal save.
   }
 }

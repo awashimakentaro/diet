@@ -8,7 +8,7 @@
  *
  * 【使用されるエージェント / 処理フロー】
  * - app-top-bar.tsx から呼ばれる。
- * - get-user-profile.ts で初期値を読み込み、save-account-profile.ts で保存する。
+ * - settings/api/get-user-profile.ts で初期値を読み込み、save-account-profile.ts で保存する。
  *
  * 【やらないこと】
  * - JSX 描画
@@ -16,7 +16,7 @@
  * - 体格目標の更新
  *
  * 【他ファイルとの関係】
- * - get-user-profile.ts、save-account-profile.ts、app/provider.tsx を利用する。
+ * - settings/api/get-user-profile.ts、save-account-profile.ts、app/provider.tsx を利用する。
  */
 
 import { useEffect, useState } from 'react';
@@ -24,9 +24,9 @@ import { useRouter } from 'next/navigation';
 
 import { useWebAuth } from '@/app/provider';
 import { paths } from '@/config/paths';
-import { getUserProfile } from '@/features/settings/get-user-profile';
+import { getUserProfile } from '@/features/settings/api/get-user-profile';
 
-import { saveAccountProfile } from './save-account-profile';
+import { saveAccountProfile } from './api/save-account-profile';
 
 type AccountFormValues = {
   username: string;

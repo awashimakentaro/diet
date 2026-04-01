@@ -9,7 +9,7 @@
  * 【使用されるエージェント / 処理フロー】
  * - web/src/app/app/record/_components/record-page-screen.tsx から呼ばれる。
  * - use-record-form.ts の RHF 設定と field array を利用する。
- * - 解析取得は request-record-analysis.ts、保存は save-record-meal.ts へ委譲する。
+ * - 解析取得は api/request-record-analysis.ts、保存は api/save-record-meal.ts へ委譲する。
  *
  * 【やらないこと】
  * - JSX 描画
@@ -28,8 +28,8 @@ import {
   type RecordFoodItemValues,
   type RecordFormValues,
 } from './record-form-schema';
-import { requestRecordAnalysis } from './request-record-analysis';
-import { saveRecordMeal } from './save-record-meal';
+import { requestRecordAnalysis } from './api/request-record-analysis';
+import { saveRecordMeal } from './api/save-record-meal';
 import { usePromptAttachments, type PromptAttachment } from './use-prompt-attachments';
 import { useRecordForm } from './use-record-form';
 

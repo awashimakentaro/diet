@@ -15,7 +15,7 @@
  *
  * 【他ファイルとの関係】
  * - app/provider.tsx の useWebAuth を利用する。
- * - get-settings-goal.ts / get-user-profile.ts / save 系関数を利用する。
+ * - api/get-settings-goal.ts / api/get-user-profile.ts / api/save 系関数を利用する。
  */
 
 import { useEffect, useState } from 'react';
@@ -28,11 +28,11 @@ import {
   mockProfileSnapshot,
 } from '@/data/mock-diet-data';
 
-import { getSettingsGoal } from './get-settings-goal';
-import { getUserProfile } from './get-user-profile';
+import { getSettingsGoal } from './api/get-settings-goal';
+import { getUserProfile } from './api/get-user-profile';
 import { calculateGoalFromProfile } from './calculate-goal-from-profile';
-import { saveSettingsGoal } from './save-settings-goal';
-import { saveUserProfile } from './save-user-profile';
+import { saveSettingsGoal } from './api/save-settings-goal';
+import { saveUserProfile } from './api/save-user-profile';
 
 type ManualTargetValues = {
   kcal: string;

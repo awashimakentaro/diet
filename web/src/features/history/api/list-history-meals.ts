@@ -1,5 +1,5 @@
 /**
- * web/src/features/history/list-history-meals.ts
+ * web/src/features/history/api/list-history-meals.ts
  *
  * 【責務】
  * History 画面向けに指定日付の meals を Supabase から取得する。
@@ -22,8 +22,8 @@ import type { WebMeal } from '@/domain/web-diet-schema';
 import { getSupabaseBrowserClient } from '@/lib/supabase';
 import { getUtcRangeForDateKey } from '@/lib/web-date';
 
-import { mapWebMealRow } from './map-web-meal-row';
-import { pruneOldMealsForCurrentUser } from './prune-old-meals';
+import { mapWebMealRow } from '../map-web-meal-row';
+import { pruneOldMealsForCurrentUser } from '../prune-old-meals';
 
 export async function listHistoryMeals(dateKey: string): Promise<WebMeal[]> {
   try {

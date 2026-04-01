@@ -14,7 +14,7 @@
  * - JSX 描画
  *
  * 【他ファイルとの関係】
- * - list-history-meals.ts と delete-history-meal.ts を利用する。
+ * - api/list-history-meals.ts と api/delete-history-meal.ts を利用する。
  * - history-entry-card.tsx へ state とハンドラを渡す。
  */
 
@@ -26,13 +26,13 @@ import type { NutritionSummary } from '@/features/record/components/record-summa
 import { formatDateKey, getTodayKey, parseDateKey } from '@/lib/web-date';
 
 import { buildNutritionSummary } from '../summary/build-nutrition-summary';
-import { listCurrentGoal } from '../settings/list-current-goal';
-import { listDailySummary } from '../summary/list-daily-summary';
-import { recomputeDailySummaryForDateKey } from '../summary/recompute-daily-summary';
-import { deleteHistoryMeal } from './delete-history-meal';
-import { listHistoryMeals } from './list-history-meals';
-import { saveHistoryMealToFoods } from './save-history-meal-to-foods';
-import { updateHistoryMeal } from './update-history-meal';
+import { listCurrentGoal } from '../settings/api/list-current-goal';
+import { listDailySummary } from '../summary/api/list-daily-summary';
+import { recomputeDailySummaryForDateKey } from '../summary/api/recompute-daily-summary';
+import { deleteHistoryMeal } from './api/delete-history-meal';
+import { listHistoryMeals } from './api/list-history-meals';
+import { saveHistoryMealToFoods } from './api/save-history-meal-to-foods';
+import { updateHistoryMeal } from './api/update-history-meal';
 
 export type UseHistoryScreenResult = {
   meals: WebMeal[];

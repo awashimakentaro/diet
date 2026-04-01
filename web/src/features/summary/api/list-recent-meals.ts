@@ -1,5 +1,5 @@
 /**
- * web/src/features/summary/list-recent-meals.ts
+ * web/src/features/summary/api/list-recent-meals.ts
  *
  * 【責務】
  * Home 画面用に今日の meals を少数件取得する。

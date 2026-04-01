@@ -7,7 +7,7 @@
  * 【使用されるエージェント / 処理フロー】
  * - web/src/app/app/history/_components/history-page-screen.tsx から呼ばれる。
  * - 対象 meal をフォームへ展開し、保存時に親へ編集値を返す。
- * - prompt 追加時は record/request-record-analysis.ts を呼び、食品候補を追記する。
+ * - prompt 追加時は record/api/request-record-analysis.ts を呼び、食品候補を追記する。
  *
  * 【やらないこと】
  * - DB 更新
@@ -28,7 +28,7 @@ import { useFieldArray, useForm } from 'react-hook-form';
 
 import type { WebMeal } from '@/domain/web-diet-schema';
 import { RecordItemAddPanel } from '@/features/record/components/record-item-add-panel';
-import { requestRecordAnalysis } from '@/features/record/request-record-analysis';
+import { requestRecordAnalysis } from '@/features/record/api/request-record-analysis';
 import { usePromptAttachments } from '@/features/record/use-prompt-attachments';
 
 type HistoryMealEditorFormValues = {

@@ -1,5 +1,5 @@
 /**
- * web/src/features/settings/save-settings-goal.ts
+ * web/src/features/settings/api/save-settings-goal.ts
  *
  * 【責務】
  * Settings 画面の目標値を goals テーブルへ upsert 保存する。
@@ -10,8 +10,7 @@
  *
  * 【やらないこと】
  * - UI 描画
- * - 自動計算
- * - profile 保存
+ * - 目標計算
  *
  * 【他ファイルとの関係】
  * - getSupabaseBrowserClient を利用する。

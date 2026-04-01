@@ -1,5 +1,5 @@
 /**
- * web/src/features/settings/append-user-weight-log.ts
+ * web/src/features/settings/api/append-user-weight-log.ts
  *
  * 【責務】
  * 現在ログイン中ユーザーの体重ログを user_weight_logs に 1 件追加する。
@@ -9,7 +9,6 @@
  * - プロフィール保存成功後に current / target weight を履歴として追記する。
  *
  * 【やらないこと】
- * - user_profiles の更新
  * - UI 描画
  * - 目標計算
  *

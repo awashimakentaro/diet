@@ -14,14 +14,14 @@
  * - ページ全体の構成管理
  *
  * 【他ファイルとの関係】
- * - list-user-weight-logs.ts の型を利用する。
+ * - api/list-user-weight-logs.ts の型を利用する。
  */
 
 'use client';
 
 import { useMemo, type JSX } from 'react';
 
-import type { UserWeightLogPoint } from '../list-user-weight-logs';
+import type { UserWeightLogPoint } from '../api/list-user-weight-logs';
 
 type WeightTrendChartProps = {
   points: UserWeightLogPoint[];

@@ -1,5 +1,5 @@
 /**
- * web/src/features/summary/recompute-recent-daily-summaries.ts
+ * web/src/features/summary/api/recompute-recent-daily-summaries.ts
  *
  * 【責務】
  * 直近 N 日分の daily_summaries を順に再計算する。

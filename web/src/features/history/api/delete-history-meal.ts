@@ -1,5 +1,5 @@
 /**
- * web/src/features/history/delete-history-meal.ts
+ * web/src/features/history/api/delete-history-meal.ts
  *
  * 【責務】
  * History 画面から指定 Meal を Supabase 上で削除する。
@@ -11,7 +11,6 @@
  * 【やらないこと】
  * - UI 描画
  * - 状態管理
- * - 履歴一覧の再取得
  *
  * 【他ファイルとの関係】
  * - getSupabaseBrowserClient を利用する。

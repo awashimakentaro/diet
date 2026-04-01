@@ -1,5 +1,5 @@
 /**
- * web/src/features/summary/list-recent-daily-summaries.ts
+ * web/src/features/summary/api/list-recent-daily-summaries.ts
  *
  * 【責務】
  * 直近 N 日分の daily_summaries を取得する。
@@ -10,8 +10,7 @@
  *
  * 【やらないこと】
  * - UI 描画
- * - 永続化
- * - 集計更新
+ * - グラフ描画
  *
  * 【他ファイルとの関係】
  * - getSupabaseBrowserClient、map-web-daily-summary-row.ts を利用する。
@@ -21,8 +20,8 @@ import type { WebDailySummary } from '@/domain/web-diet-schema';
 import { getSupabaseBrowserClient } from '@/lib/supabase';
 import { formatDateKey } from '@/lib/web-date';
 
-import { isDailySummarySchemaMissing } from './is-daily-summary-schema-missing';
-import { mapWebDailySummaryRow } from './map-web-daily-summary-row';
+import { isDailySummarySchemaMissing } from '../is-daily-summary-schema-missing';
+import { mapWebDailySummaryRow } from '../map-web-daily-summary-row';
 
 function buildStartDateKey(days: number): string {
   const start = new Date();

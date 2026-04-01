@@ -1,5 +1,5 @@
 /**
- * web/src/features/home/list-user-weight-logs.ts
+ * web/src/features/home/api/list-user-weight-logs.ts
  *
  * 【責務】
  * Home の体重推移グラフ用に user_weight_logs を取得する。
@@ -10,8 +10,7 @@
  *
  * 【やらないこと】
  * - UI 描画
- * - ログ保存
- * - 集計の永続化
+ * - グラフ描画
  *
  * 【他ファイルとの関係】
  * - getSupabaseBrowserClient を利用する。

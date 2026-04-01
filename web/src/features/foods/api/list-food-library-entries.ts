@@ -1,5 +1,5 @@
 /**
- * web/src/features/foods/list-food-library-entries.ts
+ * web/src/features/foods/api/list-food-library-entries.ts
  *
  * 【責務】
  * foods テーブルから食品ライブラリエントリを取得する。
@@ -10,8 +10,7 @@
  *
  * 【やらないこと】
  * - UI 描画
- * - SWR 状態管理
- * - 入力バリデーション
+ * - 検索条件の整形
  *
  * 【他ファイルとの関係】
  * - getSupabaseBrowserClient と map-web-food-row.ts を利用する。
@@ -19,7 +18,7 @@
 
 import { getSupabaseBrowserClient } from '@/lib/supabase';
 
-import { mapWebFoodRow } from './map-web-food-row';
+import { mapWebFoodRow } from '../map-web-food-row';
 
 export async function listFoodLibraryEntries(): Promise<
 Array<ReturnType<typeof mapWebFoodRow>>

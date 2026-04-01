@@ -1,5 +1,5 @@
 /**
- * web/src/features/summary/list-daily-summary.ts
+ * web/src/features/summary/api/list-daily-summary.ts
  *
  * 【責務】
  * 指定日付の daily_summaries を1件取得する。
@@ -10,8 +10,7 @@
  *
  * 【やらないこと】
  * - UI 描画
- * - SWR 状態管理
- * - 日次集計の再計算
+ * - 目標値の組み立て
  *
  * 【他ファイルとの関係】
  * - getSupabaseBrowserClient、map-web-daily-summary-row.ts を利用する。
@@ -20,8 +19,8 @@
 import type { WebDailySummary } from '@/domain/web-diet-schema';
 import { getSupabaseBrowserClient } from '@/lib/supabase';
 
-import { isDailySummarySchemaMissing } from './is-daily-summary-schema-missing';
-import { mapWebDailySummaryRow } from './map-web-daily-summary-row';
+import { isDailySummarySchemaMissing } from '../is-daily-summary-schema-missing';
+import { mapWebDailySummaryRow } from '../map-web-daily-summary-row';
 
 export async function listDailySummary(dateKey: string): Promise<WebDailySummary | null> {
   const client = getSupabaseBrowserClient();

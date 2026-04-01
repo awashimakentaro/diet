@@ -1,5 +1,5 @@
 /**
- * web/src/features/account/save-account-profile.ts
+ * web/src/features/account/api/save-account-profile.ts
  *
  * 【責務】
  * アカウント編集シートの公開プロフィール項目を user_profiles へ保存する。
@@ -15,7 +15,7 @@
  *
  * 【他ファイルとの関係】
  * - getSupabaseBrowserClient を利用する。
- * - get-user-profile.ts と同じ user_profiles テーブルを扱う。
+ * - settings/api/get-user-profile.ts と同じ user_profiles テーブルを扱う。
  */
 
 import { getSupabaseBrowserClient } from '@/lib/supabase';

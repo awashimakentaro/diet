@@ -1,5 +1,5 @@
 /**
- * web/src/features/settings/list-current-goal.ts
+ * web/src/features/settings/api/list-current-goal.ts
  *
  * 【責務】
  * 現在ログイン中ユーザーの goals を表示用 WebGoal として取得する。

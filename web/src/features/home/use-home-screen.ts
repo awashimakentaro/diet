@@ -15,9 +15,9 @@
  * - JSX 描画
  *
  * 【他ファイルとの関係】
- * - summary 配下の取得処理を利用する。
+ * - summary/api 配下の取得処理を利用する。
  * - record-summary-card.tsx へ渡す NutritionSummary を返す。
- * - list-user-weight-logs.ts で体重推移用ログを取得する。
+ * - api/list-user-weight-logs.ts で体重推移用ログを取得する。
  */
 
 import { useEffect } from 'react';
@@ -28,12 +28,12 @@ import type { NutritionSummary } from '@/features/record/components/record-summa
 import { formatDateKey, getTodayKey, parseDateKey } from '@/lib/web-date';
 
 import { buildNutritionSummary } from '../summary/build-nutrition-summary';
-import { listDailySummary } from '../summary/list-daily-summary';
-import { listRecentMeals } from '../summary/list-recent-meals';
-import { listWeekDailySummaries } from '../summary/list-week-daily-summaries';
-import { recomputeRecentDailySummaries } from '../summary/recompute-recent-daily-summaries';
-import { listCurrentGoal } from '../settings/list-current-goal';
-import { listUserWeightLogs, type UserWeightLogPoint } from './list-user-weight-logs';
+import { listDailySummary } from '../summary/api/list-daily-summary';
+import { listRecentMeals } from '../summary/api/list-recent-meals';
+import { listWeekDailySummaries } from '../summary/api/list-week-daily-summaries';
+import { recomputeRecentDailySummaries } from '../summary/api/recompute-recent-daily-summaries';
+import { listCurrentGoal } from '../settings/api/list-current-goal';
+import { listUserWeightLogs, type UserWeightLogPoint } from './api/list-user-weight-logs';
 
 type HomeInsight = {
   label: string;
