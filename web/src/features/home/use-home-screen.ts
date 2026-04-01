@@ -7,7 +7,7 @@
  * Home 画面に表示する日次集計ベースのサマリーと分析データを組み立てる。
  *
  * 【使用されるエージェント / 処理フロー】
- * - home-screen.tsx から呼ばれる。
+ * - web/src/app/app/(home)/_components/home-page-screen.tsx から呼ばれる。
  * - daily_summaries と recent meals を取得し、Home UI 向けに整形する。
  *
  * 【やらないこと】

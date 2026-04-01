@@ -1,14 +1,14 @@
 'use client';
 
 /**
- * web/src/features/history/history-screen.tsx
+ * web/src/app/app/history/_components/history-page-screen.tsx
  *
  * 【責務】
- * History 画面全体のトップバー、日付チップ、履歴一覧、下部ナビを組み立てる。
+ * `/app/history` ルート専用のトップバー、日付チップ、履歴一覧、下部ナビを組み立てる。
  *
  * 【使用されるエージェント / 処理フロー】
  * - web/src/app/app/history/page.tsx から呼ばれる。
- * - use-history-screen.ts と各 UI コンポーネントを接続する。
+ * - web/src/features/history/use-history-screen.ts と各 UI コンポーネントを接続する。
  *
  * 【やらないこと】
  * - API 通信
@@ -16,7 +16,7 @@
  * - 認証制御
  *
  * 【他ファイルとの関係】
- * - components/history-* と app-bottom-nav.tsx を利用する。
+ * - web/src/features/history/components 配下と web/src/components/app-bottom-nav.tsx を利用する。
  */
 
 import { motion, useReducedMotion } from 'framer-motion';
@@ -25,14 +25,13 @@ import type { JSX } from 'react';
 import { AppBottomNav } from '@/components/app-bottom-nav';
 import { HistoryScreenSkeleton } from '@/components/app-skeleton';
 import { AppTopBar } from '@/components/app-top-bar';
+import { HistoryDateChip } from '@/features/history/components/history-date-chip';
+import { HistoryEntryCard } from '@/features/history/components/history-entry-card';
+import { HistoryMealEditorPanel } from '@/features/history/components/history-meal-editor-panel';
+import { useHistoryScreen } from '@/features/history/use-history-screen';
 import { RecordSummaryCard } from '@/features/record/components/record-summary-card';
 
-import { HistoryDateChip } from './components/history-date-chip';
-import { HistoryEntryCard } from './components/history-entry-card';
-import { HistoryMealEditorPanel } from './components/history-meal-editor-panel';
-import { useHistoryScreen } from './use-history-screen';
-
-export function HistoryScreen(): JSX.Element {
+export function HistoryPageScreen(): JSX.Element {
   const reduceMotion = useReducedMotion();
   const {
     meals,
@@ -125,8 +124,8 @@ export function HistoryScreen(): JSX.Element {
                       isSaved={savedMealIds.includes(meal.id)}
                       isSaving={savingMealId === meal.id}
                       meal={meal}
-                      onEdit={handleOpenEditMeal}
                       onDelete={handleDeleteMeal}
+                      onEdit={handleOpenEditMeal}
                       onSave={handleSaveMeal}
                     />
                   </motion.div>

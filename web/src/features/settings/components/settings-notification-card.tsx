@@ -5,7 +5,7 @@
  * 通知設定カードを描画する。
  *
  * 【使用されるエージェント / 処理フロー】
- * - settings-screen.tsx から呼ばれる。
+ * - web/src/app/app/settings/_components/settings-page-screen.tsx から呼ばれる。
  * - トグル状態、時間帯、保存ハンドラを受け取る。
  *
  * 【やらないこと】

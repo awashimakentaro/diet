@@ -1,11 +1,11 @@
 /**
- * web/src/features/record/components/record-workspace-loading.tsx
+ * web/src/app/app/record/_components/record-workspace-loading.tsx
  *
  * 【責務】
- * Record 画面で解析中のローディング表示を描画する。
+ * `/app/record` ルート専用の解析中ローディング表示を描画する。
  *
  * 【使用されるエージェント / 処理フロー】
- * - record-screen.tsx から呼ばれる。
+ * - record-page-screen.tsx から呼ばれる。
  * - prompt 解析中に workspace の待機表示として描画される。
  *
  * 【やらないこと】

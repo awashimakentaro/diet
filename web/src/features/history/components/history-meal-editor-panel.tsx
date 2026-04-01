@@ -5,7 +5,7 @@
  * History 画面で選択した食事を再編集するオーバーレイパネルを描画する。
  *
  * 【使用されるエージェント / 処理フロー】
- * - history-screen.tsx から呼ばれる。
+ * - web/src/app/app/history/_components/history-page-screen.tsx から呼ばれる。
  * - 対象 meal をフォームへ展開し、保存時に親へ編集値を返す。
  * - prompt 追加時は record/request-record-analysis.ts を呼び、食品候補を追記する。
  *

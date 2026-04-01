@@ -5,7 +5,7 @@
  * 手動目標設定カードを描画する。
  *
  * 【使用されるエージェント / 処理フロー】
- * - settings-screen.tsx から呼ばれる。
+ * - web/src/app/app/settings/_components/settings-page-screen.tsx から呼ばれる。
  * - 目標値と更新ハンドラを受け取って UI を表示する。
  *
  * 【やらないこと】

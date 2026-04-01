@@ -6,7 +6,7 @@
  *
  * 【使用されるエージェント / 処理フロー】
  * - Next.js `/app/foods` ルートで呼ばれる。
- * - features/foods/foods-screen.tsx へ表示責務を委譲する。
+ * - route 専用 UI 組み立てを foods-page-screen.tsx へ委譲する。
  *
  * 【やらないこと】
  * - データ取得
@@ -14,12 +14,12 @@
  * - 永続化
  *
  * 【他ファイルとの関係】
- * - web/src/features/foods/foods-screen.tsx を利用する。
+ * - web/src/app/app/foods/_components/foods-page-screen.tsx を利用する。
  */
 
 import type { JSX } from 'react';
 
-import { FoodsScreen } from '@/features/foods/foods-screen';
+import { FoodsPageScreen } from './_components/foods-page-screen';
 
 /**
  * Foods ページ本体を描画する。
@@ -28,5 +28,5 @@ import { FoodsScreen } from '@/features/foods/foods-screen';
  * @remarks 副作用は存在しない。
  */
 export default function FoodsPage(): JSX.Element {
-  return <FoodsScreen />;
+  return <FoodsPageScreen />;
 }

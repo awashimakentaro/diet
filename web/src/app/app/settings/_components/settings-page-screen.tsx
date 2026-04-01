@@ -1,10 +1,23 @@
 'use client';
 
 /**
- * web/src/features/settings/settings-screen.tsx
+ * web/src/app/app/settings/_components/settings-page-screen.tsx
  *
  * 【責務】
- * Settings 画面全体のトップバー、各設定カード、下部ナビを組み立てる。
+ * `/app/settings` ルート専用のトップバー、設定カード群、下部ナビを組み立てる。
+ *
+ * 【使用されるエージェント / 処理フロー】
+ * - web/src/app/app/settings/page.tsx から呼ばれる。
+ * - web/src/features/settings/use-settings-screen.ts の状態を受け取り、各設定カードへ渡す。
+ *
+ * 【やらないこと】
+ * - 設定値の永続化
+ * - 認証状態の保持
+ * - 共通 UI の定義
+ *
+ * 【他ファイルとの関係】
+ * - web/src/features/settings/components 配下を利用する。
+ * - web/src/components/app-top-bar.tsx と app-bottom-nav.tsx を利用する。
  */
 
 import { motion, useReducedMotion } from 'framer-motion';
@@ -14,13 +27,12 @@ import { useRouter } from 'next/navigation';
 import { AppBottomNav } from '@/components/app-bottom-nav';
 import { AppTopBar } from '@/components/app-top-bar';
 import { paths } from '@/config/paths';
+import { SettingsAccountCard } from '@/features/settings/components/settings-account-card';
+import { SettingsManualTargetCard } from '@/features/settings/components/settings-manual-target-card';
+import { SettingsProfileCard } from '@/features/settings/components/settings-profile-card';
+import { useSettingsScreen } from '@/features/settings/use-settings-screen';
 
-import { SettingsAccountCard } from './components/settings-account-card';
-import { SettingsManualTargetCard } from './components/settings-manual-target-card';
-import { SettingsProfileCard } from './components/settings-profile-card';
-import { useSettingsScreen } from './use-settings-screen';
-
-export function SettingsScreen(): JSX.Element {
+export function SettingsPageScreen(): JSX.Element {
   const router = useRouter();
   const reduceMotion = useReducedMotion();
   const {
@@ -117,7 +129,6 @@ export function SettingsScreen(): JSX.Element {
                 onSignOut={handleSignOut}
               />
             </motion.div>
-
           </motion.div>
         </div>
       </motion.main>

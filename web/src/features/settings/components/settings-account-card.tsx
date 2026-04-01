@@ -5,7 +5,7 @@
  * アカウント情報、使い方導線、ログアウトボタンを描画する。
  *
  * 【使用されるエージェント / 処理フロー】
- * - settings-screen.tsx から呼ばれる。
+ * - web/src/app/app/settings/_components/settings-page-screen.tsx から呼ばれる。
  * - 現在ユーザー情報とログアウトハンドラを受け取る。
  *
  * 【やらないこと】

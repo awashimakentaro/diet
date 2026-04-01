@@ -7,7 +7,7 @@
  * Settings 画面の入力 state、DB 初期取得、保存ハンドラをまとめる。
  *
  * 【使用されるエージェント / 処理フロー】
- * - settings-screen.tsx から呼ばれる。
+ * - web/src/app/app/settings/_components/settings-page-screen.tsx から呼ばれる。
  * - goals / user_profiles を読み込み、Settings 画面の初期値を組み立てる。
  *
  * 【やらないこと】

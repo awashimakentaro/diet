@@ -7,7 +7,7 @@
  * Foods 画面の検索・一覧操作 state をまとめる。
  *
  * 【使用されるエージェント / 処理フロー】
- * - foods-screen.tsx から呼ばれる。
+ * - web/src/app/app/foods/_components/foods-page-screen.tsx から呼ばれる。
  * - foods テーブルの取得結果を検索条件で絞り込み、表示用に整形する。
  *
  * 【やらないこと】

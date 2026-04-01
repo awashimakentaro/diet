@@ -1,11 +1,12 @@
 /**
- * web/app/record/page.tsx
+ * web/src/app/app/record/page.tsx
  *
  * 【責務】
- * Web 版 Record ページの入口として、feature 側の RecordScreen を配置する。
+ * `/app/record` ルートの入口として、route 専用の Record 画面コンポーネントを配置する。
  *
- * 【使用箇所】
- * - `/app/record` ルートで表示される。
+ * 【使用されるエージェント / 処理フロー】
+ * - Next.js App Router から `/app/record` ルートで呼ばれる。
+ * - route 専用 UI 組み立てを record-page-screen.tsx へ委譲する。
  *
  * 【やらないこと】
  * - 記録画面の細かな UI 構築
@@ -13,12 +14,12 @@
  * - API 通信
  *
  * 【他ファイルとの関係】
- * - web/src/features/record/record-screen.tsx を呼び出す。
+ * - web/src/app/app/record/_components/record-page-screen.tsx を呼び出す。
  */
 
 import type { JSX } from 'react';
 
-import { RecordScreen } from '@/features/record/record-screen';
+import { RecordPageScreen } from './_components/record-page-screen';
 
 /**
  * 記録画面を描画する。
@@ -27,5 +28,5 @@ import { RecordScreen } from '@/features/record/record-screen';
  * @remarks 副作用は存在しない。
  */
 export default function RecordPage(): JSX.Element {
-  return <RecordScreen />;
+  return <RecordPageScreen />;
 }

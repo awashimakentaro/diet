@@ -5,7 +5,7 @@
  * History 画面の1件分の履歴カードを描画する。
  *
  * 【使用されるエージェント / 処理フロー】
- * - history-screen.tsx から呼ばれる。
+ * - web/src/app/app/history/_components/history-page-screen.tsx から呼ばれる。
  * - 履歴データとローカル操作ハンドラを受け取る。
  *
  * 【やらないこと】

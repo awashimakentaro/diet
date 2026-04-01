@@ -5,7 +5,7 @@
  * Foods 画面で食品ライブラリカードの編集 UI を描画する。
  *
  * 【使用されるエージェント / 処理フロー】
- * - foods-screen.tsx から呼ばれる。
+ * - web/src/app/app/foods/_components/foods-page-screen.tsx から呼ばれる。
  * - use-foods-screen.ts のフォーム状態を受け取り、食品カード編集 UI を構築する。
  *
  * 【やらないこと】

@@ -1,14 +1,14 @@
 'use client';
 
 /**
- * web/src/features/foods/foods-screen.tsx
+ * web/src/app/app/foods/_components/foods-page-screen.tsx
  *
  * 【責務】
- * Foods 画面全体のトップバー、検索バー、食品カード一覧、下部ナビを組み立てる。
+ * `/app/foods` ルート専用のトップバー、検索バー、食品カード一覧、下部ナビを組み立てる。
  *
  * 【使用されるエージェント / 処理フロー】
  * - web/src/app/app/foods/page.tsx から呼ばれる。
- * - use-foods-screen.ts と各 UI コンポーネントを接続する。
+ * - web/src/features/foods/use-foods-screen.ts と各 UI コンポーネントを接続する。
  *
  * 【やらないこと】
  * - API 通信
@@ -16,7 +16,7 @@
  * - 認証制御
  *
  * 【他ファイルとの関係】
- * - components/foods-* と app-bottom-nav.tsx を利用する。
+ * - web/src/features/foods/components 配下と web/src/components/app-bottom-nav.tsx を利用する。
  */
 
 import { motion, useReducedMotion } from 'framer-motion';
@@ -25,13 +25,12 @@ import type { JSX } from 'react';
 import { AppBottomNav } from '@/components/app-bottom-nav';
 import { FoodsScreenSkeleton } from '@/components/app-skeleton';
 import { AppTopBar } from '@/components/app-top-bar';
+import { FoodEntryEditorPanel } from '@/features/foods/components/food-entry-editor-panel';
+import { FoodLibraryCard } from '@/features/foods/components/food-library-card';
+import { FoodsSearchBar } from '@/features/foods/components/foods-search-bar';
+import { useFoodsScreen } from '@/features/foods/use-foods-screen';
 
-import { FoodEntryEditorPanel } from './components/food-entry-editor-panel';
-import { FoodLibraryCard } from './components/food-library-card';
-import { FoodsSearchBar } from './components/foods-search-bar';
-import { useFoodsScreen } from './use-foods-screen';
-
-export function FoodsScreen(): JSX.Element {
+export function FoodsPageScreen(): JSX.Element {
   const reduceMotion = useReducedMotion();
   const {
     visibleEntries,
@@ -90,7 +89,6 @@ export function FoodsScreen(): JSX.Element {
             <p className="eyebrow">{feedbackMessage}</p>
           ) : null}
 
-
           <section className="foods-screen__list">
             {visibleEntries.length === 0 ? (
               <motion.div
@@ -116,11 +114,10 @@ export function FoodsScreen(): JSX.Element {
                   <FoodLibraryCard
                     entry={entry}
                     isSaving={savingEntryId === entry.id}
-                    onEdit={handleOpenEditor}
                     onDelete={handleDeleteEntry}
+                    onEdit={handleOpenEditor}
                     onReuse={handleReuseEntry}
                   />
-
                 </motion.div>
               ))
             )}

@@ -1,14 +1,14 @@
 'use client';
 
 /**
- * web/src/features/home/home-screen.tsx
+ * web/src/app/app/(home)/_components/home-page-screen.tsx
  *
  * 【責務】
- * Home 画面全体のトップバー、Nutrition Status、分析サマリー、下部ナビを組み立てる。
+ * `/app` Home ルート専用のトップバー、サマリー、体重推移、下部ナビを組み立てる。
  *
  * 【使用されるエージェント / 処理フロー】
- * - web/src/app/app/page.tsx から呼ばれる。
- * - use-home-screen.ts の状態を受け取り、各表示領域へ渡す。
+ * - web/src/app/app/(home)/page.tsx から呼ばれる。
+ * - web/src/features/home/use-home-screen.ts の状態を受け取り、各表示領域へ渡す。
  *
  * 【やらないこと】
  * - API 通信
@@ -16,8 +16,9 @@
  * - 認証制御
  *
  * 【他ファイルとの関係】
- * - AppTopBar と AppBottomNav を利用する。
- * - RecordSummaryCard を Home 用の Nutrition Status として再利用する。
+ * - web/src/components/app-top-bar.tsx と app-bottom-nav.tsx を利用する。
+ * - web/src/features/record/components/record-summary-card.tsx を Home 用に再利用する。
+ * - web/src/features/home/components/weight-trend-chart.tsx を利用する。
  */
 
 import { motion, useReducedMotion } from 'framer-motion';
@@ -26,13 +27,11 @@ import { useState, type JSX } from 'react';
 import { AppBottomNav } from '@/components/app-bottom-nav';
 import { HomeScreenSkeleton } from '@/components/app-skeleton';
 import { AppTopBar } from '@/components/app-top-bar';
+import { WeightTrendChart } from '@/features/home/components/weight-trend-chart';
+import { useHomeScreen } from '@/features/home/use-home-screen';
 import { RecordSummaryCard } from '@/features/record/components/record-summary-card';
 
-import { WeightTrendChart } from './components/weight-trend-chart';
-import { useHomeScreen } from './use-home-screen';
-
-
-export function HomeScreen(): JSX.Element {
+export function HomePageScreen(): JSX.Element {
   const { summary, consecutiveDays, insights, usageBars, weightLogs, isLoading } = useHomeScreen();
   const [selectedWeightLogId, setSelectedWeightLogId] = useState<string | null>(null);
   const chartHeight = 136;
@@ -129,6 +128,7 @@ export function HomeScreen(): JSX.Element {
                     </div>
                   ) : null}
                 </div>
+
                 <WeightTrendChart
                   onSelectPoint={setSelectedWeightLogId}
                   points={weightLogs}
@@ -180,13 +180,13 @@ export function HomeScreen(): JSX.Element {
                           {bar.hasRecord ? `${bar.kcal} kcal` : '-'}
                         </strong>
                         <motion.div
-                          className={bar.hasRecord ? 'home-screen__usage-fill' : 'home-screen__usage-fill home-screen__usage-fill--empty'}
-                          initial={{ height: 0 }}
                           animate={{
                             height: bar.hasRecord
                               ? Math.max(8, Math.round((bar.value / 100) * chartHeight))
                               : 0,
                           }}
+                          className={bar.hasRecord ? 'home-screen__usage-fill' : 'home-screen__usage-fill home-screen__usage-fill--empty'}
+                          initial={{ height: 0 }}
                           transition={
                             reduceMotion
                               ? { duration: 0 }

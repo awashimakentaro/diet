@@ -5,7 +5,7 @@
  * Record 画面の食事名入力、食品内訳編集、確定ボタンを描画する。
  *
  * 【使用されるエージェント / 処理フロー】
- * - record-screen.tsx から呼ばれる。
+ * - web/src/app/app/record/_components/record-page-screen.tsx から呼ばれる。
  * - RHF form と itemFields を受け取り、下書き編集 UI を構築する。
  *
  * 【やらないこと】

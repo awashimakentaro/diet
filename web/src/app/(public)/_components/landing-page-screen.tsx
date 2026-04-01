@@ -1,14 +1,14 @@
 'use client';
 
 /**
- * web/src/features/landing/landing-screen.tsx
+ * web/src/app/(public)/_components/landing-page-screen.tsx
  *
  * 【責務】
- * 公開トップの LP と、ログイン / 新規登録導線を描画する。
+ * 公開トップ `/` 専用の LP を描画し、ログイン / 新規登録 / アプリ遷移導線を配置する。
  *
  * 【使用されるエージェント / 処理フロー】
- * - `/` ルートから呼ばれる。
- * - 未ログイン時は認証導線、ログイン済み時はアプリへ進む導線を表示する。
+ * - web/src/app/(public)/page.tsx から呼ばれる。
+ * - 未ログイン時は認証導線、ログイン済み時はアプリ導線を表示する。
  *
  * 【やらないこと】
  * - 認証 API の直接呼び出し
@@ -16,8 +16,8 @@
  * - 食事記録編集
  *
  * 【他ファイルとの関係】
- * - app/provider.tsx の useWebAuth を利用する。
- * - config/paths.ts を利用する。
+ * - web/src/app/provider.tsx の useWebAuth を利用する。
+ * - web/src/config/paths.ts を利用する。
  * - web/src/styles/globals.css の landing-screen 系クラスに依存する。
  */
 
@@ -48,7 +48,7 @@ const LANDING_STEPS = [
   },
 ] as const;
 
-export function LandingScreen(): JSX.Element {
+export function LandingPageScreen(): JSX.Element {
   const { status } = useWebAuth();
   const isSignedIn = status === 'signed-in';
 

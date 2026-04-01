@@ -5,7 +5,7 @@
  * Record 画面のプロンプト入力欄で使う画像添付プレビュー状態を管理する。
  *
  * 【使用されるエージェント / 処理フロー】
- * - record-quick-input-card.tsx と record-item-add-panel.tsx から呼ばれる。
+ * - web/src/app/app/record/_components/record-quick-input-card.tsx と record-item-add-panel.tsx から呼ばれる。
  * - file input の選択結果をプレビュー用 URL に変換して保持する。
  *
  * 【やらないこと】
@@ -87,4 +87,3 @@ export function usePromptAttachments(): UsePromptAttachmentsResult {
     setAttachments,
   };
 }
-

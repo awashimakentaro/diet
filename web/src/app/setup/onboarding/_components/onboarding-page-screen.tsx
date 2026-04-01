@@ -1,13 +1,15 @@
+'use client';
+
 /**
- * web/src/features/onboarding/onboarding-screen.tsx
+ * web/src/app/setup/onboarding/_components/onboarding-page-screen.tsx
  *
  * 【責務】
- * 登録直後の共通チュートリアル起動とプロフィール入力 UI を描画する。
+ * `/setup/onboarding` ルート専用の共通チュートリアル起動とプロフィール入力 UI を描画する。
  *
  * 【使用されるエージェント / 処理フロー】
- * - /app/onboarding/page.tsx から呼ばれる。
+ * - web/src/app/setup/onboarding/page.tsx から呼ばれる。
  * - 初回表示で共通 TutorialOverlay を開く。
- * - use-onboarding-screen.ts の state と保存処理を表示へ反映する。
+ * - web/src/features/onboarding/use-onboarding-screen.ts の state と保存処理を表示へ反映する。
  *
  * 【やらないこと】
  * - チュートリアルのステップ管理
@@ -16,20 +18,18 @@
  * - 認証状態の保持
  *
  * 【他ファイルとの関係】
- * - use-onboarding-screen.ts に依存する。
+ * - web/src/features/onboarding/use-onboarding-screen.ts に依存する。
+ * - web/src/features/home/components/tutorial-overlay.tsx を利用する。
  * - web/src/styles/globals.css の onboarding 系クラスに依存する。
  */
-
-'use client';
 
 import type { ChangeEvent, JSX } from 'react';
 import { useState } from 'react';
 
 import { TutorialOverlay } from '@/features/home/components/tutorial-overlay';
+import { useOnboardingScreen } from '@/features/onboarding/use-onboarding-screen';
 
-import { useOnboardingScreen } from './use-onboarding-screen';
-
-type OnboardingScreenProps = {
+type OnboardingPageScreenProps = {
   redirectTo: string;
 };
 
@@ -50,9 +50,9 @@ const PROFILE_FIELDS = [
   { field: 'targetDays', label: '目標日数', placeholder: '84', suffix: '日' },
 ] as const;
 
-export function OnboardingScreen({
+export function OnboardingPageScreen({
   redirectTo,
-}: OnboardingScreenProps): JSX.Element {
+}: OnboardingPageScreenProps): JSX.Element {
   const [isTutorialOpen, setIsTutorialOpen] = useState(true);
   const {
     profileValues,

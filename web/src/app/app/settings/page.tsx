@@ -6,7 +6,7 @@
  *
  * 【使用されるエージェント / 処理フロー】
  * - Next.js `/app/settings` ルートで呼ばれる。
- * - features/settings/settings-screen.tsx へ表示責務を委譲する。
+ * - route 専用 UI 組み立てを settings-page-screen.tsx へ委譲する。
  *
  * 【やらないこと】
  * - データ取得
@@ -14,12 +14,12 @@
  * - 永続化
  *
  * 【他ファイルとの関係】
- * - web/src/features/settings/settings-screen.tsx を利用する。
+ * - web/src/app/app/settings/_components/settings-page-screen.tsx を利用する。
  */
 
 import type { JSX } from 'react';
 
-import { SettingsScreen } from '@/features/settings/settings-screen';
+import { SettingsPageScreen } from './_components/settings-page-screen';
 
 /**
  * Settings ページ本体を描画する。
@@ -28,5 +28,5 @@ import { SettingsScreen } from '@/features/settings/settings-screen';
  * @remarks 副作用は存在しない。
  */
 export default function SettingsPage(): JSX.Element {
-  return <SettingsScreen />;
+  return <SettingsPageScreen />;
 }

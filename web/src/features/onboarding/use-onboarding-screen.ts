@@ -7,7 +7,7 @@
  * オンボーディング画面のプロフィール入力 state と保存処理をまとめる。
  *
  * 【使用されるエージェント / 処理フロー】
- * - onboarding-screen.tsx から呼ばれる。
+ * - web/src/app/setup/onboarding/_components/onboarding-page-screen.tsx から呼ばれる。
  * - 共通チュートリアル表示後にプロフィールを保存し、初期 goals を生成する。
  *
  * 【やらないこと】

@@ -5,7 +5,7 @@
  * 体重推移ログを Home 用の線グラフとして描画する。
  *
  * 【使用されるエージェント / 処理フロー】
- * - home-screen.tsx から呼ばれる。
+ * - web/src/app/app/(home)/_components/home-page-screen.tsx から呼ばれる。
  * - user_weight_logs の配列を受け取り SVG の折れ線へ変換する。
  *
  * 【やらないこと】

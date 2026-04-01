@@ -5,7 +5,7 @@
  * アプリ共通の使い方チュートリアルをオーバーレイで表示する。
  *
  * 【使用されるエージェント / 処理フロー】
- * - onboarding-screen.tsx や settings-screen.tsx から呼ばれる。
+ * - web/src/app/setup/onboarding/_components/onboarding-page-screen.tsx などから呼ばれる。
  * - 共有ステップ定義に沿って解説を順送り表示する。
  *
  * 【やらないこと】

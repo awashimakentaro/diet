@@ -6,7 +6,7 @@
  *
  * 【使用されるエージェント / 処理フロー】
  * - `/app` ルートで呼ばれる。
- * - web/src/features/home/home-screen.tsx を描画する。
+ * - route 専用 UI 組み立てを home-page-screen.tsx へ委譲する。
  *
  * 【やらないこと】
  * - 詳細な UI 構築
@@ -14,13 +14,13 @@
  * - 認証制御
  *
  * 【他ファイルとの関係】
- * - web/src/features/home/home-screen.tsx を呼び出す。
+ * - web/src/app/app/(home)/_components/home-page-screen.tsx を呼び出す。
  */
 
 import type { JSX } from 'react';
 
-import { HomeScreen } from '@/features/home/home-screen';
+import { HomePageScreen } from './_components/home-page-screen';
 
 export default function AppHomePage(): JSX.Element {
-  return <HomeScreen />;
+  return <HomePageScreen />;
 }

@@ -1,11 +1,11 @@
 /**
- * web/src/features/record/components/record-workspace-placeholder.tsx
+ * web/src/app/app/record/_components/record-workspace-placeholder.tsx
  *
  * 【責務】
- * Record 画面右側ワークスペースの空状態を描画する。
+ * `/app/record` ルート専用の workspace 空状態を描画する。
  *
  * 【使用されるエージェント / 処理フロー】
- * - record-screen.tsx から呼ばれる。
+ * - record-page-screen.tsx から呼ばれる。
  * - 手動入力またはプロンプト反映前の案内を表示する。
  *
  * 【やらないこと】

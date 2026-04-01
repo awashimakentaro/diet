@@ -7,7 +7,7 @@
  * Foods 画面上部の検索入力と追加ボタンを描画する。
  *
  * 【使用されるエージェント / 処理フロー】
- * - foods-screen.tsx から呼ばれる。
+ * - web/src/app/app/foods/_components/foods-page-screen.tsx から呼ばれる。
  * - 親から渡された検索値と追加ハンドラを使う。
  *
  * 【やらないこと】

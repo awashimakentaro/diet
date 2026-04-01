@@ -7,7 +7,7 @@
  * Record 画面のローカル state とフォーム編集状態をまとめる。
  *
  * 【使用されるエージェント / 処理フロー】
- * - features/record/record-screen.tsx から呼ばれる。
+ * - web/src/app/app/record/_components/record-page-screen.tsx から呼ばれる。
  * - use-record-form.ts の RHF 設定と field array を利用する。
  * - 解析取得は request-record-analysis.ts、保存は save-record-meal.ts へ委譲する。
  *
@@ -16,7 +16,7 @@
  *
  * 【他ファイルとの関係】
  * - record-form-schema.ts の型を利用する。
- * - record-screen.tsx と各 UI コンポーネントへ state を渡す。
+ * - route 専用の record-page-screen.tsx と feature / route UI コンポーネントへ state を渡す。
  */
 
 import { useMemo, useState } from 'react';

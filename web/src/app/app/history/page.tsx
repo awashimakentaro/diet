@@ -6,7 +6,7 @@
  *
  * 【使用されるエージェント / 処理フロー】
  * - Next.js `/app/history` ルートで呼ばれる。
- * - features/history/history-screen.tsx へ表示責務を委譲する。
+ * - route 専用 UI 組み立てを history-page-screen.tsx へ委譲する。
  *
  * 【やらないこと】
  * - データ取得
@@ -14,12 +14,12 @@
  * - 永続化
  *
  * 【他ファイルとの関係】
- * - web/src/features/history/history-screen.tsx を利用する。
+ * - web/src/app/app/history/_components/history-page-screen.tsx を利用する。
  */
 
 import type { JSX } from 'react';
 
-import { HistoryScreen } from '@/features/history/history-screen';
+import { HistoryPageScreen } from './_components/history-page-screen';
 
 /**
  * History ページ本体を描画する。
@@ -28,5 +28,5 @@ import { HistoryScreen } from '@/features/history/history-screen';
  * @remarks 副作用は存在しない。
  */
 export default function HistoryPage(): JSX.Element {
-  return <HistoryScreen />;
+  return <HistoryPageScreen />;
 }

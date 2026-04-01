@@ -7,7 +7,7 @@
  * History 画面上部の日付チップと日付選択 UI を描画する。
  *
  * 【使用されるエージェント / 処理フロー】
- * - history-screen.tsx から呼ばれる。
+ * - web/src/app/app/history/_components/history-page-screen.tsx から呼ばれる。
  * - 親から渡された日付文字列を表示し、日付変更イベントを親へ返す。
  *
  * 【やらないこと】

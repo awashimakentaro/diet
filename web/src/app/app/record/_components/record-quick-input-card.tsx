@@ -1,30 +1,30 @@
 'use client';
 
 /**
- * web/src/features/record/components/record-quick-input-card.tsx
+ * web/src/app/app/record/_components/record-quick-input-card.tsx
  *
  * 【責務】
- * Record 画面のクイック入力カードを描画する。
+ * `/app/record` ルート専用のクイック入力カードを描画する。
  *
  * 【使用されるエージェント / 処理フロー】
- * - record-screen.tsx から呼ばれる。
- * - RHF の register 結果とローカルハンドラを受け取る。
- * - プロンプト入力欄内の画像添付プレビューをローカル state で管理する。
+ * - record-page-screen.tsx から呼ばれる。
+ * - web/src/features/record/use-record-screen.ts が返す prompt register と添付ハンドラを受け取る。
  *
  * 【やらないこと】
  * - 永続化
  * - API 通信
- * - 下書き編集詳細の管理
+ * - 下書き全体の編集管理
  *
  * 【他ファイルとの関係】
- * - use-record-screen.ts の prompt とハンドラに依存する。
+ * - web/src/features/record/use-prompt-attachments.ts の PromptAttachment 型を利用する。
+ * - web/src/styles/globals.css の record-screen__prompt-* 系クラスに依存する。
  */
 
 import { Camera, ImagePlus, PenLine, Send, X } from 'lucide-react';
 import { useId, type ChangeEvent, type JSX } from 'react';
 import type { UseFormRegisterReturn } from 'react-hook-form';
 
-import { type PromptAttachment } from '../use-prompt-attachments';
+import type { PromptAttachment } from '@/features/record/use-prompt-attachments';
 
 type RecordQuickInputCardProps = {
   promptRegistration: UseFormRegisterReturn;
@@ -52,7 +52,6 @@ export function RecordQuickInputCard({
   const fileInputId = useId();
   const cameraInputId = useId();
 
-
   function handlePhotoChange(event: ChangeEvent<HTMLInputElement>): void {
     const hasAttached = onAttachmentChange(event);
 
@@ -60,7 +59,6 @@ export function RecordQuickInputCard({
       onPhotoRecord();
     }
   }
-
 
   return (
     <section className="record-screen__quick-card">
@@ -82,7 +80,6 @@ export function RecordQuickInputCard({
                 >
                   <X size={12} strokeWidth={2.4} />
                 </button>
-
               </div>
             ))}
           </div>
@@ -103,9 +100,6 @@ export function RecordQuickInputCard({
             style={{ height: '100px' }}
             {...promptRegistration}
           />
-
-
-
         </div>
 
         <div className="record-screen__prompt-toolbar">
@@ -161,7 +155,6 @@ export function RecordQuickInputCard({
               <Send size={18} strokeWidth={2.1} />
             )}
           </button>
-
         </div>
       </div>
     </section>

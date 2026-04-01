@@ -7,7 +7,7 @@
  * History 画面の表示対象履歴とローカル操作 state をまとめる。
  *
  * 【使用されるエージェント / 処理フロー】
- * - history-screen.tsx から呼ばれる。
+ * - web/src/app/app/history/_components/history-page-screen.tsx から呼ばれる。
  * - Supabase から選択日履歴を取得し、削除操作を接続する。
  *
  * 【やらないこと】
