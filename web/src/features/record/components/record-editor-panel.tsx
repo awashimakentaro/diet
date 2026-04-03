@@ -22,8 +22,8 @@ import type { JSX } from 'react';
 import type { FieldArrayWithId, UseFormRegisterReturn, UseFormReturn } from 'react-hook-form';
 
 import type { ChangeEvent } from 'react';
-import type { RecordFormValues } from '../record-form-schema';
-import type { PromptAttachment } from '../use-prompt-attachments';
+import type { PromptAttachment } from '../hooks/use-prompt-attachments';
+import type { RecordFormValues } from '../schemas/record-form-schema';
 import { RecordItemAddPanel } from './record-item-add-panel';
 
 

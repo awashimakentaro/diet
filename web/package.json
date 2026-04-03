@@ -9,8 +9,8 @@
     "lint": "eslint .",
     "test": "vitest run",
     "check-types": "tsc --project tsconfig.json --pretty --noEmit",
-    "storybook": "STORYBOOK_DISABLE_TELEMETRY=1 storybook dev -p 6006",
-    "build-storybook": "STORYBOOK_DISABLE_TELEMETRY=1 storybook build",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
     "prisma:generate": "prisma generate --schema ../prisma/schema.prisma",
     "prisma:validate": "prisma validate --schema ../prisma/schema.prisma"
   },
@@ -50,13 +50,13 @@
     "@mswjs/data": "^0.16.2",
     "@mswjs/http-middleware": "^0.10.3",
     "@playwright/test": "^1.58.2",
-    "@storybook/addon-a11y": "^8.6.14",
-    "@storybook/addon-actions": "^8.6.14",
-    "@storybook/addon-essentials": "^8.6.14",
-    "@storybook/addon-links": "^8.6.14",
-    "@storybook/nextjs": "^8.6.14",
-    "@storybook/node-logger": "^8.6.14",
-    "@storybook/react": "^8.6.14",
+    "@storybook/addon-a11y": "^8.6.18",
+    "@storybook/addon-actions": "^8.6.18",
+    "@storybook/addon-essentials": "^8.6.18",
+    "@storybook/addon-links": "^8.6.18",
+    "@storybook/node-logger": "^8.6.18",
+    "@storybook/react": "^8.6.18",
+    "@storybook/react-vite": "^8.6.18",
     "@tailwindcss/typography": "^0.5.19",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -70,7 +70,6 @@
     "@types/react-dom": "^19.1.1",
     "@typescript-eslint/eslint-plugin": "^8.57.1",
     "@typescript-eslint/parser": "^8.57.1",
-    "@vitejs/plugin-react": "^6.0.1",
     "autoprefixer": "^10.4.27",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
@@ -103,11 +102,17 @@
     "postcss": "^8.5.8",
     "prettier": "^3.8.1",
     "prisma": "^7.5.0",
-    "storybook": "^8.6.14",
+    "storybook": "^8.6.18",
     "tailwindcss": "^3.4.19",
     "tsx": "^4.21.0",
     "typescript": "^5.9.2",
-    "vite-tsconfig-paths": "^6.1.1",
-    "vitest": "^4.1.0"
+    "vite": "^6.4.1",
+    "vitest": "^4.1.0",
+    "eslint-plugin-storybook": "^0.8.0"
+  },
+  "eslintConfig": {
+    "extends": [
+      "plugin:storybook/recommended"
+    ]
   }
 }

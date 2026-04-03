@@ -50,3 +50,5 @@ app-example
 /mobile/web-build/
 /mobile/.dist/
 /web/storybook-static/
+
+*storybook.log

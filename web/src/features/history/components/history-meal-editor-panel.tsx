@@ -29,7 +29,7 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import type { WebMeal } from '@/domain/web-diet-schema';
 import { RecordItemAddPanel } from '@/features/record/components/record-item-add-panel';
 import { requestRecordAnalysis } from '@/features/record/api/request-record-analysis';
-import { usePromptAttachments } from '@/features/record/use-prompt-attachments';
+import { usePromptAttachments } from '@/features/record/hooks/use-prompt-attachments';
 
 type HistoryMealEditorFormValues = {
   mealName: string;

@@ -1,20 +1,5 @@
-/**
- * web/src/features/record/record-analysis-schema.ts
- *
- * 【責務】
+/* 【責務】
  * Record 画面の AI 解析リクエストとレスポンスのスキーマを定義する。
- *
- * 【使用されるエージェント / 処理フロー】
- * - client 側の解析リクエスト送信処理から利用される。
- * - app/api/record/analyze/route.ts の入出力検証に利用される。
- *
- * 【やらないこと】
- * - API 通信
- * - UI 描画
- * - フォーム state 更新
- *
- * 【他ファイルとの関係】
- * - request-record-analysis.ts と route.ts の両方から参照される。
  */
 
 import { z } from 'zod';

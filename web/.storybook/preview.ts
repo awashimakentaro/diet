@@ -12,12 +12,12 @@
  * - 本番 UI ロジックの実装
  *
  * 【他ファイルとの関係】
- * - web/app/globals.css の見た目を Storybook に反映する。
+ * - web/src/styles/globals.css の見た目を Storybook に反映する。
  */
 
 import type { Preview } from '@storybook/react';
 
-import '../app/globals.css';
+import '../src/styles/globals.css';
 
 const preview: Preview = {
   parameters: {
@@ -27,7 +27,6 @@ const preview: Preview = {
         date: /Date$/i,
       },
     },
-    layout: 'centered',
   },
 };
 

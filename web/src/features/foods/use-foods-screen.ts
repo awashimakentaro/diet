@@ -24,7 +24,7 @@ import useSWR from 'swr';
 
 import type { WebLibraryEntry } from '@/domain/web-diet-schema';
 import { formatDateKey } from '@/lib/web-date';
-import type { RecordFormValues } from '@/features/record/record-form-schema';
+import type { RecordFormValues } from '@/features/record/schemas/record-form-schema';
 
 import { createMealFromLibraryEntry } from './api/create-meal-from-library-entry';
 import { deleteFoodLibraryEntry } from './api/delete-food-library-entry';

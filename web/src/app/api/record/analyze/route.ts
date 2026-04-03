@@ -20,7 +20,7 @@
 
 import { NextResponse } from 'next/server';
 
-import { recordAnalysisRequestSchema } from '@/features/record/record-analysis-schema';
+import { recordAnalysisRequestSchema } from '@/features/record/schemas/record-analysis-schema';
 import { analyzeRecordPrompt } from '@/lib/openai-record-analysis';
 
 /**

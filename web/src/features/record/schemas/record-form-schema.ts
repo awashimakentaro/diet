@@ -1,20 +1,5 @@
-/**
- * web/src/features/record/record-form-schema.ts
- *
- * 【責務】
- * Record 画面で使う入力項目と下書き編集項目のフォームスキーマを Zod で定義する。
- *
- * 【使用箇所】
- * - web/src/features/record/use-record-form.ts
- * - web/src/features/record/use-record-screen.ts
- *
- * 【やらないこと】
- * - フォーム状態管理
- * - UI 描画
- * - API 通信
- *
- * 【他ファイルとの関係】
- * - RHF の resolver から利用され、入力検証境界になる。
+/* 【責務】
+ * Record 画面で使う入力項目と下書き編集項目のフォームスキーマを定義する。
  */
 
 import { z } from 'zod';

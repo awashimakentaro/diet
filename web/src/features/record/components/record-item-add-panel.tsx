@@ -24,7 +24,7 @@ import { ArrowLeft, Camera, ImagePlus, PenLine, Plus, Sparkles, X } from 'lucide
 import { useId, useState, type ChangeEvent, type JSX } from 'react';
 import type { UseFormRegisterReturn } from 'react-hook-form';
 
-import { type PromptAttachment } from '../use-prompt-attachments';
+import { type PromptAttachment } from '../hooks/use-prompt-attachments';
 
 type AddPanelMode = 'closed' | 'chooser' | 'prompt';
 

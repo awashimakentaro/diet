@@ -16,7 +16,7 @@
  * - getSupabaseBrowserClient を利用する。
  */
 
-import type { RecordFormValues } from '@/features/record/record-form-schema';
+import type { RecordFormValues } from '@/features/record/schemas/record-form-schema';
 import { getSupabaseBrowserClient } from '@/lib/supabase';
 
 type UpdateFoodLibraryEntryParams = {

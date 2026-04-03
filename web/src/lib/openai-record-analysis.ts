@@ -17,7 +17,7 @@
  * - record-analysis-schema.ts の型に合わせたデータを返す。
  */
 
-import type { RecordAnalysisResponse } from '@/features/record/record-analysis-schema';
+import type { RecordAnalysisResponse } from '@/features/record/schemas/record-analysis-schema';
 
 const OPENAI_ENDPOINT = 'https://api.openai.com/v1/chat/completions';
 const OPENAI_MODEL = 'gpt-4o-mini';
@@ -269,4 +269,3 @@ export async function analyzeRecordPrompt(
     return createFallbackRecordAnalysis(normalizedPrompt);
   }
 }
-

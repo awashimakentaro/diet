@@ -1,26 +1,11 @@
-/**
- * web/src/features/record/apply-record-analysis.ts
- *
- * 【責務】
+/* 【責務】
  * AI 解析結果を Record フォームへ反映する。
- *
- * 【使用されるエージェント / 処理フロー】
- * - use-record-screen.ts から呼ばれる。
- * - 解析レスポンスの items と mealName をフォーム値へ変換する。
- *
- * 【やらないこと】
- * - API 通信
- * - UI 描画
- * - エラーハンドリング表示
- *
- * 【他ファイルとの関係】
- * - record-analysis-schema.ts と record-form-schema.ts の型を利用する。
  */
 
 import type { UseFormReturn } from 'react-hook-form';
 
-import type { RecordAnalysisResponse } from './record-analysis-schema';
-import type { RecordFormValues } from './record-form-schema';
+import type { RecordAnalysisResponse } from '../schemas/record-analysis-schema';
+import type { RecordFormValues } from '../schemas/record-form-schema';
 
 type ApplyRecordAnalysisParams = {
   form: UseFormReturn<RecordFormValues>;
@@ -34,13 +19,6 @@ function toStringValue(value: number): string {
   return String(Math.round(value * 10) / 10);
 }
 
-/**
- * 解析結果をフォームへ適用する。
- * 呼び出し元: use-record-screen。
- * @param params フォームと解析結果
- * @returns void
- * @remarks 副作用: RHF form state を更新する。
- */
 export function applyRecordAnalysisToForm({
   form,
   replaceItems,

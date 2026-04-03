@@ -8,7 +8,7 @@
  *
  * 【使用されるエージェント / 処理フロー】
  * - record-page-screen.tsx から呼ばれる。
- * - web/src/features/record/use-record-screen.ts が返す prompt register と添付ハンドラを受け取る。
+ * - web/src/features/record/hooks/use-record-screen.ts が返す prompt register と添付ハンドラを受け取る。
  *
  * 【やらないこと】
  * - 永続化
@@ -16,7 +16,7 @@
  * - 下書き全体の編集管理
  *
  * 【他ファイルとの関係】
- * - web/src/features/record/use-prompt-attachments.ts の PromptAttachment 型を利用する。
+ * - web/src/features/record/hooks/use-prompt-attachments.ts の PromptAttachment 型を利用する。
  * - web/src/styles/globals.css の record-screen__prompt-* 系クラスに依存する。
  */
 
@@ -24,7 +24,7 @@ import { Camera, ImagePlus, PenLine, Send, X } from 'lucide-react';
 import { useId, type ChangeEvent, type JSX } from 'react';
 import type { UseFormRegisterReturn } from 'react-hook-form';
 
-import type { PromptAttachment } from '@/features/record/use-prompt-attachments';
+import type { PromptAttachment } from '@/features/record/hooks/use-prompt-attachments';
 
 type RecordQuickInputCardProps = {
   promptRegistration: UseFormRegisterReturn;

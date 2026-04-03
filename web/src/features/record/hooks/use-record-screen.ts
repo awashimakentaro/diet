@@ -1,48 +1,20 @@
-'use client';
-
-/**
- * web/src/features/record/use-record-screen.ts
- *
- * 【責務】
+/* 【責務】
  * Record 画面のローカル state とフォーム編集状態をまとめる。
- *
- * 【使用されるエージェント / 処理フロー】
- * - web/src/app/app/record/_components/record-page-screen.tsx から呼ばれる。
- * - use-record-form.ts の RHF 設定と field array を利用する。
- * - 解析取得は api/request-record-analysis.ts、保存は api/save-record-meal.ts へ委譲する。
- *
- * 【やらないこと】
- * - JSX 描画
- *
- * 【他ファイルとの関係】
- * - record-form-schema.ts の型を利用する。
- * - route 専用の record-page-screen.tsx と feature / route UI コンポーネントへ state を渡す。
  */
 
 import { useMemo, useState } from 'react';
 import { useFieldArray, useWatch } from 'react-hook-form';
 
 import { fileToBase64 } from '@/utils/file-to-base64';
-import { applyRecordAnalysisToForm } from './apply-record-analysis';
-import {
-  type RecordFoodItemValues,
-  type RecordFormValues,
-} from './record-form-schema';
-import { requestRecordAnalysis } from './api/request-record-analysis';
-import { saveRecordMeal } from './api/save-record-meal';
+import { requestRecordAnalysis } from '../api/request-record-analysis';
+import { saveRecordMeal } from '../api/save-record-meal';
+import { type RecordFormValues } from '../schemas/record-form-schema';
+import { applyRecordAnalysisToForm } from '../usecases/apply-record-analysis';
+import { createEmptyRecordItem } from '../utils/create-empty-record-item';
+import { getTodayDateKey } from '../utils/get-today-date-key';
 import { usePromptAttachments, type PromptAttachment } from './use-prompt-attachments';
 import { useRecordForm } from './use-record-form';
-
-function createEmptyItem(): RecordFoodItemValues {
-  return {
-    name: '',
-    amount: '1人前',
-    kcal: '0',
-    protein: '0',
-    fat: '0',
-    carbs: '0',
-  };
-}
+import { validateRecordDraft } from '../usecases/validate-record-draft';
 
 function toNumber(value: string): number {
   const parsed = Number(value);
@@ -56,15 +28,6 @@ function buildMealNameFromPrompt(prompt: string): string {
   }
 
   return compact.length <= 18 ? compact : `${compact.slice(0, 18)}…`;
-}
-
-function getTodayDateKey(): string {
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = `${date.getMonth() + 1}`.padStart(2, '0');
-  const day = `${date.getDate()}`.padStart(2, '0');
-
-  return `${year}-${month}-${day}`;
 }
 
 type WorkspaceMode = 'idle' | 'manual' | 'generated';
@@ -252,7 +215,7 @@ export function useRecordScreen(): UseRecordScreenResult {
   }
 
   function handleAddItem(): void {
-    append(createEmptyItem());
+    append(createEmptyRecordItem());
     setFeedbackMessage(null);
     setFeedbackTone('info');
   }
@@ -273,18 +236,12 @@ export function useRecordScreen(): UseRecordScreenResult {
       mealName: form.getValues('mealName'),
       items: form.getValues('items'),
     };
-    const hasAnyInput =
-      values.mealName.trim().length > 0
-      || values.items.some(
-        (item) => item.name.trim().length > 0 || item.amount.trim().length > 0,
-      );
-
-    if (!hasAnyInput) {
-      setFeedbackMessage('入力がありません。食品カードを1件以上入力してください。');
+    const validation = validateRecordDraft(values);
+    if (!validation.ok) {
+      setFeedbackMessage(validation.error);
       setFeedbackTone('error');
       return;
     }
-
     setIsSaving(true);
 
     try {
@@ -297,7 +254,7 @@ export function useRecordScreen(): UseRecordScreenResult {
       form.setValue('prompt', '', { shouldDirty: false });
       form.setValue('recordedDate', getTodayDateKey(), { shouldDirty: false });
       form.setValue('mealName', '', { shouldDirty: false });
-      replace([createEmptyItem()]);
+      replace([createEmptyRecordItem()]);
       setDraftOriginalText('');
       setWorkspaceMode('idle');
       setFeedbackMessage('履歴に保存しました。');
