@@ -15,6 +15,7 @@ import { getTodayDateKey } from '../utils/get-today-date-key';
 import { usePromptAttachments, type PromptAttachment } from './use-prompt-attachments';
 import { useRecordForm } from './use-record-form';
 import { validateRecordDraft } from '../usecases/validate-record-draft';
+import { resetRecordDraftAfterSave } from '../utils/reset-record-draft-after-save';
 
 function toNumber(value: string): number {
   const parsed = Number(value);
@@ -251,10 +252,10 @@ export function useRecordScreen(): UseRecordScreenResult {
         source: workspaceMode === 'generated' ? 'text' : 'manual',
       });
 
-      form.setValue('prompt', '', { shouldDirty: false });
-      form.setValue('recordedDate', getTodayDateKey(), { shouldDirty: false });
-      form.setValue('mealName', '', { shouldDirty: false });
-      replace([createEmptyRecordItem()]);
+      resetRecordDraftAfterSave({
+        form,
+        replaceItems: replace,
+      });
       setDraftOriginalText('');
       setWorkspaceMode('idle');
       setFeedbackMessage('履歴に保存しました。');
