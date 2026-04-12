@@ -4,31 +4,29 @@
 
 import { useMemo, useState } from 'react';
 import { useFieldArray, useWatch } from 'react-hook-form';
-
-import { fileToBase64 } from '@/utils/file-to-base64';
 import { requestRecordAnalysis } from '../api/request-record-analysis';
 import { saveRecordMeal } from '../api/save-record-meal';
 import { type RecordFormValues } from '../schemas/record-form-schema';
-import { applyRecordAnalysisToForm } from '../usecases/apply-record-analysis';
+import { applyRecordAnalysisToForm } from '../usecases/record/analysis/apply-record-analysis';
+import { buildNextRecordOriginalText } from '../usecases/record/analysis/build-next-record-original-text';
+import { buildRecordAnalysisErrorFeedback } from '../usecases/record/analysis/build-record-analysis-error-feedback';
+import { buildRecordAnalysisFallback } from '../usecases/record/analysis/build-record-analysis-fallback';
+import { buildRecordAnalysisFeedback } from '../usecases/record/analysis/build-record-analysis-feedback';
+import { convertRecordAttachmentsToBase64 } from '../usecases/record/analysis/convert-record-attachments-to-base64';
+import { resolveRecordAnalysisMode } from '../usecases/record/analysis/resolve-record-analysis-mode';
+import { buildRecordSaveErrorFeedback } from '../usecases/record/save/build-record-save-error-feedback';
+import { buildRecordSaveSuccessFeedback } from '../usecases/record/save/build-record-save-success-feedback';
+import { resolveRecordSaveSource } from '../usecases/record/save/resolve-record-save-source';
+import { validateRecordAnalysisInput } from '../usecases/record/analysis/validate-record-analysis-input';
+import { validateRecordDraft } from '../usecases/record/save/validate-record-draft';
 import { createEmptyRecordItem } from '../utils/create-empty-record-item';
-import { getTodayDateKey } from '../utils/get-today-date-key';
-import { usePromptAttachments, type PromptAttachment } from './use-prompt-attachments';
-import { useRecordForm } from './use-record-form';
-import { validateRecordDraft } from '../usecases/validate-record-draft';
 import { resetRecordDraftAfterSave } from '../utils/reset-record-draft-after-save';
+import { usePromptAttachments } from './use-prompt-attachments';
+import { useRecordForm } from './use-record-form';
 
 function toNumber(value: string): number {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : 0;
-}
-
-function buildMealNameFromPrompt(prompt: string): string {
-  const compact = prompt.replace(/\s+/g, ' ').trim();
-  if (compact.length === 0) {
-    return '';
-  }
-
-  return compact.length <= 18 ? compact : `${compact.slice(0, 18)}…`;
 }
 
 type WorkspaceMode = 'idle' | 'manual' | 'generated';
@@ -40,7 +38,6 @@ export type UseRecordScreenResult = {
   workspaceMode: WorkspaceMode;
   isAnalyzing: boolean;
   isSaving: boolean;
-  promptGuideMessage: string | null;
   attachments: ReturnType<typeof usePromptAttachments>['attachments'];
   draftTotals: {
     kcal: number;
@@ -69,13 +66,13 @@ export function useRecordScreen(): UseRecordScreenResult {
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
   const [feedbackTone, setFeedbackTone] = useState<FeedbackTone>('info');
   const [draftOriginalText, setDraftOriginalText] = useState('');
-  const { attachments, handleAttachmentChange, handleRemoveAttachment, setAttachments } = usePromptAttachments() as any; // Temporary cast for setAttachments
+  const { attachments, handleAttachmentChange, handleRemoveAttachment, setAttachments } = usePromptAttachments()
   const { fields, append, remove, replace } = useFieldArray({
     control: form.control,
     name: 'items',
   });
 
-  const prompt = useWatch({ control: form.control, name: 'prompt' });
+  const prompt = useWatch({ control: form.control, name: 'prompt' });//rhfのuseWatchは、フォームの入力値を監視する
   const items = useWatch({ control: form.control, name: 'items' });
 
   const draftTotals = useMemo(() => {
@@ -90,25 +87,16 @@ export function useRecordScreen(): UseRecordScreenResult {
     );
   }, [items]);
 
-  const promptGuideMessage = useMemo(() => {
-    const hasMeaningfulDraft =
-      workspaceMode !== 'idle'
-      && (form.getValues('mealName').trim().length > 0
-        || (items ?? []).some((item) => item.name.trim().length > 0));
-
-    if (!hasMeaningfulDraft) {
-      return null;
-    }
-
-    return 'さらに食品を追加したい場合は、食材名や料理名を入力して送信すると、いまのカードに候補を追加できます。';
-  }, [form, items, workspaceMode]);
-
   async function handleApplyPrompt(): Promise<void> {
     const trimmedPrompt = prompt.trim();
     const hasAttachments = attachments.length > 0;
+    const validation = validateRecordAnalysisInput({
+      prompt: trimmedPrompt,
+      hasAttachments,
+    });
 
-    if (trimmedPrompt.length === 0 && !hasAttachments) {
-      setFeedbackMessage('食事内容または写真を追加すると、下の編集欄へ下書きを反映できます。');
+    if (!validation.ok) {
+      setFeedbackMessage(validation.message);
       setFeedbackTone('error');
       return;
     }
@@ -116,78 +104,64 @@ export function useRecordScreen(): UseRecordScreenResult {
     setIsAnalyzing(true);
 
     try {
-      const imageUrls = await Promise.all(
-        attachments.map(async (a: PromptAttachment) => {
-          const res = await fetch(a.previewUrl);
-          const blob = await res.blob();
-          return fileToBase64(blob);
-        }),
-      );
+      const imageUrls = await convertRecordAttachmentsToBase64(attachments);
 
       const draft = await requestRecordAnalysis({
         prompt: trimmedPrompt,
         images: imageUrls.length > 0 ? imageUrls : undefined,
       });
 
-      const shouldAppend =
-        workspaceMode !== 'idle'
-        && (form.getValues('mealName').trim().length > 0
-          || (items ?? []).some((item) => item.name.trim().length > 0));
-
+      const analysisMode = resolveRecordAnalysisMode({
+        workspaceMode,
+        mealName: form.getValues('mealName'),
+        items: items ?? [],
+      });
       applyRecordAnalysisToForm({
         form,
         replaceItems: replace,
-        currentItems: shouldAppend ? items ?? [] : [],
+        currentItems: analysisMode === 'append' ? items ?? [] : [],//analysisMode === 'append' ならcurrentItems に items ?? [] を入れるそうでなければcurrentItems に [] を入れる. items ?? [] は items が null や undefined じゃなければ items そうでなければ [] を返す
         draft,
-        mode: shouldAppend ? 'append' : 'replace',
+        mode: analysisMode,
       });
-      setDraftOriginalText((current) => {
-        if (shouldAppend && current.trim().length > 0) {
-          return trimmedPrompt.length > 0 ? `${current}\n${trimmedPrompt}` : current;
-        }
-
-        return trimmedPrompt;
-      });
+      setDraftOriginalText( 
+        buildNextRecordOriginalText({
+          currentOriginalText: draftOriginalText,
+          prompt: trimmedPrompt,
+          analysisMode,
+        }),
+      );
 
       setWorkspaceMode('generated');
-      setFeedbackMessage(
-        draft.warnings[0]
-        ?? (shouldAppend
-          ? 'AI が推定した食品候補を既存カードへ追加しました。'
-          : hasAttachments
-            ? 'AI が写真から推定した栄養情報を下書きカードへ反映しました。'
-            : 'AI が推定した栄養情報を下書きカードへ反映しました。'),
-      );
-      setFeedbackTone(draft.warnings[0] ? 'error' : 'info');
+      const feedback = buildRecordAnalysisFeedback({
+        warning: draft.warnings[0] ?? null,
+        analysisMode,
+        hasAttachments,
+      });
+      setFeedbackMessage(feedback.message);
+      setFeedbackTone(feedback.tone);
       setAttachments([]);
     } catch (error) {
-      if (trimmedPrompt.length > 0 && form.getValues('mealName').trim().length === 0) {
-        form.setValue('mealName', buildMealNameFromPrompt(trimmedPrompt));
-      }
-
-      if (trimmedPrompt.length > 0 && form.getValues('items.0.name').trim().length === 0) {
-        const firstToken = trimmedPrompt.split(/[、,\s]+/).filter(Boolean)[0] ?? '';
-        form.setValue('items.0.name', firstToken);
-      }
-      setDraftOriginalText((current) => {
-        if (trimmedPrompt.length === 0) {
-          return current;
-        }
-
-        if (current.trim().length > 0) {
-          return `${current}\n${trimmedPrompt}`;
-        }
-
-        return trimmedPrompt;
+      const fallback = buildRecordAnalysisFallback({
+        prompt: trimmedPrompt,
+        currentMealName: form.getValues('mealName'),
+        currentFirstItemName: form.getValues('items.0.name'),
+        currentOriginalText: draftOriginalText,
       });
+      if (fallback.nextMealName) {
+        form.setValue('mealName', fallback.nextMealName);
+      }
+
+      if (fallback.nextFirstItemName) {
+        form.setValue('items.0.name', fallback.nextFirstItemName);
+      }
+
+      setDraftOriginalText(fallback.nextOriginalText);
 
       setWorkspaceMode('generated');
-      setFeedbackMessage(
-        error instanceof Error
-          ? error.message
-          : '解析に失敗したため、簡易的な下書きを表示しています。',
-      );
-      setFeedbackTone('error');
+      const feedback = buildRecordAnalysisErrorFeedback(error);
+      setFeedbackMessage(feedback.message);
+      setFeedbackTone(feedback.tone);
+
       if (hasAttachments) {
         setAttachments([]);
       }
@@ -249,7 +223,7 @@ export function useRecordScreen(): UseRecordScreenResult {
       await saveRecordMeal({
         values,
         originalText: draftOriginalText,
-        source: workspaceMode === 'generated' ? 'text' : 'manual',
+        source: resolveRecordSaveSource(workspaceMode),
       });
 
       resetRecordDraftAfterSave({
@@ -258,19 +232,17 @@ export function useRecordScreen(): UseRecordScreenResult {
       });
       setDraftOriginalText('');
       setWorkspaceMode('idle');
-      setFeedbackMessage('履歴に保存しました。');
-      setFeedbackTone('info');
+      const feedback = buildRecordSaveSuccessFeedback();
+      setFeedbackMessage(feedback.message);
+      setFeedbackTone(feedback.tone);
     } catch (error) {
-      setFeedbackMessage(
-        error instanceof Error
-          ? error.message
-          : '履歴へ保存できませんでした。',
-      );
-      setFeedbackTone('error');
+      const feedback = buildRecordSaveErrorFeedback(error);
+      setFeedbackMessage(feedback.message);
+      setFeedbackTone(feedback.tone);
     } finally {
       setIsSaving(false);
     }
-  }
+  }//そもそもhooksは画面の状態を持って、どの順番で何をするかをつなぐ場所だから別の場所にある関数をまとめて流れを再現する場所のため今refactしてる
 
   return {
     form,
@@ -278,7 +250,6 @@ export function useRecordScreen(): UseRecordScreenResult {
     workspaceMode,
     isAnalyzing,
     isSaving,
-    promptGuideMessage,
     attachments,
     draftTotals,
     feedbackMessage,
@@ -294,3 +265,15 @@ export function useRecordScreen(): UseRecordScreenResult {
     handleConfirmDraft,
   };
 }
+
+// - append
+//     すでに何か入ってるカードに、AI結果を追加する
+//   - replace
+//     まだ実質空のカードなので、AI結果で入れ替える　まぁ初めてプロンプト打った時ってことだね
+
+//   append になるのは、
+//   - manual で手入力中のカードに中身があるとき
+//   - generated でAI作成済みカードに中身があるとき
+
+//   replace になるのは、
+//   - idle のときカードはあるけど中身がほぼ空のとき

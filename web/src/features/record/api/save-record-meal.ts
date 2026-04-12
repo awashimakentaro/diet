@@ -6,7 +6,7 @@ import { getSupabaseBrowserClient } from '@/lib/supabase';
 import { pruneOldMealsForCurrentUser } from '../../history/prune-old-meals';
 import { recomputeDailySummaryForDateKey } from '../../summary/api/recompute-daily-summary';
 import type { RecordFormValues } from '../schemas/record-form-schema';
-import { buildRecordSavePayload } from '../usecases/build-record-save-payload';
+import { buildRecordSavePayload } from '../usecases/record/save/build-record-save-payload';
 
 type SaveRecordMealParams = {
   values: Pick<RecordFormValues, 'recordedDate' | 'mealName' | 'items'>;

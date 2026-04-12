@@ -32,7 +32,6 @@ type RecordQuickInputCardProps = {
   onOpenManualInput: () => void;
   onPhotoRecord: () => void;
   isAnalyzing: boolean;
-  promptGuideMessage: string | null;
   attachments: PromptAttachment[];
   onAttachmentChange: (event: ChangeEvent<HTMLInputElement>) => boolean;
   onRemoveAttachment: (attachmentId: string) => void;
@@ -44,7 +43,6 @@ export function RecordQuickInputCard({
   onOpenManualInput,
   onPhotoRecord,
   isAnalyzing,
-  promptGuideMessage,
   attachments,
   onAttachmentChange,
   onRemoveAttachment,
@@ -86,13 +84,6 @@ export function RecordQuickInputCard({
         ) : null}
 
         <div className="record-screen__prompt-box">
-          {promptGuideMessage !== null ? (
-            <div className="record-screen__prompt-guide">
-              <p className="record-screen__prompt-guide-label">追加ガイド</p>
-              <p className="record-screen__prompt-guide-copy">{promptGuideMessage}</p>
-            </div>
-          ) : null}
-
           <textarea
             className="record-screen__prompt-input"
             placeholder="メッセージを入力"

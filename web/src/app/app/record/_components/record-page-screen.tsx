@@ -20,7 +20,6 @@ export function RecordPageScreen(): JSX.Element {
     workspaceMode,
     isAnalyzing,
     isSaving,
-    promptGuideMessage,
     draftTotals,
     feedbackMessage,
     feedbackTone,
@@ -100,7 +99,6 @@ export function RecordPageScreen(): JSX.Element {
             onOpenManualInput={handleOpenManualInput}
             onPhotoRecord={handlePhotoRecord}
             onRemoveAttachment={handleRemoveAttachment}
-            promptGuideMessage={promptGuideMessage}
             promptRegistration={form.register('prompt')}
           />
         </motion.div>

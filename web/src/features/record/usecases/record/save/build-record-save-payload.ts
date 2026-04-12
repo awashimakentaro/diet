@@ -1,10 +1,11 @@
 /* 【責務】
  * Record 画面のフォーム値を meals テーブル保存用 payload へ変換する。
+ * payload は、送信する中身そのものです。たとえば API に何かを送るとき、宛先とかヘッダーとか送りたいデータ本体があり、そのデータ本体がpayloadです
  */
 
 import { parseDateKey } from '@/lib/web-date';
 
-import type { RecordFormValues } from '../schemas/record-form-schema';
+import type { RecordFormValues } from '../../../schemas/record-form-schema';
 
 type BuildRecordSavePayloadParams = {
   userId: string;

@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useEffect, useState, type ChangeEvent } from 'react';
+import { useEffect, useState, type ChangeEvent, type Dispatch, type SetStateAction } from 'react';
 
 export type PromptAttachment = {
   id: string;
@@ -14,9 +14,9 @@ export type PromptAttachment = {
 
 type UsePromptAttachmentsResult = {
   attachments: PromptAttachment[];
-  handleAttachmentChange: (event: ChangeEvent<HTMLInputElement>) => boolean;
+  handleAttachmentChange: (event: ChangeEvent<HTMLInputElement>) => boolean;//event: ChangeEvent<HTMLInputElement>はhandleChange に来るのは、input の変更イベントですよ　と宣言している
   handleRemoveAttachment: (attachmentId: string) => void;
-  setAttachments: (attachments: PromptAttachment[]) => void;
+  setAttachments: Dispatch<SetStateAction<PromptAttachment[]>>;//Dispatch<SetStateAction<boolean>> はsetStateはPromptAttachment[]を更新するための React の state 更新関数ですといういみ
 };
 
 function buildAttachments(files: FileList): PromptAttachment[] {
