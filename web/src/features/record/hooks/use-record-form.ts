@@ -4,29 +4,13 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, type UseFormReturn } from 'react-hook-form';
-import { formatDateKey } from '@/lib/web-date';
 
 import { recordFormSchema, type RecordFormValues } from '../schemas/record-form-schema';
-
-function createDefaultFoodItem() {
-  return {
-    name: '',
-    amount: '1人前',
-    kcal: '0',
-    protein: '0',
-    fat: '0',
-    carbs: '0',
-  };
-}
+import { createRecordFormDefaultValues } from '../utils/create-record-form-default-values';
 
 export function useRecordForm(): UseFormReturn<RecordFormValues> {
   return useForm<RecordFormValues>({
     resolver: zodResolver(recordFormSchema),
-    defaultValues: {
-      prompt: '',
-      recordedDate: formatDateKey(new Date()),
-      mealName: '',
-      items: [createDefaultFoodItem()],
-    },
+    defaultValues: createRecordFormDefaultValues(),
   });
 }
