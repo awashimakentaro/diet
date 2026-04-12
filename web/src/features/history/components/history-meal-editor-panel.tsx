@@ -91,7 +91,7 @@ export function HistoryMealEditorPanel({
 }: HistoryMealEditorPanelProps): JSX.Element {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
-  const { attachments, handleAttachmentChange, handleRemoveAttachment, setAttachments } = usePromptAttachments();
+  const { attachments, handleAttachmentChange, handleRemoveAttachment, clearAttachments } = usePromptAttachments();
   const form = useForm<HistoryMealEditorFormValues>({
     defaultValues: buildDefaults(meal),
   });
@@ -104,7 +104,7 @@ export function HistoryMealEditorPanel({
     form.reset(buildDefaults(meal));
     replace(buildDefaults(meal).items);
     setFeedbackMessage(null);
-    setAttachments([]);
+    clearAttachments();
   }, [form, meal, replace]);
 
   async function handleSave(): Promise<void> {

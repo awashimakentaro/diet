@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useEffect, useState, type ChangeEvent, type Dispatch, type SetStateAction } from 'react';
+import { useEffect, useState, type ChangeEvent } from 'react';
 
 export type PromptAttachment = {
   id: string;
@@ -14,9 +14,9 @@ export type PromptAttachment = {
 
 type UsePromptAttachmentsResult = {
   attachments: PromptAttachment[];
-  handleAttachmentChange: (event: ChangeEvent<HTMLInputElement>) => boolean;//event: ChangeEvent<HTMLInputElement>はhandleChange に来るのは、input の変更イベントですよ　と宣言している
+  handleAttachmentChange: (event: ChangeEvent<HTMLInputElement>) => boolean;
   handleRemoveAttachment: (attachmentId: string) => void;
-  setAttachments: Dispatch<SetStateAction<PromptAttachment[]>>;//Dispatch<SetStateAction<boolean>> はsetStateはPromptAttachment[]を更新するための React の state 更新関数ですといういみ
+  clearAttachments: () => void;
 };
 
 function buildAttachments(files: FileList): PromptAttachment[] {
@@ -30,11 +30,15 @@ function buildAttachments(files: FileList): PromptAttachment[] {
 export function usePromptAttachments(): UsePromptAttachmentsResult {
   const [attachments, setAttachments] = useState<PromptAttachment[]>([]);
 
+  function revokeAttachments(targets: PromptAttachment[]): void {
+    targets.forEach((attachment) => {
+      URL.revokeObjectURL(attachment.previewUrl);
+    });
+  }
+
   useEffect(() => {
     return () => {
-      attachments.forEach((attachment) => {
-        URL.revokeObjectURL(attachment.previewUrl);
-      });
+      revokeAttachments(attachments);
     };
   }, [attachments]);
 
@@ -63,10 +67,15 @@ export function usePromptAttachments(): UsePromptAttachmentsResult {
     });
   }
 
+  function clearAttachments(): void {
+    revokeAttachments(attachments);
+    setAttachments([]);
+  }
+
   return {
     attachments,
     handleAttachmentChange,
     handleRemoveAttachment,
-    setAttachments,
+    clearAttachments,
   };
 }

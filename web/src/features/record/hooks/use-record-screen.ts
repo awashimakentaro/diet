@@ -66,7 +66,7 @@ export function useRecordScreen(): UseRecordScreenResult {
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
   const [feedbackTone, setFeedbackTone] = useState<FeedbackTone>('info');
   const [draftOriginalText, setDraftOriginalText] = useState('');
-  const { attachments, handleAttachmentChange, handleRemoveAttachment, setAttachments } = usePromptAttachments()
+  const { attachments, handleAttachmentChange, handleRemoveAttachment, clearAttachments } = usePromptAttachments();
   const { fields, append, remove, replace } = useFieldArray({
     control: form.control,
     name: 'items',
@@ -139,7 +139,7 @@ export function useRecordScreen(): UseRecordScreenResult {
       });
       setFeedbackMessage(feedback.message);
       setFeedbackTone(feedback.tone);
-      setAttachments([]);
+      clearAttachments();
     } catch (error) {
       const fallback = buildRecordAnalysisFallback({
         prompt: trimmedPrompt,
@@ -163,7 +163,7 @@ export function useRecordScreen(): UseRecordScreenResult {
       setFeedbackTone(feedback.tone);
 
       if (hasAttachments) {
-        setAttachments([]);
+        clearAttachments();
       }
     } finally {
       setIsAnalyzing(false);
