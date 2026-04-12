@@ -1,3 +1,5 @@
+ 'use client';
+
 /**
  * web/src/features/history/components/history-meal-editor-panel.tsx
  *
@@ -20,29 +22,13 @@
  * - record/components/record-item-add-panel.tsx を追加導線 UI として再利用する。
  */
 
-'use client';
-
 import { CheckCircle2, Salad, X } from 'lucide-react';
-import { useEffect, useState, type JSX } from 'react';
-import { useFieldArray, useForm } from 'react-hook-form';
+import type { JSX } from 'react';
 
 import type { WebMeal } from '@/domain/web-diet-schema';
 import { RecordItemAddPanel } from '@/features/record/components/record-item-add-panel';
-import { requestRecordAnalysis } from '@/features/record/api/request-record-analysis';
-import { usePromptAttachments } from '@/features/record/hooks/use-prompt-attachments';
-
-type HistoryMealEditorFormValues = {
-  mealName: string;
-  prompt: string;
-  items: Array<{
-    name: string;
-    amount: string;
-    kcal: string;
-    protein: string;
-    fat: string;
-    carbs: string;
-  }>;
-};
+import { useHistoryMealEditor } from '../hooks/use-history-meal-editor';
+import type { HistoryMealEditorFormValues } from '../schemas/history-meal-editor-form-schema';
 
 type HistoryMealEditorPanelProps = {
   meal: WebMeal;
@@ -51,107 +37,29 @@ type HistoryMealEditorPanelProps = {
   onSave: (values: HistoryMealEditorFormValues) => Promise<void>;
 };
 
-function createEmptyItem(): HistoryMealEditorFormValues['items'][number] {
-  return {
-    name: '',
-    amount: '1人前',
-    kcal: '0',
-    protein: '0',
-    fat: '0',
-    carbs: '0',
-  };
-}
-
-function toStringNumber(value: number): string {
-  return Number.isFinite(value) ? String(value) : '0';
-}
-
-function buildDefaults(meal: WebMeal): HistoryMealEditorFormValues {
-  return {
-    mealName: meal.menuName,
-    prompt: '',
-    items: meal.items.length > 0
-      ? meal.items.map((item) => ({
-        name: item.name,
-        amount: item.amount,
-        kcal: toStringNumber(item.kcal),
-        protein: toStringNumber(item.protein),
-        fat: toStringNumber(item.fat),
-        carbs: toStringNumber(item.carbs),
-      }))
-      : [createEmptyItem()],
-  };
-}
-
 export function HistoryMealEditorPanel({
   meal,
   isSaving,
   onClose,
   onSave,
 }: HistoryMealEditorPanelProps): JSX.Element {
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
-  const { attachments, handleAttachmentChange, handleRemoveAttachment, clearAttachments } = usePromptAttachments();
-  const form = useForm<HistoryMealEditorFormValues>({
-    defaultValues: buildDefaults(meal),
+  const {
+    form,
+    itemFields,
+    isAnalyzing,
+    feedbackMessage,
+    attachments,
+    handleAttachmentChange,
+    handleRemoveAttachment,
+    handleSave,
+    handleApplyPrompt,
+    handleAddManualItem,
+    handlePhotoRecord,
+    handleRemoveItem,
+  } = useHistoryMealEditor({
+    meal,
+    onSave,
   });
-  const { fields, append, remove, replace } = useFieldArray({
-    control: form.control,
-    name: 'items',
-  });
-
-  useEffect(() => {
-    form.reset(buildDefaults(meal));
-    replace(buildDefaults(meal).items);
-    setFeedbackMessage(null);
-    clearAttachments();
-  }, [form, meal, replace]);
-
-  async function handleSave(): Promise<void> {
-    await onSave(form.getValues());
-  }
-
-  async function handleApplyPrompt(): Promise<void> {
-    const prompt = form.getValues('prompt').trim();
-
-    if (prompt.length === 0) {
-      setFeedbackMessage('追加したい食品を入力してください。');
-      return;
-    }
-
-    setIsAnalyzing(true);
-
-    try {
-      const draft = await requestRecordAnalysis({ prompt });
-      const generatedItems = draft.items.map((item) => ({
-        name: item.name,
-        amount: item.amount,
-        kcal: String(item.kcal),
-        protein: String(item.protein),
-        fat: String(item.fat),
-        carbs: String(item.carbs),
-      }));
-
-      if (generatedItems.length === 0) {
-        setFeedbackMessage('食品候補を追加できませんでした。');
-        return;
-      }
-
-      append(generatedItems);
-      form.setValue('prompt', '', { shouldDirty: false });
-      setFeedbackMessage(
-        draft.warnings[0] ?? `${generatedItems.length}件の食品候補を追加しました。`,
-      );
-    } catch (error) {
-      setFeedbackMessage(
-        error instanceof Error
-          ? error.message
-          : '食品候補の解析に失敗しました。',
-      );
-    } finally {
-      setIsAnalyzing(false);
-    }
-  }
 
   return (
     <div className="history-screen__editor-backdrop">
@@ -190,7 +98,7 @@ export function HistoryMealEditorPanel({
         <div className="record-screen__field-group">
           <label className="record-screen__field-label">内訳の詳細</label>
           <div className="record-screen__item-stack record-screen__item-stack--manual">
-            {fields.map((field, index) => (
+            {itemFields.map((field, index) => (
               <article className="record-screen__item-card" key={field.id}>
                 <div className="record-screen__item-header">
                   <div className="record-screen__item-index">{index + 1}</div>
@@ -200,11 +108,11 @@ export function HistoryMealEditorPanel({
                     type="text"
                     {...form.register(`items.${index}.name`)}
                   />
-                  {fields.length > 1 ? (
+                  {itemFields.length > 1 ? (
                     <button
                       aria-label={`食品 ${index + 1} を削除`}
                       className="record-screen__remove-button"
-                      onClick={() => remove(index)}
+                      onClick={() => handleRemoveItem(index)}
                       type="button"
                     >
                       <X size={16} strokeWidth={2.4} />
@@ -277,9 +185,9 @@ export function HistoryMealEditorPanel({
 
           <RecordItemAddPanel
             isAnalyzing={isAnalyzing}
-            onAddManualItem={() => append(createEmptyItem())}
+            onAddManualItem={handleAddManualItem}
             onApplyPrompt={handleApplyPrompt}
-            onPhotoRecord={() => setFeedbackMessage('写真解析は次の接続で対応します。')}
+            onPhotoRecord={handlePhotoRecord}
             promptRegistration={form.register('prompt')}
             attachments={attachments}
             onAttachmentChange={handleAttachmentChange}
