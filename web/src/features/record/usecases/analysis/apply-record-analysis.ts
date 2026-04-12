@@ -4,8 +4,8 @@
 
 import type { UseFormReturn } from 'react-hook-form';
 
-import type { RecordAnalysisResponse } from '../../../schemas/record-analysis-schema';
-import type { RecordFormValues } from '../../../schemas/record-form-schema';
+import type { RecordAnalysisResponse } from '../../schemas/record-analysis-schema';
+import type { RecordFormValues } from '../../schemas/record-form-schema';
 
 type ApplyRecordAnalysisParams = {
   form: UseFormReturn<RecordFormValues>;

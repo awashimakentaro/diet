@@ -4,7 +4,7 @@
 
 import { fileToBase64 } from '@/utils/file-to-base64';
 
-import type { PromptAttachment } from '../../../hooks/use-prompt-attachments';
+import type { PromptAttachment } from '../../hooks/use-prompt-attachments';
 
 export async function convertRecordAttachmentsToBase64(
   attachments: PromptAttachment[],

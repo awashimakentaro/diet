@@ -5,7 +5,7 @@
 
 import { parseDateKey } from '@/lib/web-date';
 
-import type { RecordFormValues } from '../../../schemas/record-form-schema';
+import type { RecordFormValues } from '../../schemas/record-form-schema';
 
 type BuildRecordSavePayloadParams = {
   userId: string;

@@ -2,7 +2,7 @@
  * Record の保存前入力が有効か判定する。
  */
 
-import type { RecordFormValues } from '../../../schemas/record-form-schema';
+import type { RecordFormValues } from '../../schemas/record-form-schema';
 
 type ValidateRecordDraftResult =
   | { ok: true }
