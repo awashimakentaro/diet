@@ -1,18 +1,19 @@
+/* 【責務】
+ * Record 画面の機能本体を描画する。
+ */
+
 'use client';
 
 import { motion, useReducedMotion } from 'framer-motion';
 import type { JSX } from 'react';
 
-import { AppBottomNav } from '@/components/app-bottom-nav';
-import { AppTopBar } from '@/components/app-top-bar';
-import { RecordEditorPanel } from '@/features/record/components/record-editor-panel';
-import { useRecordScreen } from '@/features/record/hooks/use-record-screen';
-
+import { useRecordScreen } from '../hooks/use-record-screen';
+import { RecordEditorPanel } from './record-editor-panel';
 import { RecordQuickInputCard } from './record-quick-input-card';
 import { RecordWorkspaceLoading } from './record-workspace-loading';
 import { RecordWorkspacePlaceholder } from './record-workspace-placeholder';
 
-export function RecordPageScreen(): JSX.Element {
+export function RecordScreen(): JSX.Element {
   const reduceMotion = useReducedMotion();
   const {
     form,
@@ -41,9 +42,7 @@ export function RecordPageScreen(): JSX.Element {
     : { duration: 0.45, ease: 'easeOut' as const };
 
   return (
-    <div className="record-screen">
-      <AppTopBar />
-
+    <>
       <motion.main
         animate={{ opacity: 1, y: 0 }}
         className="record-screen__main record-screen__main--focused"
@@ -103,8 +102,6 @@ export function RecordPageScreen(): JSX.Element {
           />
         </motion.div>
       ) : null}
-
-      <AppBottomNav currentPath="/app/record" />
-    </div>
+    </>
   );
 }

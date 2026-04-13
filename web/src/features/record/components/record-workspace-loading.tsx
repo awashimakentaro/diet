@@ -1,20 +1,5 @@
-/**
- * web/src/app/app/record/_components/record-workspace-loading.tsx
- *
- * 【責務】
- * `/app/record` ルート専用の解析中ローディング表示を描画する。
- *
- * 【使用されるエージェント / 処理フロー】
- * - record-page-screen.tsx から呼ばれる。
- * - prompt 解析中に workspace の待機表示として描画される。
- *
- * 【やらないこと】
- * - API 通信
- * - フォーム state 更新
- * - 画面遷移
- *
- * 【他ファイルとの関係】
- * - web/src/styles/globals.css の record-screen__loading-* 系クラスに依存する。
+/* 【責務】
+ * Record 画面の解析中ローディング表示を描画する。
  */
 
 import type { JSX } from 'react';

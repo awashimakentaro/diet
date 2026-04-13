@@ -1,20 +1,5 @@
-/**
- * web/src/app/app/record/_components/record-workspace-placeholder.tsx
- *
- * 【責務】
- * `/app/record` ルート専用の workspace 空状態を描画する。
- *
- * 【使用されるエージェント / 処理フロー】
- * - record-page-screen.tsx から呼ばれる。
- * - 手動入力またはプロンプト反映前の案内を表示する。
- *
- * 【やらないこと】
- * - 入力 state 管理
- * - API 通信
- * - 画面遷移
- *
- * 【他ファイルとの関係】
- * - web/src/styles/globals.css の record-screen__workspace-* 系クラスに依存する。
+/* 【責務】
+ * Record 画面の workspace 空状態を描画する。
  */
 
 import { Sparkles, SquarePen } from 'lucide-react';

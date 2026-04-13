@@ -1,20 +1,6 @@
-/**
- * web/src/features/record/components/record-editor-panel.tsx
- *
+/*
  * 【責務】
  * Record 画面の食事名入力、食品内訳編集、確定ボタンを描画する。
- *
- * 【使用されるエージェント / 処理フロー】
- * - web/src/app/app/record/_components/record-page-screen.tsx から呼ばれる。
- * - RHF form と itemFields を受け取り、下書き編集 UI を構築する。
- *
- * 【やらないこと】
- * - 認証処理
- * - API 通信
- * - ルート遷移
- *
- * 【他ファイルとの関係】
- * - use-record-screen.ts の state とハンドラに依存する。
  */
 
 import { CheckCircle2, Salad, X } from 'lucide-react';
