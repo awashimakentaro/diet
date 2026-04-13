@@ -25,14 +25,25 @@ import type { WebMeal } from '@/domain/web-diet-schema';
 import type { NutritionSummary } from '@/features/record/components/record-summary-card';
 import { formatDateKey, getTodayKey, parseDateKey } from '@/lib/web-date';
 
-import { buildNutritionSummary } from '../summary/build-nutrition-summary';
-import { listCurrentGoal } from '../settings/api/list-current-goal';
-import { listDailySummary } from '../summary/api/list-daily-summary';
-import { recomputeDailySummaryForDateKey } from '../summary/api/recompute-daily-summary';
-import { deleteHistoryMeal } from './api/delete-history-meal';
-import { listHistoryMeals } from './api/list-history-meals';
-import { saveHistoryMealToFoods } from './api/save-history-meal-to-foods';
-import { updateHistoryMeal } from './api/update-history-meal';
+import { listCurrentGoal } from '../../settings/api/list-current-goal';
+import { listDailySummary } from '../../summary/api/list-daily-summary';
+import { recomputeDailySummaryForDateKey } from '../../summary/api/recompute-daily-summary';
+import { buildNutritionSummary } from '../../summary/build-nutrition-summary';
+import { deleteHistoryMeal } from '../api/delete-history-meal';
+import { listHistoryMeals } from '../api/list-history-meals';
+import { saveHistoryMealToFoods } from '../api/save-history-meal-to-foods';
+import { updateHistoryMeal } from '../api/update-history-meal';
+import type { HistoryMealUpdateValues } from '../schemas/history-meal-update-values';
+import { buildHistoryDeleteErrorFeedback } from '../usecases/delete/build-history-delete-error-feedback';
+import { buildHistoryDeleteSuccessFeedback } from '../usecases/delete/build-history-delete-success-feedback';
+import { syncHistoryAfterDelete } from '../usecases/delete/sync-history-after-delete';
+import { buildHistorySaveMealErrorFeedback } from '../usecases/save/build-history-save-meal-error-feedback';
+import { buildHistorySaveMealSuccessFeedback } from '../usecases/save/build-history-save-meal-success-feedback';
+import { canSaveHistoryMeal } from '../usecases/save/can-save-history-meal';
+import { findHistoryMealById } from '../usecases/save/find-history-meal-by-id';
+import { buildHistoryUpdateErrorFeedback } from '../usecases/update/build-history-update-error-feedback';
+import { buildHistoryUpdateSuccessFeedback } from '../usecases/update/build-history-update-success-feedback';
+import { syncHistoryAfterUpdate } from '../usecases/update/sync-history-after-update';
 
 export type UseHistoryScreenResult = {
   meals: WebMeal[];
@@ -54,17 +65,7 @@ export type UseHistoryScreenResult = {
   handleCloseEditMeal: () => void;
   handleUpdateMeal: (
     mealId: string,
-    values: {
-      mealName: string;
-      items: Array<{
-        name: string;
-        amount: string;
-        kcal: string;
-        protein: string;
-        fat: string;
-        carbs: string;
-      }>;
-    },
+    values: HistoryMealUpdateValues,
   ) => Promise<void>;
   handleSaveMeal: (mealId: string) => void;
   isLoading: boolean;
@@ -114,6 +115,19 @@ export function useHistoryScreen(): UseHistoryScreenResult {
     return meals.find((meal) => meal.id === editingMealId) ?? null;
   }, [editingMealId, meals]);
 
+  function applyFeedback(feedback: {
+    message: string | null;
+    tone: 'info' | 'error';
+  }): void {
+    setFeedbackMessage(feedback.message);
+    setFeedbackTone(feedback.tone);
+  }
+
+  function clearFeedback(): void {
+    setFeedbackMessage(null);
+    setFeedbackTone('info');
+  }
+
   useEffect(() => {
     if (dailySummary !== null || meals.length === 0) {
       return;
@@ -128,25 +142,21 @@ export function useHistoryScreen(): UseHistoryScreenResult {
   async function handleDeleteMeal(mealId: string): Promise<void> {
     try {
       await deleteHistoryMeal(mealId);
-      await recomputeDailySummaryForDateKey(selectedDateKey);
-      await mutateDailySummary();
-      await mutate();
-      setFeedbackMessage('履歴から削除しました。');
-      setFeedbackTone('info');
+      await syncHistoryAfterDelete({
+        selectedDateKey,
+        recomputeDailySummaryForDateKey,
+        mutateDailySummary,
+        mutateMeals: mutate,
+      });
+      applyFeedback(buildHistoryDeleteSuccessFeedback());
     } catch (error) {
-      setFeedbackMessage(
-        error instanceof Error
-          ? error.message
-          : '履歴を削除できませんでした。',
-      );
-      setFeedbackTone('error');
+      applyFeedback(buildHistoryDeleteErrorFeedback(error));
     }
   }
 
   function handleOpenEditMeal(mealId: string): void {
     setEditingMealId(mealId);
-    setFeedbackMessage(null);
-    setFeedbackTone('info');
+    clearFeedback();
   }
 
   function handleCloseEditMeal(): void {
@@ -155,17 +165,7 @@ export function useHistoryScreen(): UseHistoryScreenResult {
 
   async function handleUpdateMeal(
     mealId: string,
-    values: {
-      mealName: string;
-      items: Array<{
-        name: string;
-        amount: string;
-        kcal: string;
-        protein: string;
-        fat: string;
-        carbs: string;
-      }>;
-    },
+    values: HistoryMealUpdateValues,
   ): Promise<void> {
     setIsSavingEdit(true);
 
@@ -175,30 +175,30 @@ export function useHistoryScreen(): UseHistoryScreenResult {
         mealName: values.mealName,
         items: values.items,
       });
-      await recomputeDailySummaryForDateKey(selectedDateKey);
-      await mutateDailySummary();
-      await mutate();
-      setFeedbackMessage('履歴を更新しました。');
-      setFeedbackTone('info');
+      await syncHistoryAfterUpdate({
+        selectedDateKey,
+        recomputeDailySummaryForDateKey,
+        mutateDailySummary,
+        mutateMeals: mutate,
+      });
+      applyFeedback(buildHistoryUpdateSuccessFeedback());
       setEditingMealId(null);
     } catch (error) {
-      setFeedbackMessage(
-        error instanceof Error
-          ? error.message
-          : '履歴を更新できませんでした。',
-      );
-      setFeedbackTone('error');
+      applyFeedback(buildHistoryUpdateErrorFeedback(error));
     } finally {
       setIsSavingEdit(false);
     }
   }
 
   async function handleSaveMeal(mealId: string): Promise<void> {
-    if (savedMealIds.includes(mealId)) {
+    if (!canSaveHistoryMeal({ mealId, savedMealIds })) {
       return;
     }
 
-    const targetMeal = meals.find((meal) => meal.id === mealId);
+    const targetMeal = findHistoryMealById({
+      mealId,
+      meals,
+    });
 
     if (!targetMeal) {
       return;
@@ -208,15 +208,9 @@ export function useHistoryScreen(): UseHistoryScreenResult {
       setSavingMealId(mealId);
       await saveHistoryMealToFoods(targetMeal);
       setSavedMealIds((current) => current.concat(mealId));
-      setFeedbackMessage(null);
-      setFeedbackTone('info');
+      applyFeedback(buildHistorySaveMealSuccessFeedback());
     } catch (error) {
-      setFeedbackMessage(
-        error instanceof Error
-          ? error.message
-          : '食品タブへの保存に失敗しました。',
-      );
-      setFeedbackTone('error');
+      applyFeedback(buildHistorySaveMealErrorFeedback(error));
     } finally {
       setSavingMealId(null);
     }
@@ -228,7 +222,7 @@ export function useHistoryScreen(): UseHistoryScreenResult {
     }
 
     setSelectedDateKey(dateKey);
-    setFeedbackMessage(null);
+    clearFeedback();
   }
 
   function handleShiftDate(days: number): void {
@@ -261,6 +255,6 @@ export function useHistoryScreen(): UseHistoryScreenResult {
     handleCloseEditMeal,
     handleUpdateMeal,
     handleSaveMeal,
-  isLoading: isMealsLoading || isSummaryLoading || isGoalLoading,
+    isLoading: isMealsLoading || isSummaryLoading || isGoalLoading,
   };
 }

@@ -1,29 +1,13 @@
-/**
- * web/src/features/history/api/list-history-meals.ts
- *
- * 【責務】
+/* 【責務】
  * History 画面向けに指定日付の meals を Supabase から取得する。
- *
- * 【使用されるエージェント / 処理フロー】
- * - use-history-screen.ts から呼ばれる。
- * - auth user と日付キーをもとに meals を問い合わせる。
- *
- * 【やらないこと】
- * - UI 描画
- * - SWR 状態管理
- * - 永続化
- *
- * 【他ファイルとの関係】
- * - getSupabaseBrowserClient と map-web-meal-row.ts を利用する。
- * - prune-old-meals.ts で保持期限超過分を先に削除する。
  */
 
 import type { WebMeal } from '@/domain/web-diet-schema';
 import { getSupabaseBrowserClient } from '@/lib/supabase';
 import { getUtcRangeForDateKey } from '@/lib/web-date';
 
-import { mapWebMealRow } from '../map-web-meal-row';
-import { pruneOldMealsForCurrentUser } from '../prune-old-meals';
+import { mapWebMealRow } from '../utils/map-web-meal-row';
+import { pruneOldMealsForCurrentUser } from './prune-old-meals';
 
 export async function listHistoryMeals(dateKey: string): Promise<WebMeal[]> {
   try {

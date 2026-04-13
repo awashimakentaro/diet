@@ -3,7 +3,7 @@
  */
 
 import { getSupabaseBrowserClient } from '@/lib/supabase';
-import { pruneOldMealsForCurrentUser } from '../../history/prune-old-meals';
+import { pruneOldMealsForCurrentUser } from '../../history/api/prune-old-meals';
 import { recomputeDailySummaryForDateKey } from '../../summary/api/recompute-daily-summary';
 import type { RecordFormValues } from '../schemas/record-form-schema';
 import { buildRecordSavePayload } from '../usecases/save/build-record-save-payload';

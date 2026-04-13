@@ -24,7 +24,7 @@ import type { WebLibraryEntry } from '@/domain/web-diet-schema';
 import { getSupabaseBrowserClient } from '@/lib/supabase';
 import { getTodayKey } from '@/lib/web-date';
 
-import { pruneOldMealsForCurrentUser } from '../../history/prune-old-meals';
+import { pruneOldMealsForCurrentUser } from '../../history/api/prune-old-meals';
 import { recomputeDailySummaryForDateKey } from '../../summary/api/recompute-daily-summary';
 
 export async function createMealFromLibraryEntry(entry: WebLibraryEntry): Promise<void> {

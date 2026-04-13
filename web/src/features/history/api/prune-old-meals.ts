@@ -1,20 +1,5 @@
-/**
- * web/src/features/history/prune-old-meals.ts
- *
- * 【責務】
+/* 【責務】
  * meals テーブルの古い履歴を保持期間ルールに従って削除する。
- *
- * 【使用されるエージェント / 処理フロー】
- * - History/Record/Foods の保存・取得処理から呼ばれる。
- * - 現在ユーザーを解決し、保持期限以前の meals を削除する。
- *
- * 【やらないこと】
- * - UI 描画
- * - 日次集計生成
- * - foods テーブルの削除
- *
- * 【他ファイルとの関係】
- * - getSupabaseBrowserClient を利用して meals テーブルを操作する。
  */
 
 import { getSupabaseBrowserClient } from '@/lib/supabase';

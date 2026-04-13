@@ -28,7 +28,7 @@ import { AppTopBar } from '@/components/app-top-bar';
 import { HistoryDateChip } from '@/features/history/components/history-date-chip';
 import { HistoryEntryCard } from '@/features/history/components/history-entry-card';
 import { HistoryMealEditorPanel } from '@/features/history/components/history-meal-editor-panel';
-import { useHistoryScreen } from '@/features/history/use-history-screen';
+import { useHistoryScreen } from '@/features/history/hooks/use-history-screen';
 import { RecordSummaryCard } from '@/features/record/components/record-summary-card';
 
 export function HistoryPageScreen(): JSX.Element {

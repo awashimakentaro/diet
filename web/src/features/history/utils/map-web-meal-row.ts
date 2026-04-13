@@ -1,20 +1,5 @@
-/**
- * web/src/features/history/map-web-meal-row.ts
- *
- * 【責務】
+/* 【責務】
  * Supabase の meals 行を History 画面で使う WebMeal へ変換する。
- *
- * 【使用されるエージェント / 処理フロー】
- * - list-history-meals.ts から呼ばれる。
- * - Supabase 応答を UI 表示用の型へ正規化する。
- *
- * 【やらないこと】
- * - API 通信
- * - UI 描画
- * - 永続化
- *
- * 【他ファイルとの関係】
- * - web-diet-schema.ts の WebMeal 型へ変換する。
  */
 
 import type { WebMeal, WebMealSource } from '@/domain/web-diet-schema';
