@@ -22,7 +22,6 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import type { JSX } from 'react';
 
-import { AppBottomNav } from '@/components/app-bottom-nav';
 import { FoodsScreenSkeleton } from '@/components/app-skeleton';
 import { AppTopBar } from '@/components/app-top-bar';
 import { FoodEntryEditorPanel } from '@/features/foods/components/food-entry-editor-panel';
@@ -141,8 +140,6 @@ export function FoodsPageScreen(): JSX.Element {
           onRemoveItem={handleRemoveEditorItem}
         />
       ) : null}
-
-      <AppBottomNav currentPath="/app/foods" />
     </div>
   );
 }

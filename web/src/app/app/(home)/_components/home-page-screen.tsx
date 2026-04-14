@@ -24,12 +24,11 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { useState, type JSX } from 'react';
 
-import { AppBottomNav } from '@/components/app-bottom-nav';
 import { HomeScreenSkeleton } from '@/components/app-skeleton';
 import { AppTopBar } from '@/components/app-top-bar';
 import { WeightTrendChart } from '@/features/home/components/weight-trend-chart';
 import { useHomeScreen } from '@/features/home/use-home-screen';
-import { RecordSummaryCard } from '@/features/record/components/record-summary-card';
+import { RecordSummaryCard } from '@/components/record-summary-card';
 
 export function HomePageScreen(): JSX.Element {
   const { summary, consecutiveDays, insights, usageBars, weightLogs, isLoading } = useHomeScreen();
@@ -203,8 +202,6 @@ export function HomePageScreen(): JSX.Element {
           </motion.section>
         </motion.main>
       )}
-
-      <AppBottomNav currentPath="/app" />
     </div>
   );
 }

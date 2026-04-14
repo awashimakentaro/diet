@@ -5,7 +5,6 @@
 
 import type { JSX } from 'react';
 
-import { AppBottomNav } from '@/components/app-bottom-nav';
 import { RecordScreenSkeleton } from '@/components/app-skeleton';
 import { AppTopBar } from '@/components/app-top-bar';
 
@@ -16,7 +15,6 @@ export default function Loading(): JSX.Element {
       <main className="record-screen__main record-screen__main--focused" style={{ opacity: 1 }}>
         <RecordScreenSkeleton />
       </main>
-      <AppBottomNav currentPath="/app/record" />
     </div>
   );
 }

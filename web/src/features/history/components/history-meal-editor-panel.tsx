@@ -26,7 +26,7 @@ import { CheckCircle2, Salad, X } from 'lucide-react';
 import type { JSX } from 'react';
 
 import type { WebMeal } from '@/domain/web-diet-schema';
-import { RecordItemAddPanel } from '@/features/record/components/record-item-add-panel';
+import { RecordItemAddPanel } from '@/features/record/components/editor/record-item-add-panel';
 import { useHistoryMealEditor } from '../hooks/use-history-meal-editor';
 import type { HistoryMealEditorFormValues } from '../schemas/history-meal-editor-form-schema';
 

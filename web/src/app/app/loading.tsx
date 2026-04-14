@@ -20,7 +20,6 @@
 
 import type { JSX } from 'react';
 
-import { AppBottomNav } from '@/components/app-bottom-nav';
 import { SkeletonCard, SkeletonLine } from '@/components/app-skeleton';
 import { AppTopBar } from '@/components/app-top-bar';
 
@@ -44,7 +43,6 @@ export default function Loading(): JSX.Element {
           </SkeletonCard>
         </div>
       </main>
-      <AppBottomNav currentPath="/app" />
     </div>
   );
 }

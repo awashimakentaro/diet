@@ -8,36 +8,53 @@ import { motion, useReducedMotion } from 'framer-motion';
 import type { JSX } from 'react';
 
 import { useRecordScreen } from '../hooks/use-record-screen';
-import { RecordQuickInputSection } from './record-quick-input-section';
-import { RecordWorkspace } from './record-workspace';
+import { RecordQuickInputSection } from './quick-input/record-quick-input-section';
+import { RecordWorkspace } from './workspace/record-workspace';
 
 export function RecordScreen(): JSX.Element {
   const reduceMotion = useReducedMotion();
   const {
-    form,
-    itemFields,
-    workspaceMode,
-    isAnalyzing,
-    isSaving,
-    draftTotals,
-    feedbackMessage,
-    feedbackTone,
-    attachments,
-    handleAttachmentChange,
-    handleRemoveAttachment,
-    handleApplyPrompt,
-    handleOpenManualInput,
-    handleCloseManualInput,
-    handlePhotoRecord,
-    handleAddItem,
-    handleRemoveItem,
-    handleConfirmDraft,
+    workspace,
+    quickInput,
+    prompt,
   } = useRecordScreen();
 
-  const isWorkspaceLoading = isAnalyzing;
+  const promptRegistration = workspace.form.register('prompt');
   const sectionTransition = reduceMotion
     ? { duration: 0 }
     : { duration: 0.45, ease: 'easeOut' as const };
+  const workspaceProps = {
+    attachments: workspace.attachments,
+    draftTotals: workspace.draftTotals,
+    feedbackMessage: workspace.feedbackMessage,
+    feedbackTone: workspace.feedbackTone,
+    form: workspace.form,
+    isAnalyzing: workspace.isAnalyzing,
+    isSaving: workspace.isSaving,
+    itemFields: workspace.itemFields,
+    onAddItem: workspace.handleAddItem,
+    onApplyPrompt: prompt.handleApplyPrompt,
+    onAttachmentChange: workspace.handleAttachmentChange,
+    onClose: workspace.handleCloseManualInput,
+    onConfirm: workspace.handleConfirmDraft,
+    onPhotoRecord: quickInput.handlePhotoRecord,
+    onRemoveAttachment: workspace.handleRemoveAttachment,
+    onRemoveItem: workspace.handleRemoveItem,
+    promptRegistration,
+    workspaceMode: workspace.workspaceMode,
+  };
+  const quickInputProps = {
+    attachments: quickInput.attachments,
+    isAnalyzing: quickInput.isAnalyzing,
+    onApplyPrompt: prompt.handleApplyPrompt,
+    onAttachmentChange: quickInput.handleAttachmentChange,
+    onOpenManualInput: quickInput.handleOpenManualInput,
+    onPhotoRecord: quickInput.handlePhotoRecord,
+    onRemoveAttachment: quickInput.handleRemoveAttachment,
+    promptRegistration,
+    sectionTransition,
+    workspaceMode: quickInput.workspaceMode,
+  };
 
   return (
     <>
@@ -53,41 +70,11 @@ export function RecordScreen(): JSX.Element {
           initial={{ opacity: 0, y: 24 }}
           transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.08 }}
         >
-          <RecordWorkspace
-            attachments={attachments}
-            draftTotals={draftTotals}
-            feedbackMessage={feedbackMessage}
-            feedbackTone={feedbackTone}
-            form={form}
-            isAnalyzing={isAnalyzing}
-            isSaving={isSaving}
-            itemFields={itemFields}
-            onAddItem={handleAddItem}
-            onApplyPrompt={handleApplyPrompt}
-            onAttachmentChange={handleAttachmentChange}
-            onClose={handleCloseManualInput}
-            onConfirm={handleConfirmDraft}
-            onPhotoRecord={handlePhotoRecord}
-            onRemoveAttachment={handleRemoveAttachment}
-            onRemoveItem={handleRemoveItem}
-            promptRegistration={form.register('prompt')}
-            workspaceMode={workspaceMode}
-          />
+          <RecordWorkspace {...workspaceProps} />
         </motion.div>
       </motion.main>
 
-      <RecordQuickInputSection
-        attachments={attachments}
-        isAnalyzing={isAnalyzing}
-        onApplyPrompt={handleApplyPrompt}
-        onAttachmentChange={handleAttachmentChange}
-        onOpenManualInput={handleOpenManualInput}
-        onPhotoRecord={handlePhotoRecord}
-        onRemoveAttachment={handleRemoveAttachment}
-        promptRegistration={form.register('prompt')}
-        sectionTransition={sectionTransition}
-        workspaceMode={workspaceMode}
-      />
+      <RecordQuickInputSection {...quickInputProps} />
     </>
   );
 }

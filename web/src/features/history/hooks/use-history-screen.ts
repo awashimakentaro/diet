@@ -22,7 +22,7 @@ import { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
 import type { WebMeal } from '@/domain/web-diet-schema';
-import type { NutritionSummary } from '@/features/record/components/record-summary-card';
+import type { NutritionSummary } from '@/components/record-summary-card';
 import { formatDateKey, getTodayKey, parseDateKey } from '@/lib/web-date';
 
 import { listCurrentGoal } from '../../settings/api/list-current-goal';

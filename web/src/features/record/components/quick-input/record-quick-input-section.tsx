@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import type { ChangeEvent, JSX } from 'react';
 import type { UseFormRegisterReturn } from 'react-hook-form';
 
-import type { PromptAttachment } from '../hooks/use-prompt-attachments';
+import type { PromptAttachment } from '../../hooks/use-prompt-attachments';
 import { RecordQuickInputCard } from './record-quick-input-card';
 
 type RecordQuickInputSectionProps = {

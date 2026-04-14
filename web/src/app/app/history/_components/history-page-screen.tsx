@@ -22,14 +22,13 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import type { JSX } from 'react';
 
-import { AppBottomNav } from '@/components/app-bottom-nav';
 import { HistoryScreenSkeleton } from '@/components/app-skeleton';
 import { AppTopBar } from '@/components/app-top-bar';
 import { HistoryDateChip } from '@/features/history/components/history-date-chip';
 import { HistoryEntryCard } from '@/features/history/components/history-entry-card';
 import { HistoryMealEditorPanel } from '@/features/history/components/history-meal-editor-panel';
 import { useHistoryScreen } from '@/features/history/hooks/use-history-screen';
-import { RecordSummaryCard } from '@/features/record/components/record-summary-card';
+import { RecordSummaryCard } from '@/components/record-summary-card';
 
 export function HistoryPageScreen(): JSX.Element {
   const reduceMotion = useReducedMotion();
@@ -144,8 +143,6 @@ export function HistoryPageScreen(): JSX.Element {
           onSave={(values) => handleUpdateMeal(editingMeal.id, values)}
         />
       ) : null}
-
-      <AppBottomNav currentPath="/app/history" />
     </div>
   );
 }

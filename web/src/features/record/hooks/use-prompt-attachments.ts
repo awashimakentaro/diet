@@ -21,7 +21,7 @@ type UsePromptAttachmentsResult = {
 
 function buildAttachments(files: FileList): PromptAttachment[] {
   return Array.from(files).map((file, index) => ({
-    id: `${file.name}-${file.size}-${file.lastModified}-${index}`,
+    id: `${file.name}-${file.size}-${file.lastModified}-${index}-${crypto.randomUUID()}`,
     name: file.name,
     previewUrl: URL.createObjectURL(file),
   }));

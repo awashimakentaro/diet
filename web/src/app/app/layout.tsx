@@ -1,22 +1,7 @@
 'use client';
 
-/**
- * web/src/app/app/layout.tsx
- *
- * 【責務】
- * `/app/*` 配下の画面を認証状態で保護し、未ログイン時はログイン画面へ戻す。
- *
- * 【使用箇所】
- * - web/src/app/app 配下の全ページで自動的に適用される。
- *
- * 【やらないこと】
- * - ログイン UI の描画
- * - 食事データの取得
- * - タブナビゲーションの描画
- *
- * 【他ファイルとの関係】
- * - web/src/app/provider.tsx の認証状態を参照する。
- * - 未認証時は web/src/app/page.tsx のログイン画面へ遷移させる。
+/* 【責務】
+ * `/app/*` 配下の画面を認証付きレイアウトとして描画する。
  */
 
 import type { JSX, ReactNode } from 'react';
@@ -24,6 +9,7 @@ import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 
 import { useWebAuth } from '@/app/provider';
+import { AppBottomNav } from '@/components/app-bottom-nav';
 import { paths } from '@/config/paths';
 
 type AuthenticatedAppLayoutProps = {
@@ -85,5 +71,10 @@ export default function AuthenticatedAppLayout({
     );
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      <AppBottomNav currentPath={pathname} />
+    </>
+  );
 }

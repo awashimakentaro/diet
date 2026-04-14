@@ -24,7 +24,7 @@ import { useEffect } from 'react';
 import useSWR from 'swr';
 
 import type { WebDailySummary } from '@/domain/web-diet-schema';
-import type { NutritionSummary } from '@/features/record/components/record-summary-card';
+import type { NutritionSummary } from '@/components/record-summary-card';
 import { formatDateKey, getTodayKey, parseDateKey } from '@/lib/web-date';
 
 import { buildNutritionSummary } from '../summary/build-nutrition-summary';

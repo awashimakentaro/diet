@@ -24,7 +24,6 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { type JSX } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { AppBottomNav } from '@/components/app-bottom-nav';
 import { AppTopBar } from '@/components/app-top-bar';
 import { paths } from '@/config/paths';
 import { SettingsAccountCard } from '@/features/settings/components/settings-account-card';
@@ -132,8 +131,6 @@ export function SettingsPageScreen(): JSX.Element {
           </motion.div>
         </div>
       </motion.main>
-
-      <AppBottomNav currentPath="/app/settings" />
     </div>
   );
 }

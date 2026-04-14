@@ -20,7 +20,7 @@
 
 import type { WebDailySummary } from '@/domain/web-diet-schema';
 import type { WebGoal } from '@/domain/web-diet-schema';
-import type { NutritionSummary } from '@/features/record/components/record-summary-card';
+import type { NutritionSummary } from '@/components/record-summary-card';
 import { mockGoal } from '@/data/mock-diet-data';
 
 function buildMacroSummary(
