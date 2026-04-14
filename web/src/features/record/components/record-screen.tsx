@@ -1,5 +1,5 @@
 /* 【責務】
- * Record 画面の機能本体を描画する。
+ * Record 画面の機能本体を描画する。流れを表現する
  */
 
 'use client';
@@ -8,10 +8,8 @@ import { motion, useReducedMotion } from 'framer-motion';
 import type { JSX } from 'react';
 
 import { useRecordScreen } from '../hooks/use-record-screen';
-import { RecordEditorPanel } from './record-editor-panel';
-import { RecordQuickInputCard } from './record-quick-input-card';
-import { RecordWorkspaceLoading } from './record-workspace-loading';
-import { RecordWorkspacePlaceholder } from './record-workspace-placeholder';
+import { RecordQuickInputSection } from './record-quick-input-section';
+import { RecordWorkspace } from './record-workspace';
 
 export function RecordScreen(): JSX.Element {
   const reduceMotion = useReducedMotion();
@@ -55,53 +53,41 @@ export function RecordScreen(): JSX.Element {
           initial={{ opacity: 0, y: 24 }}
           transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.08 }}
         >
-          {isWorkspaceLoading ? (
-            <RecordWorkspaceLoading />
-          ) : workspaceMode === 'idle' ? (
-            <RecordWorkspacePlaceholder />
-          ) : (
-            <RecordEditorPanel
-              attachments={attachments}
-              draftTotals={draftTotals}
-              feedbackMessage={feedbackMessage}
-              feedbackTone={feedbackTone}
-              form={form}
-              isAnalyzing={isAnalyzing}
-              isSaving={isSaving}
-              itemFields={itemFields}
-              mode={workspaceMode}
-              onAddItem={handleAddItem}
-              onApplyPrompt={handleApplyPrompt}
-              onAttachmentChange={handleAttachmentChange}
-              onClose={handleCloseManualInput}
-              onConfirm={handleConfirmDraft}
-              onPhotoRecord={handlePhotoRecord}
-              onRemoveAttachment={handleRemoveAttachment}
-              onRemoveItem={handleRemoveItem}
-              promptRegistration={form.register('prompt')}
-            />
-          )}
+          <RecordWorkspace
+            attachments={attachments}
+            draftTotals={draftTotals}
+            feedbackMessage={feedbackMessage}
+            feedbackTone={feedbackTone}
+            form={form}
+            isAnalyzing={isAnalyzing}
+            isSaving={isSaving}
+            itemFields={itemFields}
+            onAddItem={handleAddItem}
+            onApplyPrompt={handleApplyPrompt}
+            onAttachmentChange={handleAttachmentChange}
+            onClose={handleCloseManualInput}
+            onConfirm={handleConfirmDraft}
+            onPhotoRecord={handlePhotoRecord}
+            onRemoveAttachment={handleRemoveAttachment}
+            onRemoveItem={handleRemoveItem}
+            promptRegistration={form.register('prompt')}
+            workspaceMode={workspaceMode}
+          />
         </motion.div>
       </motion.main>
 
-      {workspaceMode === 'idle' && !isAnalyzing ? (
-        <motion.div
-          animate={{ opacity: 1 }}
-          initial={{ opacity: 0 }}
-          transition={sectionTransition}
-        >
-          <RecordQuickInputCard
-            attachments={attachments}
-            isAnalyzing={isAnalyzing}
-            onApplyPrompt={handleApplyPrompt}
-            onAttachmentChange={handleAttachmentChange}
-            onOpenManualInput={handleOpenManualInput}
-            onPhotoRecord={handlePhotoRecord}
-            onRemoveAttachment={handleRemoveAttachment}
-            promptRegistration={form.register('prompt')}
-          />
-        </motion.div>
-      ) : null}
+      <RecordQuickInputSection
+        attachments={attachments}
+        isAnalyzing={isAnalyzing}
+        onApplyPrompt={handleApplyPrompt}
+        onAttachmentChange={handleAttachmentChange}
+        onOpenManualInput={handleOpenManualInput}
+        onPhotoRecord={handlePhotoRecord}
+        onRemoveAttachment={handleRemoveAttachment}
+        promptRegistration={form.register('prompt')}
+        sectionTransition={sectionTransition}
+        workspaceMode={workspaceMode}
+      />
     </>
   );
 }

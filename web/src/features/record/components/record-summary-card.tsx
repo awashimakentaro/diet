@@ -1,20 +1,6 @@
-/**
- * web/src/features/record/components/record-summary-card.tsx
- *
+/*
  * 【責務】
  * Nutrition Status の PFC サマリーカードを描画する。
- *
- * 【使用されるエージェント / 処理フロー】
- * - Home 画面などから呼ばれる。
- * - 呼び出し元が組み立てたサマリーを受け取る。
- *
- * 【やらないこと】
- * - フォーム state 管理
- * - API 通信
- * - 画面遷移
- *
- * 【他ファイルとの関係】
- * - use-record-screen.ts の DailySummary 構造に依存する。
  */
 
 import { motion, useReducedMotion } from 'framer-motion';
