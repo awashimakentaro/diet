@@ -5,6 +5,7 @@
 'use client';
 
 import { motion, useReducedMotion } from 'framer-motion';
+import React from 'react';
 import type { JSX } from 'react';
 
 import { useRecordScreen } from '../hooks/use-record-screen';
