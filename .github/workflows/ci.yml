@@ -1,0 +1,57 @@
+# 【責務】
+# web の継続的インテグレーションで lint、型検査、テスト、build を検証する。
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  web:
+    name: Web CI
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: test-anon-key
+      OPENAI_API_KEY: test-openai-key
+      NEXT_PUBLIC_MEALS_RETENTION_DAYS: '30'
+    defaults:
+      run:
+        working-directory: web
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Prisma Validate
+        run: npm run prisma:validate
+
+      - name: Prisma Generate
+        run: npm run prisma:generate
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run check-types
+
+      - name: Test
+        run: npm run test
+
+      - name: Build
+        run: npm run build
