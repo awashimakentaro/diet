@@ -20,6 +20,7 @@
     "prisma:validate": "npm --prefix web exec prisma validate --schema ../prisma/schema.prisma"
   },
   "dependencies": {
+    "@prisma/client": "7.7.0",
     "@radix-ui/react-form": "^0.1.8"
   }
 }
