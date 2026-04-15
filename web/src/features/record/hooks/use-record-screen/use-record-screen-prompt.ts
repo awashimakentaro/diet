@@ -2,7 +2,8 @@
  * Record 画面の解析実行フローを提供する。
  */
 
-import { requestRecordAnalysis } from '../../api/request-record-analysis';
+import type { RecordAnalysisGateway } from '../../gateways/record-analysis-gateway';
+import { httpRecordAnalysisGateway } from '../../infrastructure/http-record-analysis-gateway';
 import type { RecordFormValues } from '../../schemas/record-form-schema';
 import { applyRecordAnalysisToForm } from '../../usecases/analysis/apply-record-analysis';
 import { buildRecordAnalysisFailureState } from '../../usecases/analysis/build-record-analysis-failure-state';
@@ -31,6 +32,7 @@ type UseRecordScreenPromptParams = {
   setDraftOriginalText: (value: string) => void;
   setWorkspaceMode: (value: WorkspaceMode) => void;
   setFeedback: (feedback: { message: string | null; tone: FeedbackTone }) => void;
+  analysisGateway?: RecordAnalysisGateway;
 };
 
 export function useRecordScreenPrompt({
@@ -46,6 +48,7 @@ export function useRecordScreenPrompt({
   setDraftOriginalText,
   setWorkspaceMode,
   setFeedback,
+  analysisGateway = httpRecordAnalysisGateway,
 }: UseRecordScreenPromptParams): {
   handleApplyPrompt: () => Promise<void>;
 } {
@@ -69,7 +72,7 @@ export function useRecordScreenPrompt({
 
     try {
       const imageUrls = await convertRecordAttachmentsToBase64(attachments);
-      const draft = await requestRecordAnalysis({
+      const draft = await analysisGateway.requestAnalysis({
         prompt: trimmedPrompt,
         images: imageUrls.length > 0 ? imageUrls : undefined,
       });

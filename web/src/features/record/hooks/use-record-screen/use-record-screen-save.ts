@@ -2,7 +2,8 @@
  * Record 画面の保存実行フローを提供する。
  */
 
-import { saveRecordMeal } from '../../api/save-record-meal';
+import { supabaseRecordMealRepository } from '../../infrastructure/supabase-record-meal-repository';
+import type { RecordMealRepository } from '../../repositories/record-meal-repository';
 import type { RecordFormValues } from '../../schemas/record-form-schema';
 import { buildRecordSaveFailureState } from '../../usecases/save/build-record-save-failure-state';
 import { buildRecordSaveSuccessState } from '../../usecases/save/build-record-save-success-state';
@@ -23,6 +24,7 @@ type UseRecordScreenSaveParams = {
   setDraftOriginalText: (value: string) => void;
   setWorkspaceMode: (value: WorkspaceMode) => void;
   setFeedback: (feedback: { message: string | null; tone: FeedbackTone }) => void;
+  mealRepository?: RecordMealRepository;
 };
 
 function buildRecordDraftValues(
@@ -44,6 +46,7 @@ export function useRecordScreenSave({
   setDraftOriginalText,
   setWorkspaceMode,
   setFeedback,
+  mealRepository = supabaseRecordMealRepository,
 }: UseRecordScreenSaveParams): {
   handleConfirmDraft: () => Promise<void>;
 } {
@@ -62,7 +65,7 @@ export function useRecordScreenSave({
     setIsSaving(true);
 
     try {
-      await saveRecordMeal({
+      await mealRepository.saveMeal({
         values,
         originalText: draftOriginalText,
         source: resolveRecordSaveSource(workspaceMode),

@@ -6,10 +6,10 @@ import type {
   RecordAnalysisRequest,
   RecordAnalysisResponse,
 } from '@/features/record/schemas/record-analysis-schema';
-import { requestRecordAnalysis } from '@/features/record/api/request-record-analysis';
+import { httpRecordAnalysisGateway } from '@/features/record/infrastructure/http-record-analysis-gateway';
 
 export async function requestHistoryMealAnalysis(
   payload: RecordAnalysisRequest,
 ): Promise<RecordAnalysisResponse> {
-  return requestRecordAnalysis(payload);
+  return httpRecordAnalysisGateway.requestAnalysis(payload);
 }

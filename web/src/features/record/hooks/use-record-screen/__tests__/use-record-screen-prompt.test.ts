@@ -13,10 +13,6 @@ const buildRecordAnalysisFailureStateMock = vi.hoisted(() => vi.fn());
 const buildRecordAnalysisSuccessStateMock = vi.hoisted(() => vi.fn());
 const convertRecordAttachmentsToBase64Mock = vi.hoisted(() => vi.fn());
 
-vi.mock('../../../api/request-record-analysis', () => ({
-  requestRecordAnalysis: requestRecordAnalysisMock,
-}));
-
 vi.mock('../../../usecases/analysis/apply-record-analysis', () => ({
   applyRecordAnalysisToForm: applyRecordAnalysisToFormMock,
 }));
@@ -31,6 +27,12 @@ vi.mock('../../../usecases/analysis/build-record-analysis-success-state', () => 
 
 vi.mock('../../../usecases/analysis/convert-record-attachments-to-base64', () => ({
   convertRecordAttachmentsToBase64: convertRecordAttachmentsToBase64Mock,
+}));
+
+vi.mock('../../../infrastructure/http-record-analysis-gateway', () => ({
+  httpRecordAnalysisGateway: {
+    requestAnalysis: requestRecordAnalysisMock,
+  },
 }));
 
 type PromptForm = Pick<ReturnType<typeof useRecordForm>, 'getValues' | 'setValue'>;
