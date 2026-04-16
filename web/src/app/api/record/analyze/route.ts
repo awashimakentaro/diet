@@ -23,6 +23,7 @@ import * as Sentry from '@sentry/nextjs';
 
 import { recordAnalysisRequestSchema } from '@/features/record/schemas/record-analysis-schema';
 import { ensureServerSentryInitialized } from '@/lib/monitoring/ensure-sentry-server';
+import { serverLogger } from '@/lib/monitoring/server-logger';
 import { analyzeRecordPrompt } from '@/lib/openai-record-analysis';
 
 /**
@@ -36,13 +37,29 @@ export async function POST(request: Request): Promise<Response> {
   try {
     const payload = await request.json();
     const parsed = recordAnalysisRequestSchema.parse(payload);
+    serverLogger.info({
+      event: 'record_analyze_started',
+      promptLength: parsed.prompt.trim().length,
+      imageCount: parsed.images?.length ?? 0,
+    });
     const draft = await analyzeRecordPrompt(parsed.prompt, parsed.images);
+    serverLogger.info({
+      event: 'record_analyze_succeeded',
+      itemCount: draft.items.length,
+      warningCount: draft.warnings.length,
+      source: draft.source,
+    });
 
     return NextResponse.json(draft);
   } catch (error) {
     const message =
       error instanceof Error ? error.message : '解析リクエストの処理に失敗しました。';
     ensureServerSentryInitialized();
+    serverLogger.error({
+      event: 'record_analyze_failed',
+      message,
+      error,
+    });
     Sentry.withScope((scope) => {
       scope.setTag('feature', 'record');
       scope.setTag('operation', 'analyze');
