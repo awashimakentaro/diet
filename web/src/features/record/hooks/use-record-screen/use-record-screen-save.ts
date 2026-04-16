@@ -2,6 +2,8 @@
  * Record 画面の保存実行フローを提供する。
  */
 
+import * as Sentry from '@sentry/nextjs';
+
 import { supabaseRecordMealRepository } from '../../infrastructure/supabase-record-meal-repository';
 import type { RecordMealRepository } from '../../repositories/record-meal-repository';
 import type { RecordFormValues } from '../../schemas/record-form-schema';
@@ -80,6 +82,14 @@ export function useRecordScreenSave({
       setWorkspaceMode(nextState.nextWorkspaceMode);
       setFeedback(nextState.feedback);
     } catch (error) {
+      Sentry.withScope((scope) => {
+        scope.setTag('feature', 'record');
+        scope.setTag('operation', 'save');
+        scope.setExtra('workspaceMode', workspaceMode);
+        scope.setExtra('recordedDate', values.recordedDate);
+        scope.setExtra('itemCount', values.items.length);
+        Sentry.captureException(error);
+      });
       const nextState = buildRecordSaveFailureState(error);
       setFeedback(nextState.feedback);
     } finally {

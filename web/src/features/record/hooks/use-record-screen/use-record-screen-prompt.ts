@@ -2,6 +2,8 @@
  * Record 画面の解析実行フローを提供する。
  */
 
+import * as Sentry from '@sentry/nextjs';
+
 import type { RecordAnalysisGateway } from '../../gateways/record-analysis-gateway';
 import { httpRecordAnalysisGateway } from '../../infrastructure/http-record-analysis-gateway';
 import type { RecordFormValues } from '../../schemas/record-form-schema';
@@ -98,6 +100,14 @@ export function useRecordScreenPrompt({
       setFeedback(nextState.feedback);
       clearAttachments();
     } catch (error) {
+      Sentry.withScope((scope) => {
+        scope.setTag('feature', 'record');
+        scope.setTag('operation', 'prompt');
+        scope.setExtra('hasAttachments', hasAttachments);
+        scope.setExtra('promptLength', trimmedPrompt.length);
+        scope.setExtra('workspaceMode', workspaceMode);
+        Sentry.captureException(error);
+      });
       const nextState = buildRecordAnalysisFailureState({
         error,
         prompt: trimmedPrompt,

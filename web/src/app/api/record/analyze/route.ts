@@ -19,8 +19,10 @@
  */
 
 import { NextResponse } from 'next/server';
+import * as Sentry from '@sentry/nextjs';
 
 import { recordAnalysisRequestSchema } from '@/features/record/schemas/record-analysis-schema';
+import { ensureServerSentryInitialized } from '@/lib/monitoring/ensure-sentry-server';
 import { analyzeRecordPrompt } from '@/lib/openai-record-analysis';
 
 /**
@@ -36,11 +38,18 @@ export async function POST(request: Request): Promise<Response> {
     const parsed = recordAnalysisRequestSchema.parse(payload);
     const draft = await analyzeRecordPrompt(parsed.prompt, parsed.images);
 
-
     return NextResponse.json(draft);
   } catch (error) {
     const message =
       error instanceof Error ? error.message : '解析リクエストの処理に失敗しました。';
+    ensureServerSentryInitialized();
+    Sentry.withScope((scope) => {
+      scope.setTag('feature', 'record');
+      scope.setTag('operation', 'analyze');
+      scope.setExtra('message', message);
+      Sentry.captureException(error);
+    });
+    await Sentry.flush(2000);
 
     return NextResponse.json(
       { message },
