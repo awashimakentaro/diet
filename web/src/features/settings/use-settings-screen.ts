@@ -184,9 +184,9 @@ export function useSettingsScreen(): UseSettingsScreenResult {
 
         setProfileValues((current) => ({
           ...current,
-          username: sanitizeEmailPrefix(user.email),
+          username: sanitizeEmailPrefix(user?.email),
         }));
-      } catch (error) {
+      } catch {
         if (!isMounted) {
           return;
         }

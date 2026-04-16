@@ -63,7 +63,7 @@ export function useHistoryMealEditor({
     replace(defaults.items);
     setFeedbackMessage(null);
     clearAttachments();
-  }, [form, meal, replace]);
+  }, [clearAttachments, form, meal, replace]);
 
   async function handleSave(): Promise<void> {
     await onSave(form.getValues());

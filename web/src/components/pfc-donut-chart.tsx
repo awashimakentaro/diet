@@ -49,15 +49,8 @@ export function PfcDonutChart({
 
     const pRatio = pKcal / totalKcal;
     const fRatio = fKcal / totalKcal;
-    const cRatio = cKcal / totalKcal;
-
     const radius = 40;
     const circumference = 2 * Math.PI * radius;
-
-    // 各セグメントの開始オフセット
-    const pOffset = 0;
-    const fOffset = pRatio * circumference;
-    const cOffset = (pRatio + fRatio) * circumference;
 
     return (
         <div className="pfc-donut" style={{ width: size, height: size, position: 'relative' }}>

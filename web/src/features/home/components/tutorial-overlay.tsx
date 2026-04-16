@@ -21,7 +21,7 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import type { JSX } from 'react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 type TutorialStep = {
     title: string;
@@ -56,13 +56,21 @@ export function TutorialOverlay({
     isOpen,
     onClose,
 }: TutorialOverlayProps): JSX.Element | null {
-    const [currentStep, setCurrentStep] = useState(0);
+    if (!isOpen) {
+        return null;
+    }
 
-    useEffect(() => {
-        if (isOpen) {
-            setCurrentStep(0);
-        }
-    }, [isOpen]);
+    return <TutorialOverlayContent key="tutorial-overlay-open" onClose={onClose} />;
+}
+
+type TutorialOverlayContentProps = {
+    onClose: () => void;
+};
+
+function TutorialOverlayContent({
+    onClose,
+}: TutorialOverlayContentProps): JSX.Element {
+    const [currentStep, setCurrentStep] = useState(0);
 
     const handleNext = () => {
         if (currentStep < TUTORIAL_STEPS.length - 1) {
@@ -75,8 +83,6 @@ export function TutorialOverlay({
     const handleComplete = () => {
         onClose();
     };
-
-    if (!isOpen) return null;
 
     const step = TUTORIAL_STEPS[currentStep];
 

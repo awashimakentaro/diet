@@ -3,6 +3,7 @@
  */
 
 import { X } from 'lucide-react';
+import Image from 'next/image';
 import type { JSX } from 'react';
 
 import type { PromptAttachment } from '../../hooks/use-prompt-attachments';
@@ -24,10 +25,13 @@ export function RecordPromptAttachmentStrip({
     <div className="record-screen__attachment-strip">
       {attachments.map((attachment) => (
         <div className="record-screen__attachment-chip" key={attachment.id}>
-          <img
+          <Image
             alt={attachment.name}
             className="record-screen__attachment-image"
+            height={80}
             src={attachment.previewUrl}
+            unoptimized
+            width={80}
           />
           <button
             aria-label={`${attachment.name} を削除`}

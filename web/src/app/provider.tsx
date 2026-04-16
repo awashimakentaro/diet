@@ -1,19 +1,30 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { createContext, useContext } from "react";
+import type { User } from "@supabase/supabase-js";
 
 import { login, logout, signUp, useUser } from "@/lib/auth";
 
-const AuthContext = createContext<any>(null);
-//createContext(...)React の共有箱を作る関数  useContext ボックスの中身を読む
+type AuthStatus = "checking" | "signed-in" | "signed-out";
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+type AuthContextValue = {
+  user: User | null | undefined;
+  status: AuthStatus;
+  signIn: (input: { email: string; password: string }) => Promise<void>;
+  signOut: () => Promise<void>;
+  signUp: (input: { email: string; password: string }) => Promise<Awaited<ReturnType<typeof signUp>>>;
+};
+
+const AuthContext = createContext<AuthContextValue | null>(null);
+
+export function AuthProvider({ children }: { children: ReactNode }) {
   const { data: user, isLoading, mutate } = useUser();
 
-  const status = isLoading ? "checking" : user ? "signed-in" : "signed-out";
+  const status: AuthStatus = isLoading ? "checking" : user ? "signed-in" : "signed-out";
 
-  async function signIn(input: { email: string; password: string }) {//この関数でloginしたい情報をsupabaseに送る
-    await login(input);//これがログインのdataを変えす
+  async function signIn(input: { email: string; password: string }) {
+    await login(input);
     await mutate();
   }
 
@@ -50,7 +61,5 @@ export function useAuth() {
   }
   return context;
 }
-//useAuth() はAuthProvider が共有した user や signIn を取り出すための入口
 
-//{children}にapp/配下のページ全て含まれてる
 export { AuthProvider as AppProvider, useAuth as useWebAuth };

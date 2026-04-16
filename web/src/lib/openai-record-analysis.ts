@@ -196,6 +196,10 @@ export async function analyzeRecordPrompt(
   prompt: string,
   images?: string[],
 ): Promise<RecordAnalysisResponse> {
+  type OpenAIUserContent =
+    | { type: 'text'; text: string }
+    | { type: 'image_url'; image_url: { url: string } };
+
   const normalizedPrompt = prompt.trim();
   const hasImages = Array.isArray(images) && images.length > 0;
 
@@ -211,7 +215,7 @@ export async function analyzeRecordPrompt(
   }
 
   try {
-    const userContent: any[] = [];
+    const userContent: OpenAIUserContent[] = [];
     if (normalizedPrompt) {
       userContent.push({ type: 'text', text: `分析対象の食事: ${normalizedPrompt}` });
     } else {

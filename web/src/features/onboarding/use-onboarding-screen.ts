@@ -116,7 +116,7 @@ export function useOnboardingScreen({
 
         setProfileValues((current) => ({
           ...current,
-          username: sanitizeEmailPrefix(user.email),
+          username: sanitizeEmailPrefix(user?.email),
         }));
       } catch (error) {
         if (!isMounted) {

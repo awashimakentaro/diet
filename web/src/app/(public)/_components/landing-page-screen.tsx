@@ -21,6 +21,7 @@
  * - web/src/styles/globals.css の landing-screen 系クラスに依存する。
  */
 
+import Image from 'next/image';
 import Link from 'next/link';
 import type { JSX } from 'react';
 
@@ -93,10 +94,12 @@ export function LandingPageScreen(): JSX.Element {
               <strong>最初の2分で準備完了</strong>
               <span>登録後はプロフィールを入力し、そのまま `/app` の Home から使い始められます。</span>
             </div>
-            <img
+            <Image
               alt="PFC Tracker の使い方"
               className="landing-screen__hero-image"
+              height={480}
               src="/tutorial/step1.png"
+              width={480}
             />
           </div>
         </div>
@@ -116,7 +119,13 @@ export function LandingPageScreen(): JSX.Element {
                 <h3>{step.title}</h3>
                 <span>{step.description}</span>
               </div>
-              <img alt={step.title} className="landing-screen__step-image" src={step.image} />
+              <Image
+                alt={step.title}
+                className="landing-screen__step-image"
+                height={360}
+                src={step.image}
+                width={360}
+              />
             </article>
           ))}
         </div>
