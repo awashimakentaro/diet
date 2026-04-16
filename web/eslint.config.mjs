@@ -17,7 +17,9 @@ const config = [
     ignores: [
       '.next/**',
       'node_modules/**',
+      'playwright-report/**',
       'storybook-static/**',
+      'test-results/**',
       'coverage/**',
       'public/**',
       'next-env.d.ts',

@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "test": "vitest run",
+    "test:e2e": "playwright test",
     "check-types": "tsc --project tsconfig.json --pretty --noEmit",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
