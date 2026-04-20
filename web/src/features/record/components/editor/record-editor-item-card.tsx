@@ -6,7 +6,7 @@ import { X } from 'lucide-react';
 import type { JSX } from 'react';
 import type { UseFormRegister } from 'react-hook-form';
 
-import type { RecordFormValues } from '../../schemas/record-form-schema';
+import type { MealFormValues as RecordFormValues } from '@/features/shared/meal-editor/schemas';
 
 type RecordEditorItemCardProps = {
   index: number;

@@ -13,24 +13,19 @@ const buildRecordAnalysisFailureStateMock = vi.hoisted(() => vi.fn());
 const buildRecordAnalysisSuccessStateMock = vi.hoisted(() => vi.fn());
 const convertRecordAttachmentsToBase64Mock = vi.hoisted(() => vi.fn());
 
-vi.mock('../../../usecases/analysis/apply-record-analysis', () => ({
-  applyRecordAnalysisToForm: applyRecordAnalysisToFormMock,
-}));
+vi.mock('../../../utils/analysis', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../../utils/analysis')>();
+  return {
+    ...actual,
+    applyRecordAnalysisToForm: applyRecordAnalysisToFormMock,
+    buildRecordAnalysisFailureState: buildRecordAnalysisFailureStateMock,
+    buildRecordAnalysisSuccessState: buildRecordAnalysisSuccessStateMock,
+    convertRecordAttachmentsToBase64: convertRecordAttachmentsToBase64Mock,
+  };
+});
 
-vi.mock('../../../usecases/analysis/build-record-analysis-failure-state', () => ({
-  buildRecordAnalysisFailureState: buildRecordAnalysisFailureStateMock,
-}));
-
-vi.mock('../../../usecases/analysis/build-record-analysis-success-state', () => ({
-  buildRecordAnalysisSuccessState: buildRecordAnalysisSuccessStateMock,
-}));
-
-vi.mock('../../../usecases/analysis/convert-record-attachments-to-base64', () => ({
-  convertRecordAttachmentsToBase64: convertRecordAttachmentsToBase64Mock,
-}));
-
-vi.mock('../../../infrastructure/http-record-analysis-gateway', () => ({
-  httpRecordAnalysisGateway: {
+vi.mock('../../../api/request-record-analysis', () => ({
+  requestRecordAnalysis: {
     requestAnalysis: requestRecordAnalysisMock,
   },
 }));

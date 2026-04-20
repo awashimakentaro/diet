@@ -19,14 +19,14 @@
  * 【他ファイルとの関係】
  * - web-diet-schema.ts の WebMeal 型を入力として利用する。
  * - record の編集系 CSS クラスを再利用する。
- * - record/components/record-item-add-panel.tsx を追加導線 UI として再利用する。
+ * - shared/meal-editor の食品追加導線 UI を再利用する。
  */
 
 import { CheckCircle2, Salad, X } from 'lucide-react';
 import type { JSX } from 'react';
 
 import type { WebMeal } from '@/domain/web-diet-schema';
-import { RecordItemAddPanel } from '@/features/record/components/editor/record-item-add-panel';
+import { MealItemAddPanel } from '@/features/shared/meal-editor/components';
 import { useHistoryMealEditor } from '../hooks/use-history-meal-editor';
 import type { HistoryMealEditorFormValues } from '../schemas/history-meal-editor-form-schema';
 
@@ -183,7 +183,7 @@ export function HistoryMealEditorPanel({
             ))}
           </div>
 
-          <RecordItemAddPanel
+          <MealItemAddPanel
             isAnalyzing={isAnalyzing}
             onAddManualItem={handleAddManualItem}
             onApplyPrompt={handleApplyPrompt}

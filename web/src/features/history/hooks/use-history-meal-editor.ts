@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { useFieldArray } from 'react-hook-form';
 
 import type { WebMeal } from '@/domain/web-diet-schema';
-import { usePromptAttachments } from '@/features/record/hooks/use-prompt-attachments';
+import { usePromptAttachments } from '@/features/shared/meal-editor/hooks/use-prompt-attachments';
 
 import { requestHistoryMealAnalysis } from '../api/request-history-meal-analysis';
 import type { HistoryMealEditorFormValues } from '../schemas/history-meal-editor-form-schema';

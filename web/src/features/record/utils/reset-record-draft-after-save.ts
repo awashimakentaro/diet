@@ -3,8 +3,7 @@
  */
 
 import type { UseFormReturn } from 'react-hook-form';
-
-import type { RecordFormValues } from '../schemas/record-form-schema';
+import type { MealFormValues as RecordFormValues } from '@/features/shared/meal-editor/schemas';
 import { createEmptyRecordItem } from '../utils/create-empty-record-item';
 import { getTodayDateKey } from '../utils/get-today-date-key';
 

@@ -8,9 +8,11 @@ import { PenLine, Send } from 'lucide-react';
 import type { ChangeEvent, JSX } from 'react';
 import type { UseFormRegisterReturn } from 'react-hook-form';
 
-import type { PromptAttachment } from '../../hooks/use-prompt-attachments';
-import { RecordPhotoInputTools } from '../shared/record-photo-input-tools';
-import { RecordPromptAttachmentStrip } from '../shared/record-prompt-attachment-strip';
+import type { PromptAttachment } from '@/features/shared/meal-editor/hooks/use-prompt-attachments';
+import {
+  MealPhotoInputTools as RecordPhotoInputTools,
+  MealPromptAttachmentStrip as RecordPromptAttachmentStrip,
+} from '@/features/shared/meal-editor/components';
 
 type RecordQuickInputCardProps = {
   promptRegistration: UseFormRegisterReturn;

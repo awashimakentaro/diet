@@ -6,8 +6,8 @@ import type { JSX } from 'react';
 import type { FieldArrayWithId, UseFormRegisterReturn, UseFormReturn } from 'react-hook-form';
 
 import type { ChangeEvent } from 'react';
-import type { PromptAttachment } from '../../hooks/use-prompt-attachments';
-import type { RecordFormValues } from '../../schemas/record-form-schema';
+import type { PromptAttachment } from '@/features/shared/meal-editor/hooks/use-prompt-attachments';
+import type { MealFormValues as RecordFormValues } from '@/features/shared/meal-editor/schemas';
 import { RecordEditorActions } from './record-editor-actions';
 import { RecordEditorDetailsFields } from './record-editor-details-fields';
 import { RecordEditorItemList } from './record-editor-item-list';

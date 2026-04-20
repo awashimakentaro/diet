@@ -11,20 +11,21 @@ const buildRecordSaveFailureStateMock = vi.hoisted(() => vi.fn());
 const buildRecordSaveSuccessStateMock = vi.hoisted(() => vi.fn());
 const resetRecordDraftAfterSaveMock = vi.hoisted(() => vi.fn());
 
-vi.mock('../../../usecases/save/build-record-save-failure-state', () => ({
-  buildRecordSaveFailureState: buildRecordSaveFailureStateMock,
-}));
-
-vi.mock('../../../usecases/save/build-record-save-success-state', () => ({
-  buildRecordSaveSuccessState: buildRecordSaveSuccessStateMock,
-}));
+vi.mock('../../../utils/save', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../../utils/save')>();
+  return {
+    ...actual,
+    buildRecordSaveFailureState: buildRecordSaveFailureStateMock,
+    buildRecordSaveSuccessState: buildRecordSaveSuccessStateMock,
+  };
+});
 
 vi.mock('../../../utils/reset-record-draft-after-save', () => ({
   resetRecordDraftAfterSave: resetRecordDraftAfterSaveMock,
 }));
 
-vi.mock('../../../infrastructure/supabase-record-meal-repository', () => ({
-  supabaseRecordMealRepository: {
+vi.mock('../../../api/save-record-meal', () => ({
+  saveRecordMeal: {
     saveMeal: saveRecordMealMock,
   },
 }));

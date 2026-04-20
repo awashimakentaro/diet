@@ -23,11 +23,11 @@ import { CheckCircle2, Salad, X } from 'lucide-react';
 import type { JSX } from 'react';
 import type { FieldArrayWithId, UseFormReturn } from 'react-hook-form';
 
-import type { RecordFormValues } from '@/features/record/schemas/record-form-schema';
+import type { MealFormValues } from '@/features/shared/meal-editor/schemas';
 
 type FoodEntryEditorPanelProps = {
-  form: UseFormReturn<RecordFormValues>;
-  itemFields: FieldArrayWithId<RecordFormValues, 'items', 'id'>[];
+  form: UseFormReturn<MealFormValues>;
+  itemFields: FieldArrayWithId<MealFormValues, 'items', 'id'>[];
   draftTotals: {
     kcal: number;
     protein: number;

@@ -16,13 +16,13 @@
  * - getSupabaseBrowserClient を利用する。
  */
 
-import type { RecordFormValues } from '@/features/record/schemas/record-form-schema';
+import type { MealFormValues } from '@/features/shared/meal-editor/schemas';
 import { getSupabaseBrowserClient } from '@/lib/supabase';
 
 type UpdateFoodLibraryEntryParams = {
   entryId: string;
   mealName: string;
-  items: RecordFormValues['items'];
+  items: MealFormValues['items'];
 };
 
 type FoodItemPayload = {
@@ -48,7 +48,7 @@ function createItemId(index: number): string {
   return `food-item-${Date.now()}-${index + 1}`;
 }
 
-function buildItems(items: RecordFormValues['items']): FoodItemPayload[] {
+function buildItems(items: MealFormValues['items']): FoodItemPayload[] {
   return items
     .filter((item) => item.name.trim().length > 0)
     .map((item, index) => ({

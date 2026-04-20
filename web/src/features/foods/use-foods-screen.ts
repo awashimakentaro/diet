@@ -23,8 +23,8 @@ import { useFieldArray, useForm, type FieldArrayWithId, type UseFormReturn } fro
 import useSWR from 'swr';
 
 import type { WebLibraryEntry } from '@/domain/web-diet-schema';
+import type { MealFormValues } from '@/features/shared/meal-editor/schemas';
 import { formatDateKey } from '@/lib/web-date';
-import type { RecordFormValues } from '@/features/record/schemas/record-form-schema';
 
 import { createMealFromLibraryEntry } from './api/create-meal-from-library-entry';
 import { deleteFoodLibraryEntry } from './api/delete-food-library-entry';
@@ -38,8 +38,8 @@ export type UseFoodsScreenResult = {
   feedbackTone: 'info' | 'error';
   savingEntryId: string | null;
   editingEntry: WebLibraryEntry | null;
-  editingForm: UseFormReturn<RecordFormValues>;
-  editingItemFields: FieldArrayWithId<RecordFormValues, 'items', 'id'>[];
+  editingForm: UseFormReturn<MealFormValues>;
+  editingItemFields: FieldArrayWithId<MealFormValues, 'items', 'id'>[];
   editingDraftTotals: {
     kcal: number;
     protein: number;
@@ -104,7 +104,7 @@ export function useFoodsScreen(): UseFoodsScreenResult {
   const { data, mutate, isLoading } = useSWR('/foods/library', listFoodLibraryEntries, {
     fallbackData: [],
   });
-  const editingForm = useForm<RecordFormValues>({
+  const editingForm = useForm<MealFormValues>({
     defaultValues: {
       prompt: '',
       recordedDate: formatDateKey(new Date()),

@@ -5,7 +5,7 @@
 import type { JSX } from 'react';
 import type { FieldArrayWithId, UseFormRegister } from 'react-hook-form';
 
-import type { RecordFormValues } from '../../schemas/record-form-schema';
+import type { MealFormValues as RecordFormValues } from '@/features/shared/meal-editor/schemas';
 import { RecordEditorItemCard } from './record-editor-item-card';
 
 type RecordEditorItemListProps = {

@@ -21,10 +21,10 @@
 import { NextResponse } from 'next/server';
 import * as Sentry from '@sentry/nextjs';
 
-import { recordAnalysisRequestSchema } from '@/features/record/schemas/record-analysis-schema';
+import { mealAnalysisRequestSchema as recordAnalysisRequestSchema } from '@/features/shared/meal-analysis/schemas';
+import { analyzeRecordDraft } from '@/features/record/server/analyze-record-draft';
 import { ensureServerSentryInitialized } from '@/lib/monitoring/ensure-sentry-server';
 import { serverLogger } from '@/lib/monitoring/server-logger';
-import { analyzeRecordPrompt } from '@/lib/openai-record-analysis';
 
 /**
  * Record 用 prompt を解析する。
@@ -42,7 +42,7 @@ export async function POST(request: Request): Promise<Response> {
       promptLength: parsed.prompt.trim().length,
       imageCount: parsed.images?.length ?? 0,
     });
-    const draft = await analyzeRecordPrompt(parsed.prompt, parsed.images);
+    const draft = await analyzeRecordDraft(parsed.prompt, parsed.images);
     serverLogger.info({
       event: 'record_analyze_succeeded',
       itemCount: draft.items.length,

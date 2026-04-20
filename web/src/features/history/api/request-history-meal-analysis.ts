@@ -3,13 +3,13 @@
  */
 
 import type {
-  RecordAnalysisRequest,
-  RecordAnalysisResponse,
-} from '@/features/record/schemas/record-analysis-schema';
-import { httpRecordAnalysisGateway } from '@/features/record/infrastructure/http-record-analysis-gateway';
+  MealAnalysisRequest,
+  MealAnalysisResponse,
+} from '@/features/shared/meal-analysis/schemas';
+import { requestMealAnalysis } from '@/features/shared/meal-analysis/api';
 
 export async function requestHistoryMealAnalysis(
-  payload: RecordAnalysisRequest,
-): Promise<RecordAnalysisResponse> {
-  return httpRecordAnalysisGateway.requestAnalysis(payload);
+  payload: MealAnalysisRequest,
+): Promise<MealAnalysisResponse> {
+  return requestMealAnalysis(payload);
 }

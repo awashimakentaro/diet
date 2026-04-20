@@ -6,8 +6,8 @@ import { CheckCircle2 } from 'lucide-react';
 import type { ChangeEvent, JSX } from 'react';
 import type { UseFormRegisterReturn } from 'react-hook-form';
 
-import type { PromptAttachment } from '../../hooks/use-prompt-attachments';
-import { RecordItemAddPanel } from './record-item-add-panel';
+import type { PromptAttachment } from '@/features/shared/meal-editor/hooks/use-prompt-attachments';
+import { MealItemAddPanel as RecordItemAddPanel } from '@/features/shared/meal-editor/components';
 
 type RecordEditorActionsProps = {
   isAnalyzing: boolean;

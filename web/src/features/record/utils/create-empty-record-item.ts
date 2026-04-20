@@ -2,7 +2,7 @@
  * Record 画面の空の食品入力行を生成する。
  */
 
-import type { RecordFoodItemValues } from '../schemas/record-form-schema';
+import type { MealFoodItemValues as RecordFoodItemValues } from '@/features/shared/meal-editor/schemas';
 
 export function createEmptyRecordItem(): RecordFoodItemValues {
   return {

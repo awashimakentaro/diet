@@ -4,7 +4,7 @@
 
 import { useMemo } from 'react';
 
-import type { RecordFormValues } from '../../schemas/record-form-schema';
+import type { MealFormValues as RecordFormValues } from '@/features/shared/meal-editor/schemas';
 
 function toNumber(value: string): number {
   const parsed = Number(value);

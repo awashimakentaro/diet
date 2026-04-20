@@ -2,12 +2,12 @@
  * History 編集パネル用に解析結果の食品一覧を組み立てる。
  */
 
-import type { RecordAnalysisResponse } from '@/features/record/schemas/record-analysis-schema';
+import type { MealAnalysisResponse } from '@/features/shared/meal-analysis/schemas';
 
 import type { HistoryMealEditorFormValues } from '../../schemas/history-meal-editor-form-schema';
 
 export function buildHistoryAnalysisItems(
-  draft: RecordAnalysisResponse,
+  draft: MealAnalysisResponse,
 ): HistoryMealEditorFormValues['items'] {
   return draft.items.map((item) => ({
     name: item.name,

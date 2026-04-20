@@ -17,7 +17,7 @@
  * - record-analysis-schema.ts の型に合わせたデータを返す。
  */
 
-import type { RecordAnalysisResponse } from '@/features/record/schemas/record-analysis-schema';
+import type { MealAnalysisResponse as RecordAnalysisResponse } from '@/features/shared/meal-analysis/schemas';
 
 const OPENAI_ENDPOINT = 'https://api.openai.com/v1/chat/completions';
 const OPENAI_MODEL = 'gpt-4o-mini';

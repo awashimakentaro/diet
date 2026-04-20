@@ -4,13 +4,15 @@
 
 import * as Sentry from '@sentry/nextjs';
 
-import { supabaseRecordMealRepository } from '../../infrastructure/supabase-record-meal-repository';
-import type { RecordMealRepository } from '../../repositories/record-meal-repository';
-import type { RecordFormValues } from '../../schemas/record-form-schema';
-import { buildRecordSaveFailureState } from '../../usecases/save/build-record-save-failure-state';
-import { buildRecordSaveSuccessState } from '../../usecases/save/build-record-save-success-state';
-import { resolveRecordSaveSource } from '../../usecases/save/resolve-record-save-source';
-import { validateRecordDraft } from '../../usecases/save/validate-record-draft';
+import type { MealFormValues as RecordFormValues } from '@/features/shared/meal-editor/schemas';
+import { saveRecordMeal } from '../../api/save-record-meal';
+import type { RecordMealRepository } from '../../types/record-meal-repository';
+import {
+  buildRecordSaveFailureState,
+  buildRecordSaveSuccessState,
+  resolveRecordSaveSource,
+  validateRecordDraft,
+} from '../../utils/save';
 import { resetRecordDraftAfterSave } from '../../utils/reset-record-draft-after-save';
 import { useRecordForm } from '../use-record-form';
 
@@ -48,7 +50,7 @@ export function useRecordScreenSave({
   setDraftOriginalText,
   setWorkspaceMode,
   setFeedback,
-  mealRepository = supabaseRecordMealRepository,
+  mealRepository = saveRecordMeal,
 }: UseRecordScreenSaveParams): {
   handleConfirmDraft: () => Promise<void>;
 } {

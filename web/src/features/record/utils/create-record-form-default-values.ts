@@ -2,7 +2,7 @@
  * Record フォームの初期値を生成する。
  */
 
-import type { RecordFormValues } from '../schemas/record-form-schema';
+import type { MealFormValues as RecordFormValues } from '@/features/shared/meal-editor/schemas';
 import { createEmptyRecordItem } from './create-empty-record-item';
 import { getTodayDateKey } from './get-today-date-key';
 

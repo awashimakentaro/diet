@@ -6,7 +6,7 @@ import { Salad } from 'lucide-react';
 import type { JSX } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 
-import type { RecordFormValues } from '../../schemas/record-form-schema';
+import type { MealFormValues as RecordFormValues } from '@/features/shared/meal-editor/schemas';
 
 type RecordEditorDetailsFieldsProps = {
   form: UseFormReturn<RecordFormValues>;
