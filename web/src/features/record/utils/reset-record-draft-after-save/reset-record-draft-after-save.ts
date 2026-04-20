@@ -4,8 +4,8 @@
 
 import type { UseFormReturn } from 'react-hook-form';
 import type { MealFormValues as RecordFormValues } from '@/features/shared/meal-editor/schemas';
-import { createEmptyRecordItem } from '../utils/create-empty-record-item';
-import { getTodayDateKey } from '../utils/get-today-date-key';
+import { createEmptyRecordItem } from '../create-empty-record-item';
+import { getTodayDateKey } from '../get-today-date-key';
 
 type ResetRecordDraftAfterSaveParams = {
     form: UseFormReturn<RecordFormValues>;//UseFormReturn は「RHF の form オブジェクトに入っている機能セットの型
