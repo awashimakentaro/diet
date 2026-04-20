@@ -8,13 +8,14 @@ import { buildRecordAnalysisFailureState } from '../build-record-analysis-failur
 
 describe('buildRecordAnalysisFailureState', () => {
   it('fallback と generated 遷移と error feedback を返す', () => {
-    const result = buildRecordAnalysisFailureState({
+    const input = {
       error: new Error('解析に失敗'),
       prompt: '鮭定食 味噌汁',
       currentMealName: '',
       currentFirstItemName: '',
       currentOriginalText: '',
-    });
+    };
+    const result = buildRecordAnalysisFailureState(input);
 
     expect(result.nextWorkspaceMode).toBe('generated');
     expect(result.feedback).toEqual({

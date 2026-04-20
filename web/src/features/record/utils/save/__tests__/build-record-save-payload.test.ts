@@ -10,7 +10,7 @@ describe('buildRecordSavePayload', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
-  });//これは、各テストが終わるたびにモックを元に戻す処理
+  });
 
   it('保存用 payload を構築する', () => {
     vi.stubGlobal('crypto', {
@@ -101,7 +101,7 @@ describe('buildRecordSavePayload', () => {
   });
 
   it('有効な食品が無ければ例外を投げる', () => {
-    expect(() =>
+    const action = () =>
       buildRecordSavePayload({
         userId: 'user-1',
         values: {
@@ -120,7 +120,8 @@ describe('buildRecordSavePayload', () => {
         },
         originalText: '',
         source: 'manual',
-      }),
-    ).toThrowError('食品カードを1件以上入力してください。');
+      });
+
+    expect(action).toThrowError('食品カードを1件以上入力してください。');
   });
 });

@@ -8,42 +8,46 @@ import { resolveRecordAnalysisMode } from '../resolve-record-analysis-mode';
 
 describe('resolveRecordAnalysisMode', () => {
   it('idle では常に replace を返す', () => {
-    expect(
-      resolveRecordAnalysisMode({
-        workspaceMode: 'idle',
-        mealName: '朝食',
-        items: [{ name: '卵' }],
-      }),
-    ).toBe('replace');
+    const input = {
+      workspaceMode: 'idle' as const,
+      mealName: '朝食',
+      items: [{ name: '卵' }],
+    };
+    const result = resolveRecordAnalysisMode(input);
+
+    expect(result).toBe('replace');
   });
 
   it('manual で mealName があれば append を返す', () => {
-    expect(
-      resolveRecordAnalysisMode({
-        workspaceMode: 'manual',
-        mealName: '朝食',
-        items: [{ name: '' }],
-      }),
-    ).toBe('append');
+    const input = {
+      workspaceMode: 'manual' as const,
+      mealName: '朝食',
+      items: [{ name: '' }],
+    };
+    const result = resolveRecordAnalysisMode(input);
+
+    expect(result).toBe('append');
   });
 
   it('generated で item 名があれば append を返す', () => {
-    expect(
-      resolveRecordAnalysisMode({
-        workspaceMode: 'generated',
-        mealName: '',
-        items: [{ name: 'ごはん' }],
-      }),
-    ).toBe('append');
+    const input = {
+      workspaceMode: 'generated' as const,
+      mealName: '',
+      items: [{ name: 'ごはん' }],
+    };
+    const result = resolveRecordAnalysisMode(input);
+
+    expect(result).toBe('append');
   });
 
   it('manual でも意味のある下書きがなければ replace を返す', () => {
-    expect(
-      resolveRecordAnalysisMode({
-        workspaceMode: 'manual',
-        mealName: '',
-        items: [{ name: '' }],
-      }),
-    ).toBe('replace');
+    const input = {
+      workspaceMode: 'manual' as const,
+      mealName: '',
+      items: [{ name: '' }],
+    };
+    const result = resolveRecordAnalysisMode(input);
+
+    expect(result).toBe('replace');
   });
 });

@@ -8,7 +8,9 @@ import { buildRecordSaveSuccessFeedback } from '../build-record-save-success-fee
 
 describe('buildRecordSaveSuccessFeedback', () => {
   it('保存成功メッセージを返す', () => {
-    expect(buildRecordSaveSuccessFeedback()).toEqual({
+    const result = buildRecordSaveSuccessFeedback();
+
+    expect(result).toEqual({
       message: '履歴に保存しました。',
       tone: 'info',
     });

@@ -8,15 +8,16 @@ import { buildRecordAnalysisSuccessState } from '../build-record-analysis-succes
 
 describe('buildRecordAnalysisSuccessState', () => {
   it('idle かつ空下書きなら replace を返す', () => {
-    const result = buildRecordAnalysisSuccessState({
+    const input = {
       warning: null,
       hasAttachments: false,
-      workspaceMode: 'idle',
+      workspaceMode: 'idle' as const,
       mealName: '',
       items: [{ name: '', amount: '', kcal: '', protein: '', fat: '', carbs: '' }],
       prompt: 'オムレツ',
       currentOriginalText: '',
-    });
+    };
+    const result = buildRecordAnalysisSuccessState(input);
 
     expect(result).toEqual({
       analysisMode: 'replace',
@@ -30,15 +31,16 @@ describe('buildRecordAnalysisSuccessState', () => {
   });
 
   it('manual で有効な下書きがあれば append を返す', () => {
-    const result = buildRecordAnalysisSuccessState({
+    const input = {
       warning: null,
       hasAttachments: false,
-      workspaceMode: 'manual',
+      workspaceMode: 'manual' as const,
       mealName: '昼食',
       items: [{ name: 'ごはん', amount: '100g', kcal: '156', protein: '2.5', fat: '0.3', carbs: '35.6' }],
       prompt: '味噌汁',
       currentOriginalText: 'ごはん',
-    });
+    };
+    const result = buildRecordAnalysisSuccessState(input);
 
     expect(result.analysisMode).toBe('append');
     expect(result.nextOriginalText).toBe('ごはん\n味噌汁');

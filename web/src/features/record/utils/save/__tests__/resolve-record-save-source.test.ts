@@ -8,11 +8,16 @@ import { resolveRecordSaveSource } from '../resolve-record-save-source';
 
 describe('resolveRecordSaveSource', () => {
   it('generated は text を返す', () => {
-    expect(resolveRecordSaveSource('generated')).toBe('text');
+    const result = resolveRecordSaveSource('generated');
+
+    expect(result).toBe('text');
   });
 
   it('generated 以外は manual を返す', () => {
-    expect(resolveRecordSaveSource('manual')).toBe('manual');
-    expect(resolveRecordSaveSource('idle')).toBe('manual');
+    const manualResult = resolveRecordSaveSource('manual');
+    const idleResult = resolveRecordSaveSource('idle');
+
+    expect(manualResult).toBe('manual');
+    expect(idleResult).toBe('manual');
   });
 });
