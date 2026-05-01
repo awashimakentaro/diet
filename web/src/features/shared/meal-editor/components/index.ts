@@ -4,5 +4,7 @@
 
 export { MealItemAddPanel } from './meal-item-add-panel';
 export type { MealItemAddPanelProps } from './meal-item-add-panel';
+export { MealEditorItemCard } from './meal-editor-item-card';
+export { MealEditorItemList } from './meal-editor-item-list';
 export { MealPhotoInputTools } from './meal-photo-input-tools';
 export { MealPromptAttachmentStrip } from './meal-prompt-attachment-strip';

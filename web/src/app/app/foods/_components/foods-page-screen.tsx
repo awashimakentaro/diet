@@ -8,7 +8,7 @@
  *
  * 【使用されるエージェント / 処理フロー】
  * - web/src/app/app/foods/page.tsx から呼ばれる。
- * - web/src/features/foods/use-foods-screen.ts と各 UI コンポーネントを接続する。
+ * - web/src/features/foods/hooks/use-foods-screen と各 UI コンポーネントを接続する。
  *
  * 【やらないこと】
  * - API 通信
@@ -24,10 +24,10 @@ import type { JSX } from 'react';
 
 import { FoodsScreenSkeleton } from '@/components/app-skeleton';
 import { AppTopBar } from '@/components/app-top-bar';
-import { FoodEntryEditorPanel } from '@/features/foods/components/food-entry-editor-panel';
-import { FoodLibraryCard } from '@/features/foods/components/food-library-card';
-import { FoodsSearchBar } from '@/features/foods/components/foods-search-bar';
-import { useFoodsScreen } from '@/features/foods/use-foods-screen';
+import { FoodEntryEditorPanel } from '@/features/foods/components/editor';
+import { FoodLibraryCard } from '@/features/foods/components/library-card';
+import { FoodsSearchBar } from '@/features/foods/components/search-bar';
+import { useFoodsScreen } from '@/features/foods/hooks';
 
 export function FoodsPageScreen(): JSX.Element {
   const reduceMotion = useReducedMotion();

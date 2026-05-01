@@ -8,7 +8,7 @@
  *
  * 【使用されるエージェント / 処理フロー】
  * - web/src/app/app/history/page.tsx から呼ばれる。
- * - web/src/features/history/use-history-screen.ts と各 UI コンポーネントを接続する。
+ * - web/src/features/history/hooks/use-history-screen と各 UI コンポーネントを接続する。
  *
  * 【やらないこと】
  * - API 通信
@@ -24,10 +24,10 @@ import type { JSX } from 'react';
 
 import { HistoryScreenSkeleton } from '@/components/app-skeleton';
 import { AppTopBar } from '@/components/app-top-bar';
-import { HistoryDateChip } from '@/features/history/components/history-date-chip';
-import { HistoryEntryCard } from '@/features/history/components/history-entry-card';
-import { HistoryMealEditorPanel } from '@/features/history/components/history-meal-editor-panel';
-import { useHistoryScreen } from '@/features/history/hooks/use-history-screen';
+import { HistoryDateChip } from '@/features/history/components/date-chip';
+import { HistoryEntryCard } from '@/features/history/components/entry-card';
+import { HistoryMealEditorPanel } from '@/features/history/components/editor';
+import { useHistoryScreen } from '@/features/history/hooks';
 import { RecordSummaryCard } from '@/components/record-summary-card';
 
 export function HistoryPageScreen(): JSX.Element {

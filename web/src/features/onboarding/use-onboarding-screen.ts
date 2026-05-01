@@ -16,7 +16,7 @@
  * - 認証レイアウトの制御
  *
  * 【他ファイルとの関係】
- * - settings/api 配下の取得保存処理と calculate-goal-from-profile.ts を利用する。
+ * - settings/api 配下の取得保存処理と settings/utils/calculate-goal-from-profile を利用する。
  */
 
 import { useEffect, useState } from 'react';
@@ -24,7 +24,7 @@ import { useRouter } from 'next/navigation';
 
 import { useWebAuth } from '@/app/provider';
 
-import { calculateGoalFromProfile } from '../settings/calculate-goal-from-profile';
+import { calculateGoalFromProfile } from '../settings/utils/calculate-goal-from-profile';
 import { getUserProfile } from '../settings/api/get-user-profile';
 import { saveSettingsGoal } from '../settings/api/save-settings-goal';
 import { saveUserProfile } from '../settings/api/save-user-profile';

@@ -8,7 +8,7 @@
  *
  * 【使用されるエージェント / 処理フロー】
  * - web/src/app/app/settings/page.tsx から呼ばれる。
- * - web/src/features/settings/use-settings-screen.ts の状態を受け取り、各設定カードへ渡す。
+ * - web/src/features/settings/hooks/use-settings-screen の状態を受け取り、各設定カードへ渡す。
  *
  * 【やらないこと】
  * - 設定値の永続化
@@ -26,10 +26,11 @@ import { useRouter } from 'next/navigation';
 
 import { AppTopBar } from '@/components/app-top-bar';
 import { paths } from '@/config/paths';
-import { SettingsAccountCard } from '@/features/settings/components/settings-account-card';
-import { SettingsManualTargetCard } from '@/features/settings/components/settings-manual-target-card';
-import { SettingsProfileCard } from '@/features/settings/components/settings-profile-card';
-import { useSettingsScreen } from '@/features/settings/use-settings-screen';
+import { SettingsAccountCard } from '@/features/settings/components/account-card';
+import { SettingsManualTargetCard } from '@/features/settings/components/manual-target-card';
+import { SettingsNotificationCard } from '@/features/settings/components/notification-card';
+import { SettingsProfileCard } from '@/features/settings/components/profile-card';
+import { useSettingsScreen } from '@/features/settings/hooks';
 
 export function SettingsPageScreen(): JSX.Element {
   const router = useRouter();
@@ -40,6 +41,8 @@ export function SettingsPageScreen(): JSX.Element {
     gender,
     activityLevel,
     accountEmail,
+    notificationsEnabled,
+    selectedReminder,
     isSaving,
     isSigningOut,
     activeSaveAction,
@@ -51,6 +54,9 @@ export function SettingsPageScreen(): JSX.Element {
     handleManualTargetSubmit,
     handleSaveProfile,
     handleRunAutoCalculate,
+    handleToggleNotificationEnabled,
+    handleSelectReminder,
+    handleSaveNotification,
     handleSignOut,
   } = useSettingsScreen();
   const sectionTransition = reduceMotion
@@ -120,6 +126,20 @@ export function SettingsPageScreen(): JSX.Element {
               animate={{ opacity: 1, y: 0 }}
               initial={{ opacity: 0, y: 14 }}
               transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.14 }}
+            >
+              <SettingsNotificationCard
+                enabled={notificationsEnabled}
+                onSave={handleSaveNotification}
+                onSelectReminder={handleSelectReminder}
+                onToggleEnabled={handleToggleNotificationEnabled}
+                selectedReminder={selectedReminder}
+              />
+            </motion.div>
+
+            <motion.div
+              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 14 }}
+              transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.18 }}
             >
               <SettingsAccountCard
                 email={accountEmail}

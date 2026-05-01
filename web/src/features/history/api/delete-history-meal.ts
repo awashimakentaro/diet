@@ -1,28 +1,12 @@
-/**
- * web/src/features/history/api/delete-history-meal.ts
- *
- * 【責務】
- * History 画面から指定 Meal を Supabase 上で削除する。
- *
- * 【使用されるエージェント / 処理フロー】
- * - use-history-screen.ts から呼ばれる。
- * - 対象 meal id を Supabase へ渡して削除する。
- *
- * 【やらないこと】
- * - UI 描画
- * - 状態管理
- *
- * 【他ファイルとの関係】
- * - getSupabaseBrowserClient を利用する。
+/* 【責務】
+ * History 画面から履歴食事削除処理を呼び出す。
  */
 
 import { getSupabaseBrowserClient } from '@/lib/supabase';
 
+import { deleteHistoryMealRecord } from '../server/delete-history-meal-record';
+
 export async function deleteHistoryMeal(mealId: string): Promise<void> {
   const client = getSupabaseBrowserClient();
-  const { error } = await client.from('meals').delete().eq('id', mealId);
-
-  if (error) {
-    throw new Error(error.message);
-  }
+  await deleteHistoryMealRecord({ client, mealId });
 }

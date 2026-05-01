@@ -25,14 +25,14 @@ vi.mock('../../hooks/use-record-screen', () => ({
   useRecordScreen: useRecordScreenMock,
 }));
 
-vi.mock('../workspace/record-workspace', () => ({
+vi.mock('../workspace', () => ({
   RecordWorkspace: (props: unknown) => {
     recordWorkspaceMock(props);
     return <div data-testid="record-workspace" />;
   },
 }));
 
-vi.mock('../quick-input/record-quick-input-section', () => ({
+vi.mock('../quick-input', () => ({
   RecordQuickInputSection: (props: unknown) => {
     recordQuickInputSectionMock(props);
     return <div data-testid="record-quick-input-section" />;

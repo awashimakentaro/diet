@@ -1,24 +1,11 @@
-/**
- * web/src/features/foods/api/list-food-library-entries.ts
- *
- * 【責務】
- * foods テーブルから食品ライブラリエントリを取得する。
- *
- * 【使用されるエージェント / 処理フロー】
- * - use-foods-screen.ts から呼ばれる。
- * - 認証ユーザーに紐づく foods を created_at 降順で取得する。
- *
- * 【やらないこと】
- * - UI 描画
- * - 検索条件の整形
- *
- * 【他ファイルとの関係】
- * - getSupabaseBrowserClient と map-web-food-row.ts を利用する。
+/* 【責務】
+ * Foods 画面から食品ライブラリエントリ取得処理を呼び出す。
  */
 
 import { getSupabaseBrowserClient } from '@/lib/supabase';
 
-import { mapWebFoodRow } from '../map-web-food-row';
+import { mapWebFoodRow } from '../utils/map-web-food-row';
+import { listFoodLibraryEntryRecords } from '../server/list-food-library-entry-records';
 
 export async function listFoodLibraryEntries(): Promise<
 Array<ReturnType<typeof mapWebFoodRow>>
@@ -36,15 +23,7 @@ Array<ReturnType<typeof mapWebFoodRow>>
     return [];
   }
 
-  const { data, error } = await client
-    .from('foods')
-    .select('*')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false });
+  const data = await listFoodLibraryEntryRecords({ client, userId });
 
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return (data ?? []).map(mapWebFoodRow);
+  return data.map(mapWebFoodRow);
 }

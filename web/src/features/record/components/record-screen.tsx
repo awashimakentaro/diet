@@ -9,8 +9,8 @@ import React from 'react';
 import type { JSX } from 'react';
 
 import { useRecordScreen } from '../hooks/use-record-screen';
-import { RecordQuickInputSection } from './quick-input/record-quick-input-section';
-import { RecordWorkspace } from './workspace/record-workspace';
+import { RecordQuickInputSection } from './quick-input';
+import { RecordWorkspace } from './workspace';
 
 export function RecordScreen(): JSX.Element {
   const reduceMotion = useReducedMotion();

@@ -6,7 +6,7 @@ import type { JSX } from 'react';
 import type { FieldArrayWithId, UseFormRegister } from 'react-hook-form';
 
 import type { MealFormValues as RecordFormValues } from '@/features/shared/meal-editor/schemas';
-import { RecordEditorItemCard } from './record-editor-item-card';
+import { MealEditorItemList } from '@/features/shared/meal-editor/components';
 
 type RecordEditorItemListProps = {
   mode: 'manual' | 'generated';
@@ -21,21 +21,13 @@ export function RecordEditorItemList({
   register,
   onRemoveItem,
 }: RecordEditorItemListProps): JSX.Element {
-  const itemStackClassName = mode === 'generated'
-    ? 'record-screen__item-stack record-screen__item-stack--generated'
-    : 'record-screen__item-stack record-screen__item-stack--manual';
-
   return (
-    <div className={itemStackClassName}>
-      {itemFields.map((field, index) => (
-        <RecordEditorItemCard
-          key={field.id}
-          canRemove={itemFields.length > 1}
-          index={index}
-          onRemove={onRemoveItem}
-          register={register}
-        />
-      ))}
-    </div>
+    <MealEditorItemList
+      fieldIdPrefix="record"
+      itemFields={itemFields}
+      mode={mode}
+      onRemoveItem={onRemoveItem}
+      register={register}
+    />
   );
 }
