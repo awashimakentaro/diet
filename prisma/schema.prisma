@@ -122,3 +122,46 @@ model NotificationPreference {
 
   @@map("notification_preferences")
 }
+
+model WorkoutMenu {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String   @map("user_id") @db.Uuid
+  workoutKind     String   @default("strength") @map("workout_kind")
+  name            String
+  exerciseName    String   @map("exercise_name")
+  sets            Int
+  reps            Int
+  weightKg        Decimal  @map("weight_kg") @db.Decimal
+  exercises       Json     @default(dbgenerated("'[]'::jsonb")) @db.JsonB
+  durationMinutes Int      @map("duration_minutes")
+  intensity       String
+  estimatedBurnedKcal Decimal? @map("estimated_burned_kcal") @db.Decimal
+  note            String?
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  logs            WorkoutLog[]
+
+  @@map("workout_menus")
+}
+
+model WorkoutLog {
+  id              String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String       @map("user_id") @db.Uuid
+  workoutKind     String       @default("strength") @map("workout_kind")
+  menuId          String?      @map("menu_id") @db.Uuid
+  menu            WorkoutMenu? @relation(fields: [menuId], references: [id], onDelete: SetNull)
+  menuName        String       @map("menu_name")
+  exerciseName    String       @map("exercise_name")
+  sets            Int
+  reps            Int
+  weightKg        Decimal      @map("weight_kg") @db.Decimal
+  exercises       Json         @default(dbgenerated("'[]'::jsonb")) @db.JsonB
+  durationMinutes Int          @map("duration_minutes")
+  intensity       String
+  burnedKcal      Decimal      @map("burned_kcal") @db.Decimal
+  note            String?
+  performedAt     DateTime     @default(now()) @map("performed_at") @db.Timestamptz(6)
+
+  @@map("workout_logs")
+}
