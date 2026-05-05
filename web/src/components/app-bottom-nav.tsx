@@ -20,7 +20,7 @@
  */
 
 import Link from 'next/link';
-import { Clock3, House, Plus, Search, Settings } from 'lucide-react';
+import { Clock3, Dumbbell, House, Plus, Search, Settings } from 'lucide-react';
 import type { JSX } from 'react';
 
 import { paths } from '@/config/paths';
@@ -37,6 +37,7 @@ export function AppBottomNav({
     { href: paths.app.record.getHref(), label: '記録', icon: Plus, activeStroke: 2.6 },
     { href: paths.app.history.getHref(), label: '履歴', icon: Clock3, activeStroke: 2 },
     { href: paths.app.foods.getHref(), label: '食品', icon: Search, activeStroke: 2 },
+    { href: paths.app.workouts.getHref(), label: '筋トレ', icon: Dumbbell, activeStroke: 2 },
     { href: paths.app.settings.getHref(), label: '設定', icon: Settings, activeStroke: 2 },
   ] as const;
 

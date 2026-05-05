@@ -31,6 +31,9 @@ export const paths = {
     foods: {
       getHref: () => '/app/foods',
     },
+    workouts: {
+      getHref: () => '/app/workouts',
+    },
     settings: {
       getHref: () => '/app/settings',
     },

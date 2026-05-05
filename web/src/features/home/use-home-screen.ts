@@ -33,6 +33,9 @@ import { listRecentMeals } from '../summary/api/list-recent-meals';
 import { listWeekDailySummaries } from '../summary/api/list-week-daily-summaries';
 import { recomputeRecentDailySummaries } from '../summary/api/recompute-recent-daily-summaries';
 import { listCurrentGoal } from '../settings/api/list-current-goal';
+import { getUserProfile } from '../settings/api/get-user-profile';
+import { listTodayWorkoutLogs } from '../workouts/api/list-today-workout-logs';
+import { buildDailyEnergySummary } from './utils/build-daily-energy-summary';
 import { listUserWeightLogs, type UserWeightLogPoint } from './api/list-user-weight-logs';
 
 type HomeInsight = {
@@ -52,6 +55,7 @@ type HomeRecentMeal = Awaited<ReturnType<typeof listRecentMeals>>[number];
 
 export type UseHomeScreenResult = {
   summary: NutritionSummary;
+  dailyEnergy: ReturnType<typeof buildDailyEnergySummary>;
   consecutiveDays: number;
   insights: HomeInsight[];
   usageBars: HomeUsageBar[];
@@ -236,6 +240,20 @@ export function useHomeScreen(): UseHomeScreenResult {
     '/settings/current-goal',
     () => listCurrentGoal(),
   );
+  const { data: profile = null, isLoading: isProfileLoading } = useSWR(
+    '/settings/user-profile',
+    () => getUserProfile(),
+    {
+      fallbackData: null,
+    },
+  );
+  const { data: todayWorkoutLogs = [], isLoading: isWorkoutLoading } = useSWR(
+    `/workouts/logs/${todayKey}`,
+    () => listTodayWorkoutLogs(todayKey),
+    {
+      fallbackData: [],
+    },
+  );
 
   useEffect(() => {
     if (recentMeals.length === 0 || weeklySummaries.length > 0) {
@@ -261,11 +279,16 @@ export function useHomeScreen(): UseHomeScreenResult {
 
   return {
     summary: buildNutritionSummary(todaySummary ?? null, goal ?? null),
+    dailyEnergy: buildDailyEnergySummary(
+      profile,
+      todaySummary?.totals.kcal ?? 0,
+      todayWorkoutLogs.reduce((sum, log) => sum + log.burnedKcal, 0),
+    ),
     consecutiveDays: buildConsecutiveDays(weeklySummaries),
     insights: buildInsights(weeklySummaries),
     usageBars: buildUsageBars(normalizedWeeklySummaries),
     recentMeals,
     weightLogs,
-    isLoading: isTodayLoading || isWeeklyLoading || isRecentLoading || isWeightLoading || isGoalLoading,
+    isLoading: isTodayLoading || isWeeklyLoading || isRecentLoading || isWeightLoading || isGoalLoading || isProfileLoading || isWorkoutLoading,
   };
 }

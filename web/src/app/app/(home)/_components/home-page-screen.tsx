@@ -27,11 +27,12 @@ import { useState, type JSX } from 'react';
 import { HomeScreenSkeleton } from '@/components/app-skeleton';
 import { AppTopBar } from '@/components/app-top-bar';
 import { WeightTrendChart } from '@/features/home/components/weight-trend-chart';
+import { DailyEnergyCard } from '@/features/home/components/daily-energy-card';
 import { useHomeScreen } from '@/features/home/use-home-screen';
 import { RecordSummaryCard } from '@/components/record-summary-card';
 
 export function HomePageScreen(): JSX.Element {
-  const { summary, consecutiveDays, insights, usageBars, weightLogs, isLoading } = useHomeScreen();
+  const { summary, dailyEnergy, consecutiveDays, insights, usageBars, weightLogs, isLoading } = useHomeScreen();
   const [selectedWeightLogId, setSelectedWeightLogId] = useState<string | null>(null);
   const chartHeight = 136;
   const reduceMotion = useReducedMotion();
@@ -62,6 +63,13 @@ export function HomePageScreen(): JSX.Element {
           >
             <div className="home-screen__hero-stack">
               <RecordSummaryCard summary={summary} />
+              <DailyEnergyCard
+                balanceKcal={dailyEnergy.balanceKcal}
+                bmr={dailyEnergy.bmr}
+                intakeKcal={dailyEnergy.intakeKcal}
+                isProfileReady={dailyEnergy.isProfileReady}
+                workoutKcal={dailyEnergy.workoutKcal}
+              />
 
               <motion.section
                 animate={{ opacity: 1, y: 0 }}

@@ -1,24 +1,10 @@
 'use client';
 
 /**
- * web/src/app/(public)/_components/landing-page-screen.tsx
+ * web/src/app/_components/landing-page-screen.tsx
  *
  * 【責務】
  * 公開トップ `/` 専用の LP を描画し、ログイン / 新規登録 / アプリ遷移導線を配置する。
- *
- * 【使用されるエージェント / 処理フロー】
- * - web/src/app/(public)/page.tsx から呼ばれる。
- * - 未ログイン時は認証導線、ログイン済み時はアプリ導線を表示する。
- *
- * 【やらないこと】
- * - 認証 API の直接呼び出し
- * - アプリ本体データの取得
- * - 食事記録編集
- *
- * 【他ファイルとの関係】
- * - web/src/app/provider.tsx の useWebAuth を利用する。
- * - web/src/config/paths.ts を利用する。
- * - web/src/styles/globals.css の landing-screen 系クラスに依存する。
  */
 
 import Image from 'next/image';
