@@ -38,6 +38,11 @@ export function RecordQuickInputCard({
   return (
     <section className="record-screen__quick-card">
       <div className="record-screen__prompt-shell">
+        <div className="record-screen__quick-head">
+          <strong>今日の食事を追加</strong>
+          <span>写真、テキスト、手動入力から選べます。</span>
+        </div>
+
         <RecordPromptAttachmentStrip
           attachments={attachments}
           onRemoveAttachment={onRemoveAttachment}
@@ -46,7 +51,7 @@ export function RecordQuickInputCard({
         <div className="record-screen__prompt-box">
           <textarea
             className="record-screen__prompt-input"
-            placeholder="メッセージを入力"
+            placeholder="例: 昼に鶏むね丼と味噌汁。写真だけでもOK"
             rows={4}
             style={{ height: '100px' }}
             {...promptRegistration}

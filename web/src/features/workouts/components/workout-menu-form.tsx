@@ -39,6 +39,7 @@ export function WorkoutMenuForm({
       <div className="workouts-screen__card-head">
         <p className="workouts-screen__eyebrow">Workout Menu</p>
         <h2 className="workouts-screen__section-title">筋トレメニュー作成</h2>
+        <span className="workouts-screen__section-copy">よく使うメニューを保存して、今日の消費カロリーへすぐ反映します。</span>
       </div>
 
       <div className="workouts-screen__form-grid">

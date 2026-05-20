@@ -1,22 +1,8 @@
 'use client';
 
-/**
- * web/src/app/app/history/_components/history-page-screen.tsx
- *
+/*
  * 【責務】
  * `/app/history` ルート専用のトップバー、日付チップ、履歴一覧、下部ナビを組み立てる。
- *
- * 【使用されるエージェント / 処理フロー】
- * - web/src/app/app/history/page.tsx から呼ばれる。
- * - web/src/features/history/hooks/use-history-screen と各 UI コンポーネントを接続する。
- *
- * 【やらないこと】
- * - API 通信
- * - 永続化
- * - 認証制御
- *
- * 【他ファイルとの関係】
- * - web/src/features/history/components 配下と web/src/components/app-bottom-nav.tsx を利用する。
  */
 
 import { motion, useReducedMotion } from 'framer-motion';

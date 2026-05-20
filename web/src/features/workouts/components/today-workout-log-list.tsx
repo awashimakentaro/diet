@@ -27,6 +27,7 @@ export function TodayWorkoutLogList({
       <div className="workouts-screen__card-head">
         <p className="workouts-screen__eyebrow">Today</p>
         <h2 className="workouts-screen__section-title">今日のワークアウト</h2>
+        <span className="workouts-screen__section-copy">記録した運動消費は Home のカロリー収支にも反映されます。</span>
       </div>
 
       <div className="workouts-screen__burned-total">

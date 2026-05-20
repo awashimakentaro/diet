@@ -4,17 +4,17 @@
  */
 
 :root {
-  --background: #f8fafc;
-  --surface: #ffffff;
-  --surface-hover: #fcfdfe;
-  --line: #f1f5f9;
-  --line-strong: #e2e8f0;
+  --background: #dfe6d8;
+  --surface: #e8ece4;
+  --surface-hover: #dfe5d8;
+  --line: #d6ddd0;
+  --line-strong: #cbd4c4;
   --text: #0f172a;
   --muted: #64748b;
   --accent: #2563eb;
   --danger: #ef4444;
   --danger-line: #fee2e2;
-  --info: #eff6ff;
+  --info: #dce8d2;
 
   --radius-card: 32px;
   --radius-btn: 16px;
@@ -28,31 +28,50 @@
   --font-body: "Inter", "Avenir Next", "Hiragino Sans", sans-serif;
 
   /* Theme Palette */
-  --blue-50: #eff6ff;
+  --blue-50: #dce8d2;
   --blue-500: #3b82f6;
   --blue-600: #2563eb;
   --blue-700: #1d4ed8;
-  --slate-50: #f8fafc;
-  --slate-100: #f1f5f9;
-  --slate-200: #e2e8f0;
+  --slate-50: #dfe6d8;
+  --slate-100: #d6ddd0;
+  --slate-200: #cbd4c4;
   --slate-500: #64748b;
   --slate-600: #475569;
   --slate-900: #0f172a;
+  --gym-ink: #10140d;
+  --gym-panel: #171d14;
+  --gym-muted: #697063;
+  --gym-line: #dfe6d8;
+  --gym-lime: #ceff29;
+  --gym-lime-soft: #ecff98;
+  --gym-orange: #ff6b35;
+  --app-bg: #f5f7f2;
+  --app-surface: #e8ece4;
+  --app-card: #e8ece4;
+  --app-line: #dde5d7;
+  --app-shadow: 0 16px 42px rgba(21, 31, 17, 0.08);
 }
 
 
 
 * {
   box-sizing: border-box;
-  scrollbar-width: none;
-  /* Firefox */
-  -ms-overflow-style: none;
-  /* IE / Edge */
 }
 
 *::-webkit-scrollbar {
-  display: none;
-  /* Chrome / Safari */
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: rgba(105, 112, 99, 0.34);
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 html {
@@ -68,12 +87,21 @@ body {
   background: var(--background);
 }
 
+:where(a, button, input, textarea, select, [role="button"], [tabindex]):focus-visible {
+  outline: 3px solid rgba(206, 255, 41, 0.86);
+  outline-offset: 3px;
+}
+
+:where(button, a) {
+  -webkit-tap-highlight-color: rgba(206, 255, 41, 0.18);
+}
+
 .landing-screen {
   min-height: 100vh;
-  color: #f8fafc;
+  color: #dfe6d8;
   background:
-    linear-gradient(90deg, rgba(248, 250, 252, 0.055) 1px, transparent 1px),
-    linear-gradient(180deg, rgba(248, 250, 252, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(223, 230, 216, 0.055) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(223, 230, 216, 0.055) 1px, transparent 1px),
     radial-gradient(circle at 78% 18%, rgba(206, 255, 41, 0.28), transparent 25%),
     radial-gradient(circle at 12% 78%, rgba(255, 107, 53, 0.2), transparent 24%),
     linear-gradient(135deg, #080a07 0%, #141810 48%, #080a07 100%);
@@ -88,7 +116,7 @@ body {
   content: "";
   background:
     linear-gradient(120deg, transparent 0 58%, rgba(206, 255, 41, 0.1) 58% 59%, transparent 59%),
-    radial-gradient(rgba(248, 250, 252, 0.12) 0.8px, transparent 0.8px);
+    radial-gradient(rgba(223, 230, 216, 0.12) 0.8px, transparent 0.8px);
   background-size: auto, 7px 7px;
   opacity: 0.55;
   animation: landing-grid-drift 18s linear infinite;
@@ -106,7 +134,7 @@ body {
   top: var(--comment-top);
   left: 0;
   width: max-content;
-  color: rgba(248, 250, 252, 0.92);
+  color: rgba(223, 230, 216, 0.92);
   font-size: clamp(1.05rem, 2.2vw, 1.75rem);
   font-weight: 900;
   letter-spacing: 0;
@@ -159,7 +187,7 @@ body {
 }
 
 .landing-screen__brand-mark {
-  color: #f8fafc;
+  color: #dfe6d8;
   font-family: var(--font-heading);
   font-size: 18px;
   font-weight: 900;
@@ -182,7 +210,7 @@ body {
   gap: 8px;
   min-height: 52px;
   padding: 0 24px;
-  border: 1px solid rgba(248, 250, 252, 0.18);
+  border: 1px solid rgba(223, 230, 216, 0.18);
   border-radius: 999px;
   text-decoration: none;
   font-size: 0.92rem;
@@ -200,9 +228,9 @@ body {
 
 .landing-screen__auth-link--secondary,
 .landing-screen__cta--secondary {
-  background: rgba(248, 250, 252, 0.08);
-  color: #f8fafc;
-  box-shadow: inset 0 0 0 1px rgba(248, 250, 252, 0.1);
+  background: rgba(223, 230, 216, 0.08);
+  color: #dfe6d8;
+  box-shadow: inset 0 0 0 1px rgba(223, 230, 216, 0.1);
   backdrop-filter: blur(16px);
 }
 
@@ -250,7 +278,7 @@ body {
 .landing-screen__section-head h2 {
   margin: 0;
   font-family: var(--font-heading);
-  color: #f8fafc;
+  color: #dfe6d8;
 }
 
 .landing-screen__hero-copy h1 {
@@ -271,13 +299,13 @@ body {
   font-size: 0.46em;
   line-height: 1.04;
   text-transform: none;
-  white-space: nowrap;
+  #e8ece4-space: nowrap;
 }
 
 .landing-screen__lead {
   margin: 24px 0 0;
   max-width: 620px;
-  color: rgba(248, 250, 252, 0.78);
+  color: rgba(223, 230, 216, 0.78);
   font-size: clamp(1rem, 1.7vw, 1.2rem);
   font-weight: 700;
   line-height: 1.75;
@@ -292,9 +320,9 @@ body {
   z-index: 1;
   overflow: hidden;
   min-height: 560px;
-  border: 1px solid rgba(248, 250, 252, 0.14);
+  border: 1px solid rgba(223, 230, 216, 0.14);
   border-radius: 36px;
-  background: rgba(248, 250, 252, 0.04);
+  background: rgba(223, 230, 216, 0.04);
   box-shadow:
     0 34px 90px rgba(0, 0, 0, 0.38),
     inset 0 0 0 1px rgba(206, 255, 41, 0.08);
@@ -494,7 +522,7 @@ body {
   }
 
   .landing-screen__live-comments {
-    top: 11%;
+    display: none;
   }
 
   .landing-screen__live-comment {
@@ -527,14 +555,14 @@ body {
   }
 
   .landing-screen__speech-stack {
-    right: 12px;
-    bottom: 12px;
-    max-width: 230px;
+    right: 14px;
+    bottom: 18px;
+    max-width: min(230px, calc(100% - 28px));
   }
 
   .landing-screen__speech-bubble {
-    padding: 13px 15px;
-    font-size: 0.86rem;
+    padding: 11px 14px;
+    font-size: 0.82rem;
   }
 
   .landing-screen__speech-bubble--first {
@@ -689,10 +717,10 @@ input {
   display: grid;
   place-items: center;
   padding: 32px 16px;
-  color: #f8fafc;
+  color: #dfe6d8;
   background:
-    linear-gradient(90deg, rgba(248, 250, 252, 0.055) 1px, transparent 1px),
-    linear-gradient(180deg, rgba(248, 250, 252, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(223, 230, 216, 0.055) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(223, 230, 216, 0.055) 1px, transparent 1px),
     radial-gradient(circle at 16% 18%, rgba(206, 255, 41, 0.16), transparent 24%),
     radial-gradient(circle at 86% 76%, rgba(255, 107, 53, 0.16), transparent 22%),
     linear-gradient(135deg, #080a07 0%, #141810 50%, #080a07 100%);
@@ -800,7 +828,7 @@ input {
   display: inline-flex;
   align-items: center;
   width: fit-content;
-  color: #f8fafc;
+  color: #dfe6d8;
   font-family: var(--font-heading);
   font-size: 18px;
   font-weight: 900;
@@ -819,7 +847,7 @@ input {
 .auth-card {
   width: 100%;
   align-self: center;
-  border: 1px solid rgba(248, 250, 252, 0.14);
+  border: 1px solid rgba(223, 230, 216, 0.14);
   border-radius: 32px;
   background: rgba(8, 10, 7, 0.78);
   padding: 34px;
@@ -847,13 +875,13 @@ input {
   font-weight: 900;
   line-height: 1;
   letter-spacing: 0;
-  color: #f8fafc;
-  white-space: nowrap;
+  color: #dfe6d8;
+  #e8ece4-space: nowrap;
 }
 
 .auth-copy p {
   margin: 0;
-  color: rgba(248, 250, 252, 0.7);
+  color: rgba(223, 230, 216, 0.7);
   font-weight: 700;
   line-height: 1.7;
   font-size: 0.95rem;
@@ -865,9 +893,9 @@ input {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   padding: 6px;
-  border: 1px solid rgba(248, 250, 252, 0.12);
+  border: 1px solid rgba(223, 230, 216, 0.12);
   border-radius: 20px;
-  background: rgba(248, 250, 252, 0.06);
+  background: rgba(223, 230, 216, 0.06);
   box-shadow: inset 0 0 0 1px rgba(206, 255, 41, 0.04);
 }
 
@@ -881,18 +909,18 @@ input {
   gap: 7px;
   font-size: 0.9rem;
   font-weight: 800;
-  color: rgba(248, 250, 252, 0.82);
+  color: rgba(223, 230, 216, 0.82);
 }
 
 .auth-field input,
 .search-input {
   width: 100%;
   min-height: 50px;
-  border: 1px solid rgba(248, 250, 252, 0.15);
+  border: 1px solid rgba(223, 230, 216, 0.15);
   border-radius: 18px;
-  background: rgba(248, 250, 252, 0.08);
+  background: rgba(223, 230, 216, 0.08);
   padding: 0 16px;
-  color: #f8fafc;
+  color: #dfe6d8;
   transition:
     border-color 180ms ease,
     box-shadow 180ms ease,
@@ -901,13 +929,13 @@ input {
 }
 
 .auth-field input::placeholder {
-  color: rgba(248, 250, 252, 0.38);
+  color: rgba(223, 230, 216, 0.38);
 }
 
 .auth-field input:focus {
   outline: none;
   border-color: rgba(206, 255, 41, 0.78);
-  background: rgba(248, 250, 252, 0.11);
+  background: rgba(223, 230, 216, 0.11);
   box-shadow: 0 0 0 4px rgba(206, 255, 41, 0.14);
   transform: translateY(-1px);
 }
@@ -927,10 +955,10 @@ input {
   border: 1px solid transparent;
   border-radius: 15px;
   background: transparent;
-  color: rgba(248, 250, 252, 0.62);
+  color: rgba(223, 230, 216, 0.62);
   font-size: 0.92rem;
   font-weight: 900;
-  white-space: nowrap;
+  #e8ece4-space: nowrap;
   transition:
     transform 180ms ease,
     color 180ms ease,
@@ -946,7 +974,7 @@ input {
 
 .auth-page .tab-link:hover {
   transform: translateY(-1px);
-  color: #f8fafc;
+  color: #dfe6d8;
 }
 
 .auth-page .tab-link--active:hover {
@@ -1112,7 +1140,7 @@ input {
   background:
     radial-gradient(circle at top left, rgba(37, 99, 235, 0.14), transparent 28%),
     radial-gradient(circle at top right, rgba(16, 185, 129, 0.12), transparent 24%),
-    linear-gradient(180deg, #f8fbff 0%, #f8fafc 42%, #ffffff 100%);
+    linear-gradient(180deg, #e4eadf 0%, #dfe6d8 42%, #e8ece4 100%);
 }
 
 .onboarding-screen__shell {
@@ -1128,7 +1156,7 @@ input {
 .onboarding-screen__panel {
   border: 1px solid rgba(226, 232, 240, 0.85);
   border-radius: 32px;
-  background: rgba(255, 255, 255, 0.82);
+  background: rgba(232, 236, 228, 0.82);
   backdrop-filter: blur(16px);
   box-shadow: 0 22px 48px rgba(15, 23, 42, 0.08);
 }
@@ -1157,7 +1185,7 @@ input {
   min-height: 32px;
   padding: 0 12px;
   border-radius: 999px;
-  background: #eff6ff;
+  background: #dce8d2;
   color: #1d4ed8;
   font-size: 11px;
   font-weight: 900;
@@ -1217,9 +1245,9 @@ input {
 
 .onboarding-screen__tutorial-card {
   overflow: hidden;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #cbd4c4;
   border-radius: 28px;
-  background: #ffffff;
+  background: #e8ece4;
   box-shadow: 0 18px 36px rgba(15, 23, 42, 0.06);
 }
 
@@ -1229,7 +1257,7 @@ input {
   justify-content: center;
   min-height: 320px;
   padding: 36px;
-  background: linear-gradient(135deg, #f8fafc 0%, #eef6ff 100%);
+  background: linear-gradient(135deg, #dfe6d8 0%, #eef6ff 100%);
 }
 
 .onboarding-screen__tutorial-image {
@@ -1294,9 +1322,9 @@ input {
   padding: 20px;
   border-radius: 24px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.92)),
-    #ffffff;
-  border: 1px solid #e2e8f0;
+    linear-gradient(180deg, rgba(232, 236, 228, 0.98), rgba(223, 230, 216, 0.92)),
+    #e8ece4;
+  border: 1px solid #cbd4c4;
 }
 
 .onboarding-screen__feature-icon {
@@ -1305,7 +1333,7 @@ input {
   width: 42px;
   height: 42px;
   border-radius: 14px;
-  background: linear-gradient(135deg, #eff6ff, #ecfeff);
+  background: linear-gradient(135deg, #dce8d2, #ecfeff);
   color: #2563eb;
 }
 
@@ -1367,7 +1395,7 @@ input {
   min-height: 54px;
   border: 1px solid #dbe3ee;
   border-radius: 18px;
-  background: #ffffff;
+  background: #e8ece4;
   padding: 0 46px 0 16px;
   color: #0f172a;
   font-size: 14px;
@@ -1407,7 +1435,7 @@ input {
 .onboarding-screen__activity {
   border: 1px solid #dbe3ee;
   border-radius: 18px;
-  background: #ffffff;
+  background: #e8ece4;
   color: #334155;
   transition: all 0.2s ease;
 }
@@ -1439,7 +1467,7 @@ input {
 .onboarding-screen__segment--active,
 .onboarding-screen__activity--active {
   border-color: #93c5fd;
-  background: linear-gradient(135deg, #eff6ff, #f0fdf4);
+  background: linear-gradient(135deg, #dce8d2, #f0fdf4);
   color: #1d4ed8;
   box-shadow: 0 10px 22px rgba(37, 99, 235, 0.12);
 }
@@ -1471,7 +1499,7 @@ input {
 .onboarding-screen__primary-button {
   border: 0;
   background: linear-gradient(135deg, #2563eb, #0f766e);
-  color: #ffffff;
+  color: #e8ece4;
   box-shadow: 0 18px 30px rgba(37, 99, 235, 0.24);
 }
 
@@ -1481,7 +1509,7 @@ input {
 
 .onboarding-screen__secondary-button {
   border: 1px solid #dbe3ee;
-  background: #ffffff;
+  background: #e8ece4;
   color: #334155;
 }
 
@@ -1545,9 +1573,9 @@ input {
 
 .skeleton-shimmer {
   background: linear-gradient(90deg,
-      #f1f5f9 0%,
+      #d6ddd0 0%,
       #e8edf4 40%,
-      #f1f5f9 80%);
+      #d6ddd0 80%);
   background-size: 800px 100%;
   animation: skeleton-shimmer 1.6s ease-in-out infinite;
 }
@@ -1571,6 +1599,24 @@ input {
   border-radius: var(--radius-card);
   background: var(--surface);
   box-shadow: var(--shadow-sm);
+}
+
+.skeleton-loading-note {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid rgba(206, 255, 41, 0.18);
+  border-radius: 999px;
+  background: rgba(223, 230, 216, 0.08);
+  color: rgba(223, 230, 216, 0.72);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.skeleton-home-action-card {
+  border-color: rgba(206, 255, 41, 0.28);
 }
 
 .skeleton-card--large {
@@ -1617,7 +1663,7 @@ input {
   gap: 0;
   padding: 18px;
   border-radius: 22px;
-  background: #f8fafc;
+  background: #dfe6d8;
 }
 
 .skeleton-home-weight-summary {
@@ -1632,7 +1678,7 @@ input {
   min-height: 116px;
   padding: 16px 18px;
   border-radius: 22px;
-  background: #f8fafc;
+  background: #dfe6d8;
   align-content: start;
 }
 
@@ -1679,7 +1725,7 @@ input {
   gap: 14px;
   padding: 16px 18px;
   border-radius: 22px;
-  background: #f8fafc;
+  background: #dfe6d8;
 }
 
 .skeleton-record-quick-card {
@@ -1799,7 +1845,7 @@ input {
 
 .app-btn--primary {
   background: linear-gradient(135deg, var(--blue-600) 0%, var(--blue-700) 100%);
-  color: white;
+  color: #e8ece4;
   box-shadow: 0 8px 16px rgba(37, 99, 235, 0.2);
 }
 
@@ -1916,7 +1962,7 @@ input {
 .progress-track {
   height: 10px;
   border-radius: 999px;
-  background: #f2f4f7;
+  background: #d8dfd2;
   overflow: hidden;
 }
 
@@ -2025,7 +2071,7 @@ input {
 
 .primary-button {
   background: var(--accent);
-  color: #ffffff;
+  color: #e8ece4;
 }
 
 .secondary-button {
@@ -2052,7 +2098,7 @@ input {
   padding: 16px 18px;
   border-radius: 18px;
   background: var(--accent);
-  color: #ffffff;
+  color: #e8ece4;
 }
 
 .history-card__prompt {
@@ -2071,7 +2117,7 @@ input {
   align-items: center;
   padding: 8px 12px;
   border-radius: 999px;
-  background: #f2f4f7;
+  background: #d8dfd2;
   color: var(--text);
   font-size: 0.85rem;
   font-weight: 600;
@@ -2140,7 +2186,7 @@ input {
   margin: 0 auto;
   display: grid;
   grid-template-rows: auto 1fr auto;
-  background: #f9fafb;
+  background: #e1e6dd;
 }
 
 .record-screen__header {
@@ -2149,7 +2195,7 @@ input {
   align-items: center;
   padding: 32px 24px 16px;
   border-bottom: 1px solid #f3f4f6;
-  background: #ffffff;
+  background: #e8ece4;
 }
 
 .record-screen__brand h1 {
@@ -2175,7 +2221,7 @@ input {
   height: 36px;
   border: 0;
   border-radius: 14px;
-  background: #eff6ff;
+  background: #dce8d2;
   color: #155dfc;
   font-size: 22px;
   line-height: 1;
@@ -2201,7 +2247,7 @@ input {
 .record-screen__editor,
 .record-screen__confirm-bar {
   border: 1px solid var(--line);
-  background: #ffffff;
+  background: #e8ece4;
   border-radius: 32px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
 }
@@ -2254,7 +2300,7 @@ input {
   justify-self: start;
   padding: 8px 12px;
   border-radius: 10px;
-  background: #eff6ff;
+  background: #dce8d2;
   color: #155dfc;
   font-size: 10px;
   font-weight: 800;
@@ -2272,7 +2318,7 @@ input {
   gap: 8px;
   padding: 10px 12px;
   border-radius: 18px;
-  background: #f8fafc;
+  background: #dfe6d8;
 }
 
 .record-screen__macro-meta {
@@ -2350,10 +2396,29 @@ input {
   display: grid;
   border: 1px solid rgba(226, 232, 240, 0.92);
   border-radius: 28px;
-  background: rgba(255, 255, 255, 0.94);
+  background: rgba(232, 236, 228, 0.94);
   backdrop-filter: blur(14px);
   box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
   padding: 14px 14px 12px;
+}
+
+.record-screen__quick-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.record-screen__quick-head strong {
+  color: var(--gym-ink);
+  font-size: 0.94rem;
+  font-weight: 900;
+}
+
+.record-screen__quick-head span {
+  color: var(--gym-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
 }
 
 .record-screen__prompt-shell {
@@ -2373,7 +2438,7 @@ input {
   height: 76px;
   overflow: hidden;
   border-radius: 18px;
-  background: #f2f4f7;
+  background: #d8dfd2;
 }
 
 .record-screen__attachment-image {
@@ -2393,7 +2458,7 @@ input {
   border: 0;
   border-radius: 999px;
   background: rgba(15, 23, 42, 0.72);
-  color: #ffffff;
+  color: #e8ece4;
 }
 
 .record-screen__prompt-box {
@@ -2407,7 +2472,7 @@ input {
   padding: 12px 14px;
   border: 1px solid #dbeafe;
   border-radius: 18px;
-  background: #f8fbff;
+  background: #e4eadf;
 }
 
 .record-screen__prompt-guide-label,
@@ -2430,15 +2495,26 @@ input {
 
 .record-screen__prompt-input {
   width: 100%;
-  min-height: 72px;
+  min-height: 64px;
   resize: none;
   border: 0;
   border-radius: 22px;
-  background: linear-gradient(180deg, #f8fafc 0%, #f2f4f7 100%);
+  background: linear-gradient(180deg, #dfe6d8 0%, #d8dfd2 100%);
   padding: 16px 18px;
   color: var(--text);
   font-size: 0.95rem;
   line-height: 1.45;
+}
+
+:where(button, input, textarea, select):disabled {
+  cursor: not-allowed;
+  opacity: 0.64;
+}
+
+.record-screen__prompt-submit--loading,
+.app-btn:disabled,
+.primary-button:disabled {
+  filter: saturate(0.9);
 }
 
 .record-screen__prompt-input::placeholder {
@@ -2471,7 +2547,7 @@ input {
   padding: 0 12px;
   border: 0;
   border-radius: 999px;
-  background: #f6f7f9;
+  background: #dfe5d8;
   color: #344054;
   font-size: 11px;
   font-weight: 800;
@@ -2491,14 +2567,14 @@ input {
   border: 0;
   border-radius: 12px;
   background: linear-gradient(180deg, #155dfc 0%, #0047ff 100%);
-  color: #ffffff;
+  color: #e8ece4;
 }
 
 .record-screen__editor-shell {
   display: grid;
   gap: 0;
   border-radius: 36px;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(232, 236, 228, 0.92);
   box-shadow: 0 32px 70px rgba(15, 23, 42, 0.2);
 }
 
@@ -2537,7 +2613,7 @@ input {
   height: 36px;
   border: 0;
   border-radius: 14px;
-  background: #f8fafc;
+  background: #dfe6d8;
   color: #667085;
 }
 
@@ -2547,7 +2623,7 @@ input {
   padding: 28px;
   border: 1px dashed #cbd5e1;
   border-radius: 32px;
-  background: rgba(255, 255, 255, 0.68);
+  background: rgba(232, 236, 228, 0.68);
 }
 
 .record-screen__workspace-placeholder-head {
@@ -2581,7 +2657,7 @@ input {
   gap: 14px;
   padding: 16px 18px;
   border-radius: 22px;
-  background: #f8fafc;
+  background: #dfe6d8;
   color: #475467;
 }
 
@@ -2611,7 +2687,7 @@ input {
   padding: 40px 28px;
   border: 1px solid #e5e7eb;
   border-radius: 32px;
-  background: rgba(255, 255, 255, 0.82);
+  background: rgba(232, 236, 228, 0.82);
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
   text-align: center;
 }
@@ -2638,7 +2714,7 @@ input {
 }
 
 .record-screen__loading-shell {
-  background: rgba(255, 255, 255, 0.96);
+  background: rgba(232, 236, 228, 0.96);
 }
 
 @keyframes record-screen-spin {
@@ -2709,7 +2785,7 @@ input {
   height: 68px;
   border: 1px solid #f3f4f6;
   border-radius: 24px;
-  background: #ffffff;
+  background: #e8ece4;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.08);
   padding: 0 24px 0 48px;
   color: var(--text);
@@ -2730,7 +2806,7 @@ input {
   height: 56px;
   border: 1px solid #f3f4f6;
   border-radius: 20px;
-  background: #ffffff;
+  background: #e8ece4;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05);
   padding: 0 18px;
   color: var(--text);
@@ -2757,7 +2833,7 @@ input {
   position: relative;
   border: 1px solid rgba(243, 244, 246, 0.5);
   border-radius: 40px;
-  background: #ffffff;
+  background: #e8ece4;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.08);
   padding: 24px;
 }
@@ -2849,7 +2925,7 @@ input {
   height: 44px;
   border: 0;
   border-radius: 16px;
-  background: #f9fafb;
+  background: #e1e6dd;
   padding: 0 16px;
   color: var(--text);
   font-size: 14px;
@@ -2937,7 +3013,7 @@ input {
   min-height: 64px;
   border: 2px solid #f3f4f6;
   border-radius: 40px;
-  background: #ffffff;
+  background: #e8ece4;
   color: #99a1af;
   font-size: 14px;
   font-weight: 800;
@@ -2949,11 +3025,11 @@ input {
   padding: 18px;
   border: 1px solid #e5e7eb;
   border-radius: 28px;
-  background: #f8fafc;
+  background: #dfe6d8;
 }
 
 .record-screen__add-panel--prompt {
-  background: linear-gradient(180deg, #fbfdff 0%, #f8fafc 100%);
+  background: linear-gradient(180deg, #fbfdff 0%, #dfe6d8 100%);
 }
 
 .record-screen__add-panel-head {
@@ -2978,7 +3054,7 @@ input {
   height: 34px;
   border: 0;
   border-radius: 12px;
-  background: #ffffff;
+  background: #e8ece4;
   color: #667085;
 }
 
@@ -2995,7 +3071,7 @@ input {
   padding: 16px;
   border: 1px solid #e5e7eb;
   border-radius: 20px;
-  background: #ffffff;
+  background: #e8ece4;
   color: #101828;
   text-align: left;
 }
@@ -3035,7 +3111,7 @@ input {
   resize: vertical;
   border: 1px solid #e5e7eb;
   border-radius: 18px;
-  background: #ffffff;
+  background: #e8ece4;
   padding: 14px 16px;
   color: var(--text);
   font-size: 0.95rem;
@@ -3083,7 +3159,7 @@ input {
   border: 0;
   border-radius: 16px;
   background: #155dfc;
-  color: #ffffff;
+  color: #e8ece4;
   font-size: 0.9rem;
   font-weight: 800;
 }
@@ -3128,7 +3204,7 @@ input {
   border-radius: 24px;
   background: linear-gradient(135deg, var(--blue-500), var(--blue-700));
   box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
-  color: #ffffff;
+  color: #e8ece4;
   font-size: 16px;
   font-weight: 800;
 }
@@ -3161,7 +3237,7 @@ input {
   gap: 4px;
   padding: 16px 24px 20px;
   border-top: 1px solid #f3f4f6;
-  background: #ffffff;
+  background: #e8ece4;
 }
 
 .record-screen__nav-item {
@@ -3221,6 +3297,12 @@ input {
 
 .home-screen {
   min-height: 100vh;
+  color: #dfe6d8;
+  background:
+    radial-gradient(circle at 18% 10%, rgba(198, 255, 41, 0.18), transparent 24%),
+    radial-gradient(circle at 86% 18%, rgba(34, 197, 94, 0.18), transparent 22%),
+    linear-gradient(135deg, #070a06 0%, #11170d 48%, #1b2115 100%);
+  overflow: hidden;
 }
 
 .workouts-screen {
@@ -3230,7 +3312,9 @@ input {
 .home-screen__main {
   display: grid;
   gap: 24px;
-  padding: 16px 24px 112px;
+  padding: 12px 18px 112px;
+  position: relative;
+  z-index: 1;
 }
 
 .home-screen__hero-grid,
@@ -3241,14 +3325,117 @@ input {
 
 .home-screen__hero-stack {
   display: grid;
-  gap: 24px;
+  gap: 18px;
   align-content: start;
 }
 
 .home-screen__side-stack {
   display: grid;
-  gap: 24px;
+  gap: 18px;
   align-content: start;
+}
+
+.home-screen__action-card {
+  display: grid;
+  gap: 18px;
+  padding: 22px;
+  border: 1px solid rgba(206, 255, 41, 0.42);
+  border-radius: 24px;
+  background:
+    linear-gradient(135deg, rgba(206, 255, 41, 0.92) 0%, rgba(116, 232, 62, 0.86) 100%);
+  color: #11170d;
+  box-shadow: 0 24px 54px rgba(0, 0, 0, 0.24);
+}
+
+.home-screen__action-card h2 {
+  margin: 0;
+  font-size: clamp(2rem, 7vw, 3.4rem);
+  line-height: 0.96;
+  font-weight: 900;
+}
+
+.home-screen__action-card span {
+  display: block;
+  margin-top: 8px;
+  color: rgba(17, 23, 13, 0.76);
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.home-screen__record-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: start;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: #11170d;
+  color: #dfe6d8;
+  font-size: 0.9rem;
+  font-weight: 900;
+  text-decoration: none;
+  box-shadow: 0 12px 22px rgba(0, 0, 0, 0.24);
+}
+
+.home-screen__record-link--ghost {
+  background: rgba(223, 230, 216, 0.1);
+  color: #dfe6d8;
+  box-shadow: none;
+}
+
+.home-screen__empty-card {
+  display: grid;
+  gap: 8px;
+  padding: 16px 18px;
+  border: 1px solid rgba(206, 255, 41, 0.22);
+  border-radius: 20px;
+  background: rgba(206, 255, 41, 0.08);
+  color: #dfe6d8;
+}
+
+.home-screen__empty-card strong {
+  color: var(--gym-lime);
+  font-size: 0.96rem;
+  font-weight: 900;
+}
+
+.home-screen__empty-card span {
+  color: rgba(223, 230, 216, 0.72);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.home-screen__gym-card {
+  display: grid;
+  min-height: 144px;
+  align-content: end;
+  gap: 8px;
+  padding: 22px;
+  border: 1px solid rgba(223, 230, 216, 0.12);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 16% 20%, rgba(206, 255, 41, 0.2), transparent 32%),
+    linear-gradient(145deg, rgba(223, 230, 216, 0.1), rgba(223, 230, 216, 0.03));
+  color: #dfe6d8;
+  box-shadow: inset 0 1px 0 rgba(232, 236, 228, 0.08);
+}
+
+.home-screen__gym-card svg {
+  color: #ceff29;
+}
+
+.home-screen__gym-card strong {
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+}
+
+.home-screen__gym-card span {
+  font-size: clamp(1.8rem, 6vw, 3rem);
+  line-height: 1;
+  font-weight: 900;
 }
 
 .home-screen__side-row {
@@ -3258,7 +3445,7 @@ input {
 }
 
 .app-card {
-  background: white;
+  background: #e8ece4;
   border-radius: 32px;
   padding: 32px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
@@ -3275,10 +3462,12 @@ input {
   display: grid;
   gap: 20px;
   padding: 24px;
-  border: 1px solid #f3f4f6;
-  border-radius: 32px;
-  background: #ffffff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(223, 230, 216, 0.12);
+  border-radius: 24px;
+  background: rgba(8, 13, 7, 0.78);
+  box-shadow: 0 24px 54px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 }
 
 .home-screen__card--weight {
@@ -3293,19 +3482,19 @@ input {
 
 .home-screen__eyebrow {
   margin: 0;
-  color: #99a1af;
+  color: #ceff29;
   font-size: 10px;
   font-weight: 800;
-  letter-spacing: 0.21em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
 .home-screen__section-title {
   margin: 0;
-  color: #101828;
+  color: #dfe6d8;
   font-size: 1.5rem;
   font-weight: 900;
-  letter-spacing: -0.05em;
+  letter-spacing: 0;
 }
 
 .home-screen__streak {
@@ -3329,7 +3518,7 @@ input {
 
 .home-screen__support-copy {
   margin: 0;
-  color: #667085;
+  color: rgba(223, 230, 216, 0.68);
   font-size: 0.95rem;
   line-height: 1.7;
 }
@@ -3353,8 +3542,8 @@ input {
   border: 1px solid #e5e7eb;
   border-radius: 22px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 250, 252, 0.96) 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    linear-gradient(180deg, rgba(232, 236, 228, 0.96) 0%, rgba(223, 230, 216, 0.96) 100%);
+  box-shadow: inset 0 1px 0 rgba(232, 236, 228, 0.9);
 }
 
 .home-screen__insight-label-row {
@@ -3407,21 +3596,21 @@ input {
   gap: 4px;
   min-height: 112px;
   padding: 9px 13px;
-  border-radius: 22px;
-  background: linear-gradient(180deg, #f8fbff 0%, #eef6ff 100%);
-  border: 1px solid #dbeafe;
+  border-radius: 18px;
+  background: rgba(223, 230, 216, 0.08);
+  border: 1px solid rgba(223, 230, 216, 0.1);
 }
 
 .home-screen__weight-summary span {
-  color: #64748b;
+  color: rgba(223, 230, 216, 0.62);
   font-size: 0.76rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
 .home-screen__weight-summary strong {
-  color: #0f172a;
+  color: #dfe6d8;
   font-size: 1.38rem;
   line-height: 1;
   font-weight: 900;
@@ -3453,7 +3642,7 @@ input {
   gap: 4px;
   padding: 14px 16px;
   border-radius: 18px;
-  background: linear-gradient(135deg, #eff6ff, #f8fafc);
+  background: linear-gradient(135deg, #dce8d2, #dfe6d8);
   border: 1px solid #bfdbfe;
 }
 
@@ -3513,14 +3702,14 @@ input {
 }
 
 .home-screen__weight-grid-line {
-  stroke: #e2e8f0;
+  stroke: rgba(223, 230, 216, 0.12);
   stroke-width: 1;
   stroke-dasharray: 4 6;
 }
 
 .home-screen__weight-path-shadow {
   fill: none;
-  stroke: rgba(37, 99, 235, 0.14);
+  stroke: rgba(206, 255, 41, 0.18);
   stroke-width: 12;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -3535,20 +3724,20 @@ input {
 }
 
 .home-screen__weight-point {
-  fill: #ffffff;
-  stroke: #2563eb;
+  fill: #11170d;
+  stroke: #ceff29;
   stroke-width: 3;
 }
 
 .home-screen__weight-point--selected {
-  fill: #2563eb;
-  stroke: #dbeafe;
+  fill: #ceff29;
+  stroke: rgba(223, 230, 216, 0.82);
   stroke-width: 4;
 }
 
 .home-screen__weight-point--latest {
-  fill: #2563eb;
-  stroke: #bfdbfe;
+  fill: #ceff29;
+  stroke: rgba(223, 230, 216, 0.62);
 }
 
 .home-screen__weight-hit-area {
@@ -3563,14 +3752,14 @@ input {
 }
 
 .home-screen__weight-label {
-  color: #64748b;
+  color: rgba(223, 230, 216, 0.56);
   font-size: 0.68rem;
   font-weight: 700;
   text-align: center;
 }
 
 .home-screen__weight-label--active {
-  color: #2563eb;
+  color: #ceff29;
 }
 
 .home-screen__weight-empty {
@@ -3578,15 +3767,19 @@ input {
   place-items: center;
   min-height: 150px;
   padding: 18px;
-  border: 1px dashed #cbd5e1;
+  border: 1px dashed rgba(223, 230, 216, 0.18);
   border-radius: 24px;
-  background: #f8fafc;
+  background: rgba(223, 230, 216, 0.06);
+}
+
+.home-screen__weight-empty--action {
+  gap: 14px;
 }
 
 .home-screen__weight-empty p {
   margin: 0;
   max-width: 22rem;
-  color: #64748b;
+  color: rgba(223, 230, 216, 0.64);
   font-size: 0.92rem;
   line-height: 1.7;
   text-align: center;
@@ -3641,11 +3834,11 @@ input {
   display: flex;
   align-items: center;
   gap: 12px;
-  color: #f97316;
+  color: #ceff29;
 }
 
 .home-screen__energy-total strong {
-  color: #101828;
+  color: #dfe6d8;
   font-size: 2.4rem;
   line-height: 1;
   font-weight: 900;
@@ -3663,12 +3856,59 @@ input {
   place-items: center;
   min-height: 46px;
   padding: 8px;
+  border: 1px solid rgba(223, 230, 216, 0.1);
   border-radius: 14px;
-  background: #f8fafc;
-  color: #475467;
+  background: rgba(223, 230, 216, 0.07);
+  color: rgba(223, 230, 216, 0.78);
   font-size: 0.74rem;
   font-weight: 800;
   text-align: center;
+}
+
+.home-screen .app-top-bar {
+  border-color: rgba(223, 230, 216, 0.1);
+  background: rgba(7, 10, 6, 0.72);
+  color: #dfe6d8;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.home-screen .app-top-bar__brand h1,
+.home-screen .app-top-bar__brand-link {
+  color: #dfe6d8;
+}
+
+.home-screen .app-top-bar__brand p {
+  color: rgba(223, 230, 216, 0.58);
+}
+
+.home-screen .record-screen__summary-card {
+  border-color: rgba(223, 230, 216, 0.12);
+  background: rgba(8, 13, 7, 0.82);
+  color: #dfe6d8;
+  box-shadow: 0 24px 54px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.home-screen .record-screen__eyebrow {
+  color: #ceff29;
+  letter-spacing: 0.16em;
+}
+
+.home-screen .record-screen__headline strong,
+.home-screen .record-screen__macro-values strong,
+.home-screen .record-screen__macro-label {
+  color: #dfe6d8;
+}
+
+.home-screen .record-screen__headline span,
+.home-screen .record-screen__macro-values span {
+  color: rgba(223, 230, 216, 0.56);
+}
+
+.home-screen .record-screen__track {
+  background: rgba(223, 230, 216, 0.1);
 }
 
 .workouts-screen__main {
@@ -3701,7 +3941,7 @@ input {
   padding: 22px;
   border: 1px solid #f3f4f6;
   border-radius: 24px;
-  background: #ffffff;
+  background: #e8ece4;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.06);
 }
 
@@ -3752,9 +3992,9 @@ input {
 .workouts-screen__field textarea {
   width: 100%;
   min-width: 0;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #cbd4c4;
   border-radius: 14px;
-  background: #f8fafc;
+  background: #dfe6d8;
   color: #101828;
   font: inherit;
   font-weight: 700;
@@ -3783,9 +4023,9 @@ input {
   display: grid;
   gap: 12px;
   padding: 14px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #cbd4c4;
   border-radius: 18px;
-  background: #f8fafc;
+  background: #dfe6d8;
 }
 
 .workouts-screen__exercise-head {
@@ -3806,9 +4046,9 @@ input {
   place-items: center;
   width: 34px;
   height: 34px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #cbd4c4;
   border-radius: 12px;
-  background: #ffffff;
+  background: #e8ece4;
   color: #64748b;
 }
 
@@ -3825,7 +4065,7 @@ input {
   border: 0;
   border-radius: 16px;
   background: #155dfc;
-  color: #ffffff;
+  color: #e8ece4;
   font-weight: 900;
 }
 
@@ -3837,7 +4077,7 @@ input {
   min-height: 42px;
   border: 1px solid #dbeafe;
   border-radius: 15px;
-  background: #eff6ff;
+  background: #dce8d2;
   color: #155dfc;
   font-weight: 900;
 }
@@ -3860,7 +4100,7 @@ input {
   gap: 14px;
   padding: 18px;
   border-radius: 20px;
-  background: linear-gradient(135deg, #fff7ed, #eff6ff);
+  background: linear-gradient(135deg, #fff7ed, #dce8d2);
   border: 1px solid #fed7aa;
 }
 
@@ -3900,7 +4140,7 @@ input {
   padding: 16px;
   border: 1px solid #e5e7eb;
   border-radius: 18px;
-  background: #ffffff;
+  background: #e8ece4;
 }
 
 .workouts-screen__menu-main,
@@ -3945,7 +4185,7 @@ input {
   flex: 0 0 auto;
   padding: 7px 10px;
   border-radius: 999px;
-  background: #f1f5f9;
+  background: #d6ddd0;
   color: #334155;
   font-size: 0.72rem;
   font-weight: 900;
@@ -3960,7 +4200,7 @@ input {
 .workouts-screen__menu-stats span {
   padding: 8px 10px;
   border-radius: 12px;
-  background: #f8fafc;
+  background: #dfe6d8;
   color: #475467;
   font-size: 0.74rem;
   font-weight: 800;
@@ -3979,7 +4219,7 @@ input {
   gap: 8px;
   padding: 9px 10px;
   border-radius: 12px;
-  background: #f8fafc;
+  background: #dfe6d8;
 }
 
 .workouts-screen__exercise-summary strong {
@@ -4014,9 +4254,9 @@ input {
   justify-content: center;
   gap: 7px;
   min-height: 40px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #cbd4c4;
   border-radius: 14px;
-  background: #ffffff;
+  background: #e8ece4;
   color: #334155;
   font-weight: 900;
 }
@@ -4057,7 +4297,7 @@ input {
   border: 1px dashed #cbd5e1;
   border-radius: 18px;
   color: #64748b;
-  background: #f8fafc;
+  background: #dfe6d8;
 }
 
 .workouts-screen__empty p {
@@ -4094,7 +4334,7 @@ input {
   gap: 16px;
   padding: 16px 18px;
   border-radius: 20px;
-  background: #f8fafc;
+  background: #dfe6d8;
 }
 
 .home-screen__recent-item strong,
@@ -4129,7 +4369,7 @@ input {
   gap: 2px;
   padding: 8px 16px 10px;
   border-top: 1px solid #f3f4f6;
-  background: #ffffff;
+  background: #e8ece4;
   position: sticky;
   bottom: 0;
   z-index: 20;
@@ -4164,7 +4404,7 @@ input {
   justify-content: space-between;
   gap: 16px;
   padding: 16px 24px 12px;
-  background: #ffffff;
+  background: #e8ece4;
   border-bottom: 1px solid #f3f4f6;
 }
 
@@ -4218,7 +4458,7 @@ input {
   padding: 0;
   border: 1px solid #e5e7eb;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(232, 236, 228, 0.88);
   color: #101828;
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
 }
@@ -4243,13 +4483,13 @@ input {
 
 .app-top-bar__auth-link--secondary {
   border: 1px solid #dbe4f0;
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(232, 236, 228, 0.88);
   color: #334155;
 }
 
 .app-top-bar__auth-link--primary {
   background: linear-gradient(135deg, var(--blue-500), var(--blue-700));
-  color: #ffffff;
+  color: #e8ece4;
   box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
 }
 
@@ -4279,7 +4519,7 @@ input {
   border-radius: 28px 28px 0 0;
   background:
     radial-gradient(circle at top right, rgba(219, 234, 254, 0.7), transparent 32%),
-    linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    linear-gradient(180deg, #e8ece4 0%, #e4eadf 100%);
   box-shadow: 0 -18px 42px rgba(15, 23, 42, 0.16);
 }
 
@@ -4326,7 +4566,7 @@ input {
   padding: 0 16px;
   border: 1px solid #dbe4f0;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(232, 236, 228, 0.88);
   color: #475467;
   font-size: 12px;
   font-weight: 800;
@@ -4339,7 +4579,7 @@ input {
   padding: 18px 20px;
   border: 1px solid rgba(219, 234, 254, 0.9);
   border-radius: 24px;
-  background: rgba(255, 255, 255, 0.82);
+  background: rgba(232, 236, 228, 0.82);
 }
 
 .account-sheet__hero-copy {
@@ -4399,7 +4639,7 @@ input {
   padding: 0 18px;
   border: 1px solid #dbe4f0;
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(232, 236, 228, 0.88);
   color: #101828;
   font-size: 15px;
   font-weight: 700;
@@ -4444,13 +4684,13 @@ input {
 .account-sheet__primary-action {
   border: 0;
   background: linear-gradient(135deg, var(--blue-500), var(--blue-700));
-  color: white;
+  color: #e8ece4;
   box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
 }
 
 .foods-screen {
   min-height: 100vh;
-  background: #f9fafb;
+  background: #e1e6dd;
   display: flex;
   flex-direction: column;
 }
@@ -4461,7 +4701,7 @@ input {
   justify-content: space-between;
   padding: 32px 24px 14px;
   border-bottom: 1px solid #f3f4f6;
-  background: #ffffff;
+  background: #e8ece4;
 }
 
 .foods-screen__brand h1 {
@@ -4487,7 +4727,7 @@ input {
   width: 36px;
   height: 36px;
   border-radius: 14px;
-  background: #eff6ff;
+  background: #dce8d2;
   color: #155dfc;
   font-size: 18px;
   font-weight: 500;
@@ -4518,7 +4758,7 @@ input {
   padding: 0 16px 0 42px;
   border: 1px solid #f3f4f6;
   border-radius: 16px;
-  background: #ffffff;
+  background: #e8ece4;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
   color: #101828;
 }
@@ -4542,7 +4782,7 @@ input {
   border-radius: 16px;
   background: #155dfc;
   box-shadow: 0 10px 15px rgba(219, 234, 254, 1), 0 4px 6px rgba(219, 234, 254, 1);
-  color: #ffffff;
+  color: #e8ece4;
   font-weight: 900;
 }
 
@@ -4550,7 +4790,7 @@ input {
   margin: 0;
   padding: 14px 16px;
   border-radius: 18px;
-  background: #eff6ff;
+  background: #dce8d2;
   color: #155dfc;
   font-size: 0.92rem;
   font-weight: 700;
@@ -4581,7 +4821,7 @@ input {
   padding: 26px 26px 30px;
   border: 1px solid rgba(243, 244, 246, 0.8);
   border-radius: 28px;
-  background: #ffffff;
+  background: #e8ece4;
   box-shadow: 0 32px 64px rgba(2, 6, 23, 0.28);
 }
 
@@ -4627,7 +4867,7 @@ input {
   font-size: 15px;
   font-weight: 800;
   letter-spacing: -0.01em;
-  white-space: nowrap;
+  #e8ece4-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   flex-shrink: 0;
@@ -4676,7 +4916,7 @@ input {
 }
 
 .food-card__macro--p {
-  background: #eff6ff;
+  background: #dce8d2;
   color: #2563eb;
 }
 
@@ -4711,7 +4951,7 @@ input {
   font-size: 11px;
   font-weight: 700;
   transition: all 0.2s ease;
-  white-space: nowrap;
+  #e8ece4-space: nowrap;
 }
 
 .food-card__btn:hover {
@@ -4720,7 +4960,7 @@ input {
 
 .food-card__btn--edit {
   border-color: #bfdbfe;
-  background: #eff6ff;
+  background: #dce8d2;
   color: #1d4ed8;
 }
 
@@ -4780,6 +5020,21 @@ input {
 .foods-screen__empty p {
   margin: 0;
   color: #6a7282;
+}
+
+.foods-screen__empty-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: start;
+  min-height: 44px;
+  margin-top: 18px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--gym-ink);
+  color: var(--gym-lime);
+  font-weight: 900;
 }
 
 @media (max-width: 640px) {
@@ -4859,7 +5114,7 @@ input {
 
 .history-screen {
   min-height: 100vh;
-  background: #f9fafb;
+  background: #e1e6dd;
   display: flex;
   flex-direction: column;
 }
@@ -4870,7 +5125,7 @@ input {
   justify-content: space-between;
   padding: 32px 24px 14px;
   border-bottom: 1px solid #f3f4f6;
-  background: #ffffff;
+  background: #e8ece4;
 }
 
 .history-screen__brand h1 {
@@ -4896,7 +5151,7 @@ input {
   width: 36px;
   height: 36px;
   border-radius: 14px;
-  background: #eff6ff;
+  background: #dce8d2;
   color: #155dfc;
   font-size: 18px;
   font-weight: 500;
@@ -4937,7 +5192,7 @@ input {
   padding: 0 20px;
   border: 1px solid #f3f4f6;
   border-radius: 16px;
-  background: #ffffff;
+  background: #e8ece4;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
@@ -4976,7 +5231,7 @@ input {
   min-height: 34px;
   border: 1px solid #e5e7eb;
   border-radius: 10px;
-  background: #ffffff;
+  background: #e8ece4;
   color: #475467;
   padding: 0 12px;
   font-size: 12px;
@@ -4985,7 +5240,7 @@ input {
 
 .history-screen__date-action--today {
   border-color: #bfdbfe;
-  background: #eff6ff;
+  background: #dce8d2;
   color: #1d4ed8;
 }
 
@@ -5002,7 +5257,7 @@ input {
   padding: 14px 16px;
   border-radius: 16px;
   border: 1px solid #dbeafe;
-  background: #eff6ff;
+  background: #dce8d2;
   color: #1d4ed8;
   font-size: 0.92rem;
   font-weight: 700;
@@ -5025,7 +5280,7 @@ input {
   padding: 22px;
   border: 1px solid rgba(243, 244, 246, 0.6);
   border-radius: 30px;
-  background: #ffffff;
+  background: #e8ece4;
   box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
 }
 
@@ -5053,11 +5308,11 @@ input {
   color: #99a1af;
   font-size: 0.92rem;
   font-weight: 600;
-  white-space: nowrap;
+  #e8ece4-space: nowrap;
 }
 
 .history-screen__macro-token {
-  white-space: nowrap;
+  #e8ece4-space: nowrap;
 }
 
 .history-screen__kcal-box {
@@ -5087,7 +5342,7 @@ input {
   padding: 12px 14px;
   border: 1px solid #f3f4f6;
   border-radius: 14px;
-  background: #f8fafc;
+  background: #dfe6d8;
 }
 
 .history-screen__item-list {
@@ -5130,7 +5385,7 @@ input {
   min-height: 38px;
   border: 1px solid #f3f4f6;
   border-radius: 12px;
-  background: #ffffff;
+  background: #e8ece4;
   color: #475467;
   font-size: 12px;
   font-weight: 700;
@@ -5138,7 +5393,7 @@ input {
 
 .history-screen__action--edit {
   border-color: #bfdbfe;
-  background: #eff6ff;
+  background: #dce8d2;
   color: #1d4ed8;
 }
 
@@ -5188,7 +5443,7 @@ input {
   padding: 26px 26px 30px;
   border: 1px solid rgba(243, 244, 246, 0.8);
   border-radius: 28px;
-  background: #ffffff;
+  background: #e8ece4;
   box-shadow: 0 32px 64px rgba(2, 6, 23, 0.28);
 }
 
@@ -5229,7 +5484,7 @@ input {
 
 .settings-screen {
   min-height: 100vh;
-  background: #f9fafb;
+  background: #e1e6dd;
   display: flex;
   flex-direction: column;
 }
@@ -5240,7 +5495,7 @@ input {
   justify-content: space-between;
   padding: 32px 24px 14px;
   border-bottom: 1px solid #f3f4f6;
-  background: #ffffff;
+  background: #e8ece4;
 }
 
 .settings-screen__brand h1 {
@@ -5266,7 +5521,7 @@ input {
   width: 36px;
   height: 36px;
   border-radius: 14px;
-  background: #eff6ff;
+  background: #dce8d2;
   color: #155dfc;
   font-size: 18px;
   font-weight: 500;
@@ -5292,6 +5547,24 @@ input {
   gap: 16px;
 }
 
+.settings-screen__section-head {
+  display: grid;
+  gap: 6px;
+  padding-left: 8px;
+}
+
+.settings-screen__section-head .eyebrow {
+  margin: 0;
+}
+
+.settings-screen__section-head span,
+.workouts-screen__section-copy {
+  color: var(--gym-muted);
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
 .settings-screen__section-label {
   margin: 0;
   padding-left: 8px;
@@ -5307,7 +5580,7 @@ input {
   padding: 28px;
   border: 1px solid rgba(243, 244, 246, 0.5);
   border-radius: 40px;
-  background: #ffffff;
+  background: #e8ece4;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
@@ -5342,7 +5615,7 @@ input {
   padding: 0 44px 0 16px;
   border: 0;
   border-radius: 16px;
-  background: #f9fafb;
+  background: #e1e6dd;
   color: #101828;
   font-size: 14px;
   font-weight: 900;
@@ -5365,7 +5638,7 @@ input {
   border-radius: 16px;
   background: #101828;
   box-shadow: 0 20px 25px rgba(0, 0, 0, 0.05), 0 8px 10px rgba(0, 0, 0, 0.05);
-  color: #ffffff;
+  color: #e8ece4;
   font-size: 16px;
   font-weight: 900;
 }
@@ -5400,12 +5673,12 @@ input {
 }
 
 .profile-gender-picker__btn:hover {
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(232, 236, 228, 0.6);
 }
 
 .profile-gender-picker__btn--active {
   border-color: var(--blue-500);
-  background: #ffffff;
+  background: #e8ece4;
   color: var(--blue-600);
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
 }
@@ -5433,7 +5706,7 @@ input {
 }
 
 .profile-field:focus-within {
-  background: #ffffff;
+  background: #e8ece4;
   box-shadow: 0 0 0 2px var(--blue-500), 0 2px 8px rgba(59, 130, 246, 0.1);
 }
 
@@ -5451,7 +5724,7 @@ input {
   color: var(--slate-500);
   font-size: 13px;
   font-weight: 600;
-  white-space: nowrap;
+  #e8ece4-space: nowrap;
 }
 
 .profile-field__input-wrapper {
@@ -5525,13 +5798,13 @@ input {
 }
 
 .profile-activity__btn:hover {
-  background: #ffffff;
+  background: #e8ece4;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .profile-activity__btn--active {
   border-color: var(--blue-500);
-  background: linear-gradient(145deg, #eff6ff 0%, #eef2ff 100%);
+  background: linear-gradient(145deg, #dce8d2 0%, #eef2ff 100%);
   color: var(--blue-600);
   box-shadow: 0 4px 14px rgba(59, 130, 246, 0.18);
 }
@@ -5583,7 +5856,7 @@ input {
 
 .profile-actions__btn--save {
   background: linear-gradient(135deg, var(--blue-500), var(--blue-700));
-  color: #ffffff;
+  color: #e8ece4;
   box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
 }
 
@@ -5609,14 +5882,14 @@ input {
 }
 
 .settings-screen__secondary-button {
-  background: #f9fafb;
+  background: #e1e6dd;
   color: #99a1af;
 }
 
 .settings-screen__accent-button {
   background: #0092b8;
   box-shadow: 0 10px 15px #cefafe, 0 4px 6px #cefafe;
-  color: #ffffff;
+  color: #e8ece4;
 }
 
 .settings-screen__toggle-row {
@@ -5626,7 +5899,7 @@ input {
   min-height: 60px;
   padding: 0 16px;
   border-radius: 24px;
-  background: #f9fafb;
+  background: #e1e6dd;
 }
 
 .settings-screen__switch {
@@ -5645,7 +5918,7 @@ input {
   width: 20px;
   height: 20px;
   border-radius: 999px;
-  background: #ffffff;
+  background: #e8ece4;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -5667,7 +5940,7 @@ input {
   min-height: 56px;
   border: 0;
   border-radius: 16px;
-  background: #f9fafb;
+  background: #e1e6dd;
   color: #99a1af;
   display: grid;
   place-items: center;
@@ -5701,7 +5974,7 @@ input {
   width: 48px;
   height: 48px;
   border-radius: 16px;
-  background: #f9fafb;
+  background: #e1e6dd;
   color: #99a1af;
 }
 
@@ -5740,7 +6013,7 @@ input {
   gap: 10px;
   padding: 14px 16px;
   border-radius: 18px;
-  background: #eff6ff;
+  background: #dce8d2;
   color: #155dfc;
   font-size: 0.92rem;
   font-weight: 700;
@@ -5770,7 +6043,7 @@ input {
     width: auto;
     margin: 0;
     padding: 14px 40px 14px 28px;
-    background: rgba(255, 255, 255, 0.97);
+    background: rgba(232, 236, 228, 0.97);
     border-bottom-color: #e5e7eb;
     box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
   }
@@ -5790,7 +6063,7 @@ input {
     border-bottom: 0;
     border-left: 0;
     border-radius: 0;
-    background: #ffffff;
+    background: #e8ece4;
     box-shadow: 8px 0 24px rgba(15, 23, 42, 0.04);
   }
 
@@ -5806,6 +6079,13 @@ input {
     background:
       radial-gradient(circle at top left, rgba(219, 234, 254, 0.45), transparent 28%),
       linear-gradient(180deg, #fcfdff 0%, #f7f9fc 100%);
+  }
+
+  .home-screen {
+    background:
+      radial-gradient(circle at 18% 10%, rgba(198, 255, 41, 0.18), transparent 24%),
+      radial-gradient(circle at 86% 18%, rgba(34, 197, 94, 0.18), transparent 22%),
+      linear-gradient(135deg, #070a06 0%, #11170d 48%, #1b2115 100%);
   }
 
   .app-top-bar__brand h1 {
@@ -5836,7 +6116,7 @@ input {
   }
 
   .home-screen__hero-grid {
-    grid-template-columns: minmax(320px, 420px) minmax(320px, 1fr);
+    grid-template-columns: minmax(320px, 0.86fr) minmax(360px, 1.14fr);
     align-items: start;
   }
 
@@ -5914,13 +6194,13 @@ input {
   }
 
   .app-bottom-nav__item:hover {
-    background: #f8fafc;
+    background: #dfe6d8;
     color: #667085;
     transform: none;
   }
 
   .app-bottom-nav__item--active {
-    background: #eff6ff;
+    background: #dce8d2;
     color: #155dfc;
   }
 
@@ -6038,7 +6318,7 @@ input {
 }
 
 .tutorial-overlay__card {
-  background: white;
+  background: #e8ece4;
   width: 100%;
   max-width: 440px;
   border-radius: 32px;
@@ -6051,7 +6331,7 @@ input {
 .tutorial-overlay__image-box {
   width: 100%;
   height: 280px;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background: linear-gradient(135deg, #dfe6d8 0%, #d6ddd0 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -6114,7 +6394,7 @@ input {
   flex: 2;
   height: 56px;
   background: linear-gradient(135deg, var(--blue-600) 0%, var(--blue-700) 100%);
-  color: white;
+  color: #e8ece4;
   border-radius: 18px;
   font-weight: 800;
   font-size: 16px;
@@ -6155,4 +6435,1236 @@ input {
 .tutorial-overlay__dot--active {
   width: 24px;
   background: var(--blue-600);
+}
+
+/* UI/UX polish: PFC TRACKER brand system */
+.landing-screen {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.landing-screen__hero {
+  min-height: 100svh;
+  padding: 16px 0 clamp(28px, 6vh, 56px);
+}
+
+.landing-screen__topbar {
+  position: relative;
+  z-index: 8;
+  margin-bottom: clamp(18px, 4vh, 34px);
+}
+
+.landing-screen__hero-grid {
+  align-items: center;
+}
+
+.landing-screen__hero-copy {
+  max-width: 620px;
+  padding-top: 0;
+}
+
+.landing-screen__eyebrow,
+.landing-screen__lead {
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.46);
+}
+
+.landing-screen__hero-copy h1 {
+  max-width: 760px;
+  font-size: clamp(3.3rem, 10vw, 7.2rem);
+  letter-spacing: 0;
+  text-wrap: balance;
+}
+
+.landing-screen__hero-copy h1 span {
+  margin-top: 6px;
+  #e8ece4-space: normal;
+}
+
+.landing-screen__lead {
+  max-width: 34rem;
+  color: rgba(223, 230, 216, 0.9);
+  font-size: clamp(1rem, 2.6vw, 1.16rem);
+}
+
+.landing-screen__cta {
+  min-height: 54px;
+  padding-inline: 22px;
+}
+
+.landing-screen__impact {
+  isolation: isolate;
+}
+
+.landing-screen__live-comments {
+  inset: 18% 0 auto;
+  z-index: 2;
+}
+
+.landing-screen__live-comment {
+  color: rgba(223, 230, 216, 0.72);
+  font-size: clamp(0.9rem, 1.4vw, 1.22rem);
+}
+
+.auth-page {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.auth-card {
+  border-radius: 28px;
+  background: rgba(11, 15, 9, 0.84);
+}
+
+.auth-field input[aria-invalid="true"] {
+  border-color: rgba(255, 87, 87, 0.82);
+  background: rgba(255, 87, 87, 0.08);
+}
+
+.auth-message {
+  border-color: rgba(255, 87, 87, 0.44);
+  background: rgba(255, 87, 87, 0.14);
+  color: #ffd1d1;
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.app-top-bar {
+  border-bottom-color: var(--app-line);
+  background: rgba(250, 252, 247, 0.9);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.app-top-bar__brand h1 {
+  color: var(--gym-ink);
+  letter-spacing: 0;
+}
+
+.app-bottom-nav {
+  border-color: var(--app-line);
+  background: rgba(250, 252, 247, 0.94);
+  box-shadow: 0 -12px 34px rgba(21, 31, 17, 0.08);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.app-bottom-nav__item {
+  min-height: 48px;
+  border-radius: 16px;
+  color: var(--gym-muted);
+  text-decoration: none;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.app-bottom-nav__item span {
+  font-size: 11px;
+  line-height: 1.1;
+}
+
+.app-bottom-nav__item--active {
+  background: var(--gym-ink);
+  color: var(--gym-lime);
+  font-weight: 900;
+}
+
+.record-screen,
+.foods-screen,
+.history-screen,
+.workouts-screen,
+.settings-screen {
+  background:
+    radial-gradient(circle at 12% 0%, rgba(206, 255, 41, 0.13), transparent 28%),
+    linear-gradient(180deg, #e8ece4 0%, var(--app-bg) 100%);
+}
+
+.home-screen {
+  background:
+    radial-gradient(circle at 18% 10%, rgba(206, 255, 41, 0.14), transparent 24%),
+    radial-gradient(circle at 86% 18%, rgba(255, 107, 53, 0.08), transparent 26%),
+    linear-gradient(180deg, #10140d 0%, #151b12 100%);
+}
+
+.record-screen__summary-card,
+.home-screen__card,
+.workouts-screen__card,
+.record-screen__quick-card,
+.record-screen__editor,
+.record-screen__confirm-bar,
+.food-card,
+.foods-screen__empty,
+.history-screen__card,
+.settings-screen__card,
+.foods-screen__editor-panel,
+.history-screen__editor-panel {
+  border-color: var(--app-line);
+  border-radius: 22px;
+  box-shadow: var(--app-shadow);
+}
+
+.foods-screen__header,
+.history-screen__header,
+.workouts-screen__header,
+.settings-screen__header {
+  border-bottom: 1px solid rgba(221, 229, 215, 0.9);
+  background:
+    linear-gradient(90deg, rgba(206, 255, 41, 0.12), transparent 48%),
+    rgba(250, 252, 247, 0.84);
+}
+
+.foods-screen__brand h1,
+.history-screen__brand h1,
+.workouts-screen__header h1,
+.settings-screen__brand h1 {
+  color: var(--gym-ink);
+  letter-spacing: 0;
+}
+
+.foods-screen__brand p,
+.history-screen__brand p,
+.settings-screen__brand p,
+.workouts-screen__empty p,
+.foods-screen__empty p,
+.history-screen__item-row>span {
+  color: var(--gym-muted);
+}
+
+.record-screen__quick-card {
+  z-index: 35;
+  border-color: rgba(206, 255, 41, 0.42);
+  background: rgba(232, 236, 228, 0.96);
+}
+
+.record-screen__prompt-guide {
+  border-color: rgba(206, 255, 41, 0.38);
+  background: #f9ffe8;
+}
+
+.record-screen__prompt-guide-label,
+.record-screen__prompt-tool svg:first-child {
+  color: #497000;
+}
+
+.record-screen__prompt-input,
+.foods-screen__search-field input,
+.workouts-screen__field input,
+.workouts-screen__field textarea,
+.settings-screen__metric-input input,
+.settings-screen__profile-input input,
+.history-screen__date-input {
+  border: 1px solid var(--app-line);
+  background: #e8ece4;
+}
+
+.record-screen__prompt-input:focus,
+.foods-screen__search-field input:focus,
+.workouts-screen__field input:focus,
+.workouts-screen__field textarea:focus,
+.settings-screen__metric-input input:focus,
+.settings-screen__profile-input input:focus,
+.history-screen__date-input:focus {
+  outline: none;
+  border-color: rgba(105, 153, 10, 0.7);
+  box-shadow: 0 0 0 4px rgba(206, 255, 41, 0.2);
+}
+
+.record-screen__prompt-submit,
+.workouts-screen__primary-button,
+.settings-screen__primary-button,
+.foods-screen__add-button,
+.history-screen__action--primary {
+  background: var(--gym-ink);
+  color: var(--gym-lime);
+  box-shadow: 0 12px 28px rgba(16, 20, 13, 0.18);
+}
+
+.record-screen__prompt-tool,
+.workouts-screen__secondary-button,
+.settings-screen__secondary-button,
+.history-screen__action {
+  border: 1px solid var(--app-line);
+  background: #e8ece4;
+  color: var(--gym-ink);
+}
+
+.record-screen__workspace-placeholder {
+  border-color: rgba(105, 112, 99, 0.22);
+  background:
+    linear-gradient(135deg, rgba(206, 255, 41, 0.1), transparent 42%),
+    rgba(232, 236, 228, 0.78);
+}
+
+.record-screen__editor-shell {
+  overflow: hidden;
+  border: 1px solid var(--app-line);
+}
+
+.history-screen__macro-token,
+.workouts-screen__menu-stats span,
+.settings-screen__badge,
+.foods-screen__badge,
+.history-screen__badge {
+  border-color: rgba(206, 255, 41, 0.28);
+  background: #f6ffd8;
+  color: #3c5f00;
+}
+
+.foods-screen__feedback,
+.history-screen__feedback,
+.settings-screen__feedback,
+.workouts-screen__feedback {
+  border-radius: 16px;
+}
+
+@media (max-width: 767px) {
+  .landing-screen {
+    background-size: 34px 34px, 34px 34px, auto, auto, auto;
+  }
+
+  .landing-screen__live-comments {
+    display: none;
+  }
+
+  .landing-screen__hero {
+    width: min(calc(100% - 28px), 1200px);
+    min-height: auto;
+  }
+
+  .landing-screen__topbar {
+    margin-bottom: 22px;
+  }
+
+  .landing-screen__brand-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+  }
+
+  .landing-screen__brand-mark {
+    font-size: 15px;
+  }
+
+  .landing-screen__hero-grid {
+    gap: 18px;
+  }
+
+  .landing-screen__hero-copy h1 {
+    font-size: clamp(3.1rem, 18vw, 4.7rem);
+    line-height: 0.95;
+  }
+
+  .landing-screen__lead {
+    max-width: 28rem;
+    font-size: 0.98rem;
+    line-height: 1.72;
+  }
+
+  .landing-screen__hero-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .landing-screen__cta {
+    width: 100%;
+    min-height: 54px;
+  }
+
+  .landing-screen__impact {
+    min-height: 255px;
+    margin-top: 4px;
+  }
+
+  .landing-screen__athlete-image {
+    opacity: 0.74;
+  }
+
+  .landing-screen__speech-stack {
+    right: 10px;
+    bottom: 14px;
+    max-width: min(250px, 76vw);
+  }
+
+  .auth-card {
+    padding: 26px 20px;
+    border-radius: 24px;
+  }
+
+  .auth-pop,
+  .auth-emoji {
+    display: none;
+  }
+
+  .record-screen__main {
+    padding-inline: 14px;
+    padding-bottom: 238px;
+  }
+
+  .record-screen__quick-card {
+    right: 12px;
+    bottom: 78px;
+    left: 12px;
+    padding: 12px;
+    border-radius: 22px;
+  }
+
+  .record-screen__prompt-toolbar {
+    align-items: stretch;
+  }
+
+  .record-screen__prompt-tools {
+    gap: 6px;
+  }
+
+  .app-bottom-nav {
+    padding: 8px 10px 10px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .app-top-bar {
+    padding-left: 34px;
+  }
+
+  .app-bottom-nav {
+    top: 61px;
+    width: 148px;
+    gap: 8px;
+    padding: 22px 12px 24px;
+  }
+
+  .app-bottom-nav__item {
+    grid-template-columns: 22px 1fr;
+    justify-items: start;
+    align-items: center;
+    gap: 10px;
+    min-height: 46px;
+    padding: 0 14px;
+    border-radius: 16px;
+  }
+
+  .app-bottom-nav__item span {
+    font-size: 12px;
+    line-height: 1.1;
+  }
+
+  .home-screen,
+  .record-screen,
+  .foods-screen,
+  .history-screen,
+  .workouts-screen,
+  .settings-screen {
+    padding-left: 164px;
+  }
+
+  .home-screen__main,
+  .record-screen__main,
+  .foods-screen__main,
+  .history-screen__main,
+  .workouts-screen__main,
+  .settings-screen__main {
+    padding-inline: 32px;
+  }
+
+  .record-screen__quick-card {
+    left: 196px;
+    right: 32px;
+    bottom: 26px;
+  }
+}
+
+/* App-wide page polish beyond Home */
+.record-screen__summary-card,
+.food-card,
+.history-screen__card,
+.workouts-screen__card,
+.settings-screen__card {
+  background: rgba(232, 236, 228, 0.94);
+}
+
+.record-screen__eyebrow,
+.home-screen__eyebrow,
+.workouts-screen__eyebrow,
+.settings-screen__section-label {
+  letter-spacing: 0.1em;
+}
+
+.record-screen__headline strong,
+.history-screen__kcal-box strong,
+.workouts-screen__burned-total strong {
+  letter-spacing: 0;
+}
+
+.record-screen__macro-row,
+.history-screen__item-row,
+.profile-field,
+.settings-screen__toggle-row,
+.workouts-screen__exercise-card,
+.workouts-screen__menu-card,
+.workouts-screen__log-card {
+  border: 1px solid rgba(221, 229, 215, 0.78);
+  background: #dfe5d8;
+}
+
+.record-screen__fill--protein,
+.food-card__macro--p {
+  background: #dff7ff;
+  color: #006982;
+}
+
+.record-screen__fill--fat,
+.food-card__macro--f {
+  background: #fff2d1;
+  color: #895600;
+}
+
+.record-screen__fill--carbs,
+.food-card__macro--c {
+  background: #e8ffd7;
+  color: #356900;
+}
+
+.record-screen__fill--protein,
+.record-screen__fill--fat,
+.record-screen__fill--carbs {
+  color: inherit;
+}
+
+.record-screen__fill--protein {
+  background: #00a4c7;
+}
+
+.record-screen__fill--fat {
+  background: #e6a400;
+}
+
+.record-screen__fill--carbs {
+  background: #75b900;
+}
+
+.record-screen__loading-spinner {
+  border-color: rgba(206, 255, 41, 0.28);
+  border-top-color: var(--gym-ink);
+}
+
+.record-screen__workspace-title,
+.record-screen__editor-title,
+.record-screen__add-panel-title,
+.history-screen__meal-meta h2,
+.foods-screen__empty h2,
+.workouts-screen__section-title {
+  color: var(--gym-ink);
+  letter-spacing: 0;
+}
+
+.record-screen__workspace-copy,
+.record-screen__workspace-guide p,
+.record-screen__add-option span,
+.record-screen__add-panel-copy,
+.record-screen__add-panel-loading,
+.record-screen__feedback,
+.workouts-screen__empty-copy,
+.settings-screen__account-copy span {
+  color: var(--gym-muted);
+}
+
+.record-screen__workspace-guide,
+.record-screen__add-panel,
+.record-screen__loading-card {
+  border: 1px solid var(--app-line);
+  background: rgba(232, 236, 228, 0.78);
+}
+
+.record-screen__workspace-guide svg,
+.record-screen__add-option svg,
+.record-screen__name-icon {
+  color: #69990a;
+}
+
+.record-screen__name-input,
+.record-screen__date-input,
+.record-screen__item-card,
+.record-screen__mini-field input,
+.record-screen__macro-input input,
+.record-screen__add-prompt-input {
+  border: 1px solid var(--app-line);
+  background: #e8ece4;
+  box-shadow: none;
+}
+
+.record-screen__name-input:focus,
+.record-screen__date-input:focus,
+.record-screen__item-name:focus,
+.record-screen__mini-field input:focus,
+.record-screen__macro-input input:focus,
+.record-screen__add-prompt-input:focus {
+  outline: none;
+  border-color: rgba(105, 153, 10, 0.72);
+  box-shadow: 0 0 0 4px rgba(206, 255, 41, 0.18);
+}
+
+.record-screen__item-card {
+  border-radius: 24px;
+  padding: 20px;
+}
+
+.record-screen__item-index,
+.record-screen__macro-chip--protein {
+  background: #e9ffae;
+  color: #3f6200;
+}
+
+.record-screen__macro-chip--fat {
+  background: #fff3cf;
+  color: #815400;
+}
+
+.record-screen__macro-chip--carbs {
+  background: #dcffd1;
+  color: #356900;
+}
+
+.record-screen__add-button,
+.record-screen__add-option {
+  border-color: var(--app-line);
+  background: #e8ece4;
+  color: var(--gym-ink);
+}
+
+.record-screen__add-panel-submit,
+.record-screen__confirm-button {
+  background: var(--gym-ink);
+  color: var(--gym-lime);
+  box-shadow: 0 16px 34px rgba(16, 20, 13, 0.18);
+}
+
+.record-screen__feedback--error,
+.workouts-screen__feedback--error,
+.history-screen__feedback--error {
+  border-color: rgba(220, 38, 38, 0.24);
+  background: #fff1f1;
+  color: #b42318;
+}
+
+.food-card {
+  padding: 16px 18px;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease;
+}
+
+.food-card:hover {
+  transform: translateY(-1px);
+  border-color: rgba(105, 153, 10, 0.28);
+  box-shadow: 0 18px 38px rgba(21, 31, 17, 0.1);
+}
+
+.food-card__name,
+.food-card__kcal strong,
+.history-screen__item-row strong,
+.workouts-screen__menu-main strong,
+.workouts-screen__log-card strong,
+.settings-screen__account-copy strong {
+  color: var(--gym-ink);
+}
+
+.food-card__kcal {
+  background: #f0f5ea;
+}
+
+.food-card__btn {
+  border-color: var(--app-line);
+  background: #e8ece4;
+  color: var(--gym-muted);
+}
+
+.food-card__btn--reuse {
+  border-color: rgba(206, 255, 41, 0.55);
+  background: var(--gym-ink);
+  color: var(--gym-lime);
+}
+
+.food-card__btn--edit {
+  border-color: rgba(105, 153, 10, 0.28);
+  background: #f6ffd8;
+  color: #3c5f00;
+}
+
+.food-card__btn--delete,
+.history-screen__action--delete,
+.workouts-screen__log-actions button,
+.workouts-screen__menu-actions button {
+  border-color: rgba(220, 38, 38, 0.16);
+}
+
+.foods-screen__feedback,
+.history-screen__feedback,
+.settings-screen__feedback,
+.workouts-screen__feedback {
+  border: 1px solid rgba(105, 153, 10, 0.22);
+  background: #f6ffd8;
+  color: #3c5f00;
+}
+
+.history-screen__date-chip {
+  border-color: var(--app-line);
+  background: #e8ece4;
+  box-shadow: var(--app-shadow);
+}
+
+.history-screen__date-icon,
+.history-screen__date-action--today {
+  color: #3c5f00;
+}
+
+.history-screen__date-action {
+  border-color: var(--app-line);
+  background: #e8ece4;
+  color: var(--gym-muted);
+}
+
+.history-screen__date-action--today {
+  border-color: rgba(206, 255, 41, 0.55);
+  background: #f6ffd8;
+}
+
+.history-screen__card {
+  border-radius: 24px;
+  padding: 20px;
+}
+
+.history-screen__actions {
+  gap: 10px;
+}
+
+.history-screen__action {
+  min-height: 42px;
+  border-radius: 14px;
+  font-weight: 800;
+}
+
+.history-screen__action--edit {
+  border-color: rgba(105, 153, 10, 0.26);
+  background: #f6ffd8;
+  color: #3c5f00;
+}
+
+.history-screen__action--primary {
+  border-color: rgba(206, 255, 41, 0.55);
+  background: var(--gym-ink);
+  color: var(--gym-lime);
+}
+
+.workouts-screen__main,
+.foods-screen__main,
+.history-screen__main,
+.settings-screen__main {
+  gap: 22px;
+}
+
+.workouts-screen__header {
+  display: grid;
+  gap: 8px;
+  padding: 24px;
+  border-radius: 24px;
+  border: 1px solid var(--app-line);
+  box-shadow: var(--app-shadow);
+}
+
+.workouts-screen__header h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  line-height: 1;
+}
+
+.workouts-screen__card {
+  border-radius: 24px;
+  padding: 22px;
+}
+
+.workouts-screen__field input,
+.workouts-screen__field textarea {
+  min-height: 48px;
+  border-radius: 14px;
+  color: var(--gym-ink);
+}
+
+.workouts-screen__field span,
+.settings-screen__metric-field span:first-child,
+.settings-screen__section-label {
+  color: var(--gym-muted);
+}
+
+.workouts-screen__burned-total {
+  border: 1px solid rgba(206, 255, 41, 0.35);
+  background: linear-gradient(135deg, #10140d, #273018);
+}
+
+.workouts-screen__burned-total svg,
+.workouts-screen__burned-total strong {
+  color: var(--gym-lime);
+}
+
+.workouts-screen__burned-total span {
+  color: rgba(223, 230, 216, 0.7);
+}
+
+.workouts-screen__menu-card,
+.workouts-screen__log-card {
+  border-radius: 18px;
+}
+
+.workouts-screen__primary-button,
+.workouts-screen__secondary-button,
+.settings-screen__primary-button,
+.settings-screen__secondary-button,
+.settings-screen__accent-button,
+.settings-screen__logout-button,
+.foods-screen__add-button {
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    filter 160ms ease;
+}
+
+.workouts-screen__primary-button:hover:not(:disabled),
+.settings-screen__primary-button:hover:not(:disabled),
+.settings-screen__accent-button:hover:not(:disabled),
+.foods-screen__add-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.02);
+}
+
+.settings-screen__card {
+  border-radius: 24px;
+  padding: 24px;
+}
+
+.settings-screen__metric-input input,
+.settings-screen__profile-input input,
+.profile-field,
+.profile-gender-picker,
+.profile-activity__btn,
+.settings-screen__reminder-button {
+  border: 1px solid var(--app-line);
+  background: #e8ece4;
+}
+
+.profile-gender-picker,
+.profile-field,
+.profile-activity__btn,
+.settings-screen__toggle-row,
+.settings-screen__reminder-button {
+  background: #dfe5d8;
+}
+
+.profile-gender-picker__btn--active,
+.profile-activity__btn--active,
+.settings-screen__reminder-button--active {
+  border-color: rgba(206, 255, 41, 0.58);
+  background: #10140d;
+  color: var(--gym-lime);
+  box-shadow: 0 12px 26px rgba(16, 20, 13, 0.14);
+}
+
+.profile-field:focus-within {
+  background: #e8ece4;
+  box-shadow: 0 0 0 3px rgba(206, 255, 41, 0.2);
+}
+
+.profile-field__icon {
+  background: #effac9;
+  color: #3c5f00;
+}
+
+.profile-actions__btn--calc,
+.settings-screen__secondary-button {
+  border: 1px solid var(--app-line);
+  background: #e8ece4;
+  color: var(--gym-ink);
+}
+
+.profile-actions__btn--save,
+.settings-screen__accent-button {
+  background: var(--gym-ink);
+  color: var(--gym-lime);
+  box-shadow: 0 14px 30px rgba(16, 20, 13, 0.16);
+}
+
+.settings-screen__switch--on {
+  background: var(--gym-ink);
+}
+
+.settings-screen__logout-button {
+  border: 1px solid rgba(220, 38, 38, 0.16);
+  background: #fff1f1;
+  color: #b42318;
+}
+
+.account-sheet__primary-action {
+  background: var(--gym-ink);
+  color: var(--gym-lime);
+  box-shadow: 0 14px 30px rgba(16, 20, 13, 0.16);
+}
+
+.account-avatar-badge {
+  background: #f6ffd8;
+  color: #3c5f00;
+  box-shadow: 0 10px 24px rgba(105, 153, 10, 0.13);
+}
+
+@media (max-width: 640px) {
+  .food-card__row,
+  .history-screen__card-head {
+    gap: 12px;
+  }
+
+  .food-card__metrics,
+  .food-card__actions,
+  .history-screen__item-row div {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .history-screen__kcal-box strong {
+    font-size: 1.55rem;
+  }
+
+  .record-screen__editor {
+    gap: 22px;
+    padding: 20px 16px 26px;
+  }
+
+  .record-screen__split-fields,
+  .record-screen__macro-edit-grid,
+  .settings-screen__target-grid,
+  .profile-actions,
+  .profile-activity__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .workouts-screen__card,
+  .settings-screen__card {
+    padding: 20px;
+  }
+
+  .settings-screen__reminder-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.record-screen__quick-card .record-screen__prompt-input {
+  min-height: 68px;
+  height: 68px !important;
+  padding: 12px 14px;
+  border: 1px solid var(--app-line);
+  border-radius: 18px;
+  background: #e8ece4;
+  overflow: auto;
+}
+
+@media (min-width: 1024px) {
+  .record-screen__quick-card .record-screen__prompt-input {
+    height: 58px !important;
+    min-height: 58px;
+  }
+}
+
+/* Dark app shell: keep the gym/neon brand consistent across authenticated screens */
+.record-screen,
+.foods-screen,
+.history-screen,
+.workouts-screen,
+.settings-screen {
+  color: #dfe6d8;
+  background:
+    radial-gradient(circle at 18% 6%, rgba(206, 255, 41, 0.12), transparent 26%),
+    radial-gradient(circle at 92% 18%, rgba(255, 107, 53, 0.08), transparent 24%),
+    linear-gradient(180deg, #080b07 0%, #11170d 52%, #080b07 100%);
+}
+
+.app-top-bar,
+.app-bottom-nav {
+  border-color: rgba(223, 230, 216, 0.1);
+  background: rgba(8, 11, 7, 0.9);
+  color: #dfe6d8;
+}
+
+.app-top-bar__brand h1,
+.app-top-bar__brand-link {
+  color: #dfe6d8;
+}
+
+.app-top-bar__avatar-button {
+  border-color: rgba(206, 255, 41, 0.28);
+  background: rgba(223, 230, 216, 0.08);
+  color: #dfe6d8;
+}
+
+.app-bottom-nav__item {
+  color: rgba(223, 230, 216, 0.58);
+}
+
+.app-bottom-nav__item:hover {
+  background: rgba(223, 230, 216, 0.08);
+  color: #dfe6d8;
+}
+
+.app-bottom-nav__item--active {
+  background: rgba(206, 255, 41, 0.14);
+  color: var(--gym-lime);
+  box-shadow: inset 0 0 0 1px rgba(206, 255, 41, 0.34);
+}
+
+.record-screen__summary-card,
+.record-screen__quick-card,
+.record-screen__editor,
+.record-screen__confirm-bar,
+.record-screen__workspace-placeholder,
+.record-screen__workspace-guide,
+.record-screen__add-panel,
+.record-screen__loading-card,
+.food-card,
+.foods-screen__empty,
+.foods-screen__editor-panel,
+.history-screen__card,
+.history-screen__date-chip,
+.history-screen__editor-panel,
+.workouts-screen__header,
+.workouts-screen__card,
+.settings-screen__card,
+.account-sheet__panel {
+  border-color: rgba(223, 230, 216, 0.12);
+  background: rgba(14, 19, 11, 0.92);
+  color: #dfe6d8;
+  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.28);
+}
+
+.record-screen__macro-row,
+.record-screen__item-card,
+.history-screen__item-row,
+.workouts-screen__exercise-card,
+.workouts-screen__menu-card,
+.workouts-screen__log-card,
+.settings-screen__toggle-row,
+.profile-field,
+.profile-gender-picker,
+.profile-activity__btn,
+.settings-screen__reminder-button,
+.food-card__kcal {
+  border-color: rgba(223, 230, 216, 0.1);
+  background: rgba(223, 230, 216, 0.06);
+}
+
+.foods-screen__header,
+.history-screen__header,
+.workouts-screen__header,
+.settings-screen__header {
+  border-color: rgba(223, 230, 216, 0.1);
+  background:
+    linear-gradient(90deg, rgba(206, 255, 41, 0.12), transparent 54%),
+    rgba(14, 19, 11, 0.86);
+}
+
+.record-screen__workspace-title,
+.record-screen__editor-title,
+.record-screen__add-panel-title,
+.record-screen__headline strong,
+.record-screen__macro-values strong,
+.record-screen__macro-label,
+.food-card__name,
+.food-card__kcal strong,
+.foods-screen__empty h2,
+.history-screen__meal-meta h2,
+.history-screen__kcal-box strong,
+.history-screen__item-row strong,
+.history-screen__date-chip strong,
+.workouts-screen__header h1,
+.workouts-screen__section-title,
+.workouts-screen__menu-main strong,
+.workouts-screen__log-card strong,
+.settings-screen__account-copy strong,
+.foods-screen__brand h1,
+.history-screen__brand h1,
+.settings-screen__brand h1 {
+  color: #dfe6d8;
+}
+
+.record-screen__eyebrow,
+.home-screen__eyebrow,
+.workouts-screen__eyebrow,
+.settings-screen__section-label,
+.settings-screen__section-head .eyebrow,
+.foods-screen__badge,
+.history-screen__badge,
+.settings-screen__badge,
+.history-screen__date-icon,
+.history-screen__date-action--today {
+  color: var(--gym-lime);
+}
+
+.record-screen__headline span,
+.record-screen__macro-values span,
+.record-screen__workspace-copy,
+.record-screen__workspace-guide p,
+.record-screen__add-option span,
+.record-screen__add-panel-copy,
+.record-screen__add-panel-loading,
+.record-screen__feedback,
+.foods-screen__brand p,
+.foods-screen__empty p,
+.history-screen__brand p,
+.history-screen__item-row>span,
+.history-screen__item-row div,
+.history-screen__macro-line,
+.history-screen__kcal-box span,
+.workouts-screen__field span,
+.workouts-screen__section-copy,
+.workouts-screen__menu-main p,
+.workouts-screen__menu-main span,
+.workouts-screen__menu-note,
+.workouts-screen__log-card span,
+.workouts-screen__empty-copy,
+.settings-screen__brand p,
+.settings-screen__section-head span,
+.settings-screen__metric-field span:first-child,
+.settings-screen__account-copy span {
+  color: rgba(223, 230, 216, 0.64);
+}
+
+.record-screen__prompt-input,
+.record-screen__name-input,
+.record-screen__date-input,
+.record-screen__mini-field input,
+.record-screen__macro-input input,
+.record-screen__add-prompt-input,
+.foods-screen__search-field input,
+.workouts-screen__field input,
+.workouts-screen__field textarea,
+.settings-screen__metric-input input,
+.settings-screen__profile-input input,
+.profile-field__input,
+.history-screen__date-input {
+  border-color: rgba(223, 230, 216, 0.12);
+  background: rgba(223, 230, 216, 0.08);
+  color: #dfe6d8;
+  box-shadow: none;
+}
+
+.record-screen__prompt-input::placeholder,
+.record-screen__name-input::placeholder,
+.record-screen__item-name::placeholder,
+.record-screen__mini-field input::placeholder,
+.record-screen__macro-input input::placeholder,
+.record-screen__add-prompt-input::placeholder,
+.foods-screen__search-field input::placeholder,
+.workouts-screen__field input::placeholder {
+  color: rgba(223, 230, 216, 0.34);
+}
+
+.record-screen__prompt-guide,
+.record-screen__add-button,
+.record-screen__add-option,
+.record-screen__editor-close,
+.record-screen__add-panel-close,
+.food-card__btn,
+.history-screen__date-action,
+.history-screen__action,
+.workouts-screen__secondary-button,
+.workouts-screen__exercise-head button,
+.workouts-screen__menu-actions button,
+.workouts-screen__log-actions button,
+.settings-screen__secondary-button,
+.profile-actions__btn--calc {
+  border-color: rgba(223, 230, 216, 0.12);
+  background: rgba(223, 230, 216, 0.08);
+  color: #dfe6d8;
+}
+
+.record-screen__prompt-submit,
+.record-screen__add-panel-submit,
+.record-screen__confirm-button,
+.foods-screen__add-button,
+.foods-screen__empty-action,
+.history-screen__action--primary,
+.workouts-screen__primary-button,
+.settings-screen__primary-button,
+.settings-screen__accent-button,
+.profile-actions__btn--save,
+.account-sheet__primary-action,
+.app-top-bar__auth-link--primary {
+  border-color: rgba(206, 255, 41, 0.48);
+  background: var(--gym-lime);
+  color: #080b07;
+  box-shadow: 0 14px 30px rgba(206, 255, 41, 0.14);
+}
+
+.history-screen__action--edit,
+.food-card__btn--edit,
+.food-card__btn--reuse,
+.settings-screen__reminder-button--active,
+.profile-gender-picker__btn--active,
+.profile-activity__btn--active {
+  border-color: rgba(206, 255, 41, 0.46);
+  background: rgba(206, 255, 41, 0.14);
+  color: var(--gym-lime);
+}
+
+.settings-screen__switch {
+  background: rgba(223, 230, 216, 0.2);
+}
+
+.settings-screen__switch--on {
+  background: var(--gym-lime);
+}
+
+.settings-screen__switch--on i {
+  background: #080b07;
+}
+
+.settings-screen__logout-button,
+.history-screen__action--delete,
+.food-card__btn--delete,
+.workouts-screen__log-actions button,
+.workouts-screen__menu-actions button {
+  background: rgba(255, 87, 87, 0.1);
+  border-color: rgba(255, 87, 87, 0.24);
+  color: #ffb4b4;
+}
+
+.record-screen__feedback--error,
+.workouts-screen__feedback--error,
+.history-screen__feedback--error {
+  background: rgba(255, 87, 87, 0.12);
+  border-color: rgba(255, 87, 87, 0.28);
+  color: #ffd1d1;
+}
+
+.foods-screen__feedback,
+.history-screen__feedback,
+.settings-screen__feedback,
+.workouts-screen__feedback {
+  background: rgba(206, 255, 41, 0.12);
+  border-color: rgba(206, 255, 41, 0.3);
+  color: var(--gym-lime);
+}
+
+.skeleton-card {
+  border-color: rgba(223, 230, 216, 0.1);
+  background: rgba(14, 19, 11, 0.9);
+}
+
+.skeleton-shimmer {
+  background:
+    linear-gradient(90deg, rgba(223, 230, 216, 0.06) 0%, rgba(206, 255, 41, 0.12) 42%, rgba(223, 230, 216, 0.06) 80%);
+  background-size: 800px 100%;
+}
+
+@media (min-width: 1024px) {
+  .app-top-bar,
+  .app-bottom-nav {
+    background: rgba(8, 11, 7, 0.94);
+  }
 }

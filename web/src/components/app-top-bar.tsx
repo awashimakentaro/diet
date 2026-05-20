@@ -1,22 +1,6 @@
-/**
- * web/src/components/app-top-bar.tsx
- *
+/*
  * 【責務】
  * Web アプリ共通のトップバーとアカウント編集シートの起動導線を描画する。
- *
- * 【使用されるエージェント / 処理フロー】
- * - record / history / foods / settings 画面から呼ばれる。
- * - account/use-account-sheet.ts の state を受け取り、アカウント表示と編集シートを組み立てる。
- *
- * 【やらないこと】
- * - 認証処理
- * - 画面遷移
- * - ページ固有の状態管理
- *
- * 【他ファイルとの関係】
- * - web/src/features/account/use-account-sheet.ts を利用する。
- * - web/src/features/account/account-sheet.tsx を利用する。
- * - web/src/styles/globals.css の app-top-bar 系クラスに依存する。
  */
 
 'use client';

@@ -1,22 +1,6 @@
-/**
- * web/src/components/app-bottom-nav.tsx
- *
+/*
  * 【責務】
  * Web アプリ共通の主要ナビゲーションを描画する。
- *
- * 【使用されるエージェント / 処理フロー】
- * - record/history などの画面から呼ばれる。
- * - 現在のパスに応じてアクティブ表示を切り替える。
- * - スマホでは画面下部、デスクトップでは左サイドのナビゲーションとして機能する。
- *
- * 【やらないこと】
- * - 認証処理
- * - ルート保護
- * - 画面固有のロジック
- *
- * 【他ファイルとの関係】
- * - web/src/config/paths.ts を使って各画面へのリンクを生成する。
- * - web/src/styles/globals.css の下部ナビ用クラスに依存する。
  */
 
 import Link from 'next/link';
@@ -49,6 +33,7 @@ export function AppBottomNav({
 
         return (
           <Link
+            aria-current={isActive ? 'page' : undefined}
             className={isActive ? 'app-bottom-nav__item app-bottom-nav__item--active' : 'app-bottom-nav__item'}
             href={item.href}
             key={item.href}

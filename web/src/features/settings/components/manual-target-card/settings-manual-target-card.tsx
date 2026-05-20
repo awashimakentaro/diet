@@ -1,20 +1,6 @@
-/**
- * web/src/features/settings/components/settings-manual-target-card.tsx
- *
+/*
  * 【責務】
  * 手動目標設定カードを描画する。
- *
- * 【使用されるエージェント / 処理フロー】
- * - web/src/app/app/settings/_components/settings-page-screen.tsx から呼ばれる。
- * - 目標値と更新ハンドラを受け取って UI を表示する。
- *
- * 【やらないこと】
- * - 永続化
- * - 自動計算
- * - 通知設定
- *
- * 【他ファイルとの関係】
- * - use-settings-screen.ts の手動目標 state に依存する。
  */
 
 import type { ChangeEvent, JSX } from 'react';
@@ -62,7 +48,10 @@ export function SettingsManualTargetCard({
 
   return (
     <section className="settings-screen__section">
-      <p className="eyebrow">手動目標設定</p>
+      <div className="settings-screen__section-head">
+        <p className="eyebrow">手動目標設定</p>
+        <span>このカードの保存ボタンは kcal / PFC 目標だけを更新します。</span>
+      </div>
 
 
       <div className="settings-screen__card settings-screen__card--manual app-card">

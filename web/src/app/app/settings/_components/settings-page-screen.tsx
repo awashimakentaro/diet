@@ -1,23 +1,8 @@
 'use client';
 
-/**
- * web/src/app/app/settings/_components/settings-page-screen.tsx
- *
+/*
  * 【責務】
  * `/app/settings` ルート専用のトップバー、設定カード群、下部ナビを組み立てる。
- *
- * 【使用されるエージェント / 処理フロー】
- * - web/src/app/app/settings/page.tsx から呼ばれる。
- * - web/src/features/settings/hooks/use-settings-screen の状態を受け取り、各設定カードへ渡す。
- *
- * 【やらないこと】
- * - 設定値の永続化
- * - 認証状態の保持
- * - 共通 UI の定義
- *
- * 【他ファイルとの関係】
- * - web/src/features/settings/components 配下を利用する。
- * - web/src/components/app-top-bar.tsx と app-bottom-nav.tsx を利用する。
  */
 
 import { motion, useReducedMotion } from 'framer-motion';

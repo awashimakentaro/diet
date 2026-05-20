@@ -1,27 +1,13 @@
 'use client';
 
-/**
- * web/src/app/app/(home)/_components/home-page-screen.tsx
- *
+/*
  * 【責務】
  * `/app` Home ルート専用のトップバー、サマリー、体重推移、下部ナビを組み立てる。
- *
- * 【使用されるエージェント / 処理フロー】
- * - web/src/app/app/(home)/page.tsx から呼ばれる。
- * - web/src/features/home/use-home-screen.ts の状態を受け取り、各表示領域へ渡す。
- *
- * 【やらないこと】
- * - API 通信
- * - 永続化
- * - 認証制御
- *
- * 【他ファイルとの関係】
- * - web/src/components/app-top-bar.tsx と app-bottom-nav.tsx を利用する。
- * - web/src/features/record/components/record-summary-card.tsx を Home 用に再利用する。
- * - web/src/features/home/components/weight-trend-chart.tsx を利用する。
  */
 
 import { motion, useReducedMotion } from 'framer-motion';
+import { Camera, Dumbbell } from 'lucide-react';
+import Link from 'next/link';
 import { useState, type JSX } from 'react';
 
 import { HomeScreenSkeleton } from '@/components/app-skeleton';
@@ -30,11 +16,13 @@ import { WeightTrendChart } from '@/features/home/components/weight-trend-chart'
 import { DailyEnergyCard } from '@/features/home/components/daily-energy-card';
 import { useHomeScreen } from '@/features/home/use-home-screen';
 import { RecordSummaryCard } from '@/components/record-summary-card';
+import { paths } from '@/config/paths';
 
 export function HomePageScreen(): JSX.Element {
-  const { summary, dailyEnergy, consecutiveDays, insights, usageBars, weightLogs, isLoading } = useHomeScreen();
+  const { summary, dailyEnergy, weightLogs, isLoading } = useHomeScreen();
   const [selectedWeightLogId, setSelectedWeightLogId] = useState<string | null>(null);
-  const chartHeight = 136;
+  const hasTodayRecord = summary.kcal > 0 || summary.macros.some((macro) => macro.current > 0);
+  const hasWeightLogs = weightLogs.length > 0;
   const reduceMotion = useReducedMotion();
   const sectionTransition = reduceMotion
     ? { duration: 0 }
@@ -62,6 +50,25 @@ export function HomePageScreen(): JSX.Element {
             transition={sectionTransition}
           >
             <div className="home-screen__hero-stack">
+              <section className="home-screen__action-card">
+                <div>
+                  <p className="home-screen__eyebrow">Quick Start</p>
+                  <h2>写真で記録する。</h2>
+                  <span>{hasTodayRecord ? '今日の続きも、写真か一言で足せます。' : 'まずは今日の食事を1つ残すところから。'}</span>
+                </div>
+                <Link className="home-screen__record-link" href={paths.app.record.getHref()}>
+                  <Camera aria-hidden="true" size={19} strokeWidth={2.5} />
+                  記録する
+                </Link>
+              </section>
+
+              {!hasTodayRecord ? (
+                <section className="home-screen__empty-card" aria-label="今日の記録がない状態">
+                  <strong>今日の記録はまだありません</strong>
+                  <span>写真を追加すると AI が候補を作ります。細かい PFC は後から直せます。</span>
+                </section>
+              ) : null}
+
               <RecordSummaryCard summary={summary} />
               <DailyEnergyCard
                 balanceKcal={dailyEnergy.balanceKcal}
@@ -70,40 +77,15 @@ export function HomePageScreen(): JSX.Element {
                 isProfileReady={dailyEnergy.isProfileReady}
                 workoutKcal={dailyEnergy.workoutKcal}
               />
-
-              <motion.section
-                animate={{ opacity: 1, y: 0 }}
-                className="home-screen__card"
-                initial={{ opacity: 0, y: 20 }}
-                transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.16 }}
-              >
-                <div className="home-screen__card-head">
-                  <p className="home-screen__eyebrow">インサイト</p>
-                  <h2 className="home-screen__section-title">分析結果</h2>
-                </div>
-
-                <div className="home-screen__insight-list">
-                  {insights.map((insight) => (
-                    <motion.article
-                      animate={{ opacity: 1, y: 0 }}
-                      className="home-screen__insight-card"
-                      initial={{ opacity: 0, y: 14 }}
-                      key={insight.label}
-                      transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.22 }}
-                    >
-                      <div className="home-screen__insight-label-row">
-                        <p>{insight.label}</p>
-                        <span className="home-screen__insight-dot" />
-                      </div>
-                      <strong>{insight.value}</strong>
-                      <span>{insight.description}</span>
-                    </motion.article>
-                  ))}
-                </div>
-              </motion.section>
             </div>
 
             <div className="home-screen__side-stack">
+              <section className="home-screen__gym-card" aria-label="PFC Tracker のコンセプト">
+                <Dumbbell aria-hidden="true" size={28} strokeWidth={2.4} />
+                <strong>NO MORE</strong>
+                <span>面倒な食事管理。</span>
+              </section>
+
               <motion.section
                 animate={{ opacity: 1, y: 0 }}
                 className="home-screen__card home-screen__card--weight"
@@ -124,7 +106,7 @@ export function HomePageScreen(): JSX.Element {
                     <span>目標体重</span>
                     <strong>{weightLogs.at(-1)?.targetWeightKg ?? '--'} kg</strong>
                   </div>
-                  {weightLogs.length > 0 ? (
+                  {hasWeightLogs ? (
                     <div className="home-screen__weight-summary-slot">
                       <WeightTrendChart
                         onSelectPoint={setSelectedWeightLogId}
@@ -136,76 +118,21 @@ export function HomePageScreen(): JSX.Element {
                   ) : null}
                 </div>
 
-                <WeightTrendChart
-                  onSelectPoint={setSelectedWeightLogId}
-                  points={weightLogs}
-                  selectedPointId={selectedWeightLogId ?? weightLogs.at(-1)?.id ?? null}
-                />
+                {hasWeightLogs ? (
+                  <WeightTrendChart
+                    onSelectPoint={setSelectedWeightLogId}
+                    points={weightLogs}
+                    selectedPointId={selectedWeightLogId ?? weightLogs.at(-1)?.id ?? null}
+                  />
+                ) : (
+                  <div className="home-screen__weight-empty home-screen__weight-empty--action">
+                    <p>設定で現在体重と目標体重を保存すると、ここに推移が表示されます。</p>
+                    <Link className="home-screen__record-link home-screen__record-link--ghost" href={paths.app.settings.getHref()}>
+                      設定を開く
+                    </Link>
+                  </div>
+                )}
               </motion.section>
-
-              <div className="home-screen__side-row">
-                <motion.section
-                  animate={{ opacity: 1, y: 0 }}
-                  className="home-screen__card"
-                  initial={{ opacity: 0, y: 20 }}
-                  transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.16 }}
-                >
-                  <div className="home-screen__card-head">
-                    <p className="home-screen__eyebrow">コンスタンス</p>
-                    <h2 className="home-screen__section-title">継続利用</h2>
-                  </div>
-
-                  <div className="home-screen__streak">
-                    <strong>{consecutiveDays}</strong>
-                    <span>日間連続</span>
-                  </div>
-
-                  <p className="home-screen__support-copy">
-                    連続して記録できています。今日も入力を続けて、日々の推移を安定して残しましょう。
-                  </p>
-                </motion.section>
-
-                <motion.section
-                  animate={{ opacity: 1, y: 0 }}
-                  className="home-screen__card"
-                  initial={{ opacity: 0, y: 20 }}
-                  transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.2 }}
-                >
-                  <div className="home-screen__card-head">
-                    <p className="home-screen__eyebrow">アクティビティ</p>
-                    <h2 className="home-screen__section-title">曜日ごとの摂取カロリー</h2>
-                  </div>
-
-                  <p className="home-screen__activity-copy">
-                    今週の各曜日でどれだけ摂取したかを kcal ベースで表示しています。
-                  </p>
-
-                  <div className="home-screen__usage-chart">
-                    {usageBars.map((bar) => (
-                      <div className="home-screen__usage-bar" key={bar.label}>
-                        <strong className="home-screen__usage-kcal">
-                          {bar.hasRecord ? `${bar.kcal} kcal` : '-'}
-                        </strong>
-                        <motion.div
-                          animate={{
-                            height: bar.hasRecord
-                              ? Math.max(8, Math.round((bar.value / 100) * chartHeight))
-                              : 0,
-                          }}
-                          className={bar.hasRecord ? 'home-screen__usage-fill' : 'home-screen__usage-fill home-screen__usage-fill--empty'}
-                          initial={{ height: 0 }}
-                          transition={
-                            reduceMotion
-                              ? { duration: 0 }
-                              : { duration: 0.8, ease: 'easeOut' as const }
-                          }
-                        />
-                        <span>{bar.label}</span>
-                      </div>
-                    ))}
-                  </div>
-                </motion.section>
-              </div>
             </div>
           </motion.section>
         </motion.main>

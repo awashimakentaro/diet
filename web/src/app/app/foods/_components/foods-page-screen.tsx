@@ -1,22 +1,8 @@
 'use client';
 
-/**
- * web/src/app/app/foods/_components/foods-page-screen.tsx
- *
+/*
  * 【責務】
  * `/app/foods` ルート専用のトップバー、検索バー、食品カード一覧、下部ナビを組み立てる。
- *
- * 【使用されるエージェント / 処理フロー】
- * - web/src/app/app/foods/page.tsx から呼ばれる。
- * - web/src/features/foods/hooks/use-foods-screen と各 UI コンポーネントを接続する。
- *
- * 【やらないこと】
- * - API 通信
- * - 永続化
- * - 認証制御
- *
- * 【他ファイルとの関係】
- * - web/src/features/foods/components 配下と web/src/components/app-bottom-nav.tsx を利用する。
  */
 
 import { motion, useReducedMotion } from 'framer-motion';
@@ -96,8 +82,15 @@ export function FoodsPageScreen(): JSX.Element {
                 initial={{ opacity: 0, y: 20 }}
                 transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.1 }}
               >
-                <h2>一致する食品がありません</h2>
-                <p>検索語を変えてもう一度試してください。</p>
+                <h2>{searchTerm.trim().length > 0 ? '一致する食品がありません' : '食品ライブラリはまだ空です'}</h2>
+                <p>
+                  {searchTerm.trim().length > 0
+                    ? '検索語を短くするか、よく使う食品として新しく追加できます。'
+                    : '鶏むね丼、プロテイン、いつもの朝食などを保存しておくと、次回からすぐ再利用できます。'}
+                </p>
+                <button className="foods-screen__empty-action" onClick={handleAddFood} type="button">
+                  食品を追加する
+                </button>
               </motion.div>
             ) : (
               visibleEntries.map((entry, index) => (

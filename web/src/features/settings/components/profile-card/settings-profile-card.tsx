@@ -1,6 +1,4 @@
-/**
- * web/src/features/settings/components/settings-profile-card.tsx
- *
+/*
  * 【責務】
  * 共有用プロフィール項目と体格情報、自動計算カードを描画する。
  */
@@ -95,7 +93,10 @@ export function SettingsProfileCard({
 
   return (
     <section className="settings-screen__section">
-      <p className="eyebrow">体格情報 + 自動計算</p>
+      <div className="settings-screen__section-head">
+        <p className="eyebrow">体格情報 + 自動計算</p>
+        <span>プロフィール保存と目標の自動計算は別々に実行できます。</span>
+      </div>
 
       <div className="settings-screen__card settings-screen__card--profile app-card">
         {/* Gender Segmented Control */}

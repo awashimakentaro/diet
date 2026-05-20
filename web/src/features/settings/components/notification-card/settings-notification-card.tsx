@@ -30,7 +30,10 @@ export function SettingsNotificationCard({
 }: SettingsNotificationCardProps): JSX.Element {
   return (
     <section className="settings-screen__section">
-      <p className="eyebrow">通知設定</p>
+      <div className="settings-screen__section-head">
+        <p className="eyebrow">通知設定</p>
+        <span>このカードの保存ボタンは通知の有効状態と時間帯だけを更新します。</span>
+      </div>
 
 
       <div className="settings-screen__card settings-screen__card--notification app-card">

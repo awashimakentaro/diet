@@ -1,25 +1,9 @@
-/**
- * web/src/components/app-skeleton.tsx
- *
+/*
  * 【責務】
  * データ取得中に表示するスケルトン UI コンポーネントを提供する。
- *
- * 【使用されるエージェント / 処理フロー】
- * - Home / History / Foods / Record の loading.tsx や screen から呼ばれる。
- * - 現在の実画面レイアウトに寄せた骨格だけを描画する。
- *
- * 【やらないこと】
- * - データ取得
- * - 画面 state 管理
- * - 画面遷移
- *
- * 【他ファイルとの関係】
- * - web/src/styles/globals.css の skeleton-* 系クラスに依存する。
  */
 
 import type { CSSProperties, JSX } from 'react';
-
-const SKELETON_BAR_HEIGHTS = ['42px', '78px', '64px', '92px', '58px', '84px', '70px'] as const;
 
 type SkeletonLineProps = {
     width?: string;
@@ -77,8 +61,19 @@ export function SkeletonCard({ children, className = '', style }: SkeletonCardPr
 export function HomeScreenSkeleton(): JSX.Element {
     return (
         <div className="skeleton-screen skeleton-screen--home">
+            <div className="skeleton-loading-note">
+                <SkeletonCircle size="18px" />
+                <span>今日の記録を読み込んでいます</span>
+            </div>
             <div className="skeleton-home-grid">
                 <div className="skeleton-home-stack">
+                    <SkeletonCard className="skeleton-home-action-card">
+                        <SkeletonLine width="28%" height="11px" />
+                        <SkeletonLine width="68%" height="40px" style={{ marginTop: 10 }} />
+                        <SkeletonLine width="82%" height="14px" style={{ marginTop: 8 }} />
+                        <SkeletonLine width="120px" height="44px" borderRadius="999px" style={{ marginTop: 12 }} />
+                    </SkeletonCard>
+
                     <SkeletonCard className="skeleton-card--large">
                         <SkeletonLine width="34%" height="11px" />
                         <SkeletonLine width="42%" height="30px" style={{ marginTop: 10 }} />
@@ -98,24 +93,21 @@ export function HomeScreenSkeleton(): JSX.Element {
                     <SkeletonCard>
                         <SkeletonLine width="24%" height="10px" />
                         <SkeletonLine width="32%" height="18px" style={{ marginTop: 8 }} />
-
-                        <div className="skeleton-home-insights">
-                            {Array.from({ length: 3 }).map((_, index) => (
-                                <div className="skeleton-home-insight-card" key={index}>
-                                    <div className="skeleton-row">
-                                        <SkeletonLine width="40%" height="12px" />
-                                        <SkeletonCircle size="8px" />
-                                    </div>
-                                    <SkeletonLine width="52%" height="24px" style={{ marginTop: 12 }} />
-                                    <SkeletonLine width="100%" height="12px" style={{ marginTop: 10 }} />
-                                    <SkeletonLine width="76%" height="12px" style={{ marginTop: 6 }} />
-                                </div>
-                            ))}
+                        <SkeletonLine width="52%" height="40px" style={{ marginTop: 18 }} />
+                        <div className="skeleton-row" style={{ marginTop: 16 }}>
+                            <SkeletonLine width="30%" height="36px" borderRadius="14px" />
+                            <SkeletonLine width="30%" height="36px" borderRadius="14px" />
+                            <SkeletonLine width="30%" height="36px" borderRadius="14px" />
                         </div>
                     </SkeletonCard>
                 </div>
 
                 <div className="skeleton-home-stack">
+                    <SkeletonCard>
+                        <SkeletonLine width="20%" height="18px" />
+                        <SkeletonLine width="58%" height="42px" style={{ marginTop: 22 }} />
+                    </SkeletonCard>
+
                     <SkeletonCard>
                         <SkeletonLine width="30%" height="10px" />
                         <SkeletonLine width="36%" height="18px" style={{ marginTop: 8 }} />
@@ -131,35 +123,6 @@ export function HomeScreenSkeleton(): JSX.Element {
 
                         <SkeletonLine width="100%" height="156px" borderRadius="26px" style={{ marginTop: 16 }} />
                     </SkeletonCard>
-
-                    <div className="skeleton-home-side-row">
-                        <SkeletonCard>
-                            <SkeletonLine width="34%" height="10px" />
-                            <SkeletonLine width="52%" height="18px" style={{ marginTop: 8 }} />
-                            <SkeletonLine width="48%" height="52px" borderRadius="18px" style={{ marginTop: 22 }} />
-                            <SkeletonLine width="100%" height="12px" style={{ marginTop: 18 }} />
-                            <SkeletonLine width="88%" height="12px" style={{ marginTop: 8 }} />
-                        </SkeletonCard>
-
-                        <SkeletonCard>
-                            <SkeletonLine width="34%" height="10px" />
-                            <SkeletonLine width="56%" height="18px" style={{ marginTop: 8 }} />
-                            <SkeletonLine width="92%" height="12px" style={{ marginTop: 18 }} />
-                            <div className="skeleton-bar-chart" style={{ marginTop: 18 }}>
-                                {SKELETON_BAR_HEIGHTS.map((height, i) => (
-                                    <div key={i} className="skeleton-bar-col">
-                                        <SkeletonLine width="100%" height="12px" borderRadius="8px" style={{ marginBottom: 8 }} />
-                                        <SkeletonLine
-                                            width="100%"
-                                            height={height}
-                                            borderRadius="10px"
-                                        />
-                                        <SkeletonLine width="100%" height="10px" style={{ marginTop: 6 }} />
-                                    </div>
-                                ))}
-                            </div>
-                        </SkeletonCard>
-                    </div>
                 </div>
             </div>
         </div>
