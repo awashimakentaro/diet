@@ -3882,8 +3882,8 @@ input {
   color: rgba(223, 230, 216, 0.58);
 }
 
-.home-screen .record-screen__summary-card {
-  border-color: #dfe6d8;
+.home-screen .record-screxen__summary-card {
+  border-color: rgba(50, 57, 43, 0.12);
   background: rgba(8, 13, 7, 0.82);
   color: #dfe6d8;
   box-shadow: 0 24px 54px rgba(0, 0, 0, 0.24);
@@ -7667,4 +7667,49 @@ input {
   .app-bottom-nav {
     background: rgba(8, 11, 7, 0.94);
   }
+}
+
+.home-screen__card,
+.home-screen .record-screen__summary-card {
+  border-color: rgba(223, 230, 216, 0.12);
+}
+
+.record-screen__quick-card {
+  border-color: rgba(206, 255, 41, 0.22);
+  background: rgba(11, 15, 9, 0.94);
+}
+
+.record-screen__quick-head strong {
+  color: #dfe6d8;
+}
+
+.record-screen__quick-head span {
+  color: rgba(223, 230, 216, 0.64);
+}
+
+.record-screen__quick-card .record-screen__prompt-input {
+  border-color: rgba(223, 230, 216, 0.16);
+  background: #151b12;
+  color: #e8ece4;
+  caret-color: var(--gym-lime);
+}
+
+.record-screen__quick-card .record-screen__prompt-input::placeholder {
+  color: rgba(223, 230, 216, 0.46);
+}
+
+.record-screen__quick-card .record-screen__prompt-input:focus {
+  border-color: rgba(206, 255, 41, 0.58);
+  background: #171f13;
+  box-shadow: 0 0 0 4px rgba(206, 255, 41, 0.14);
+}
+
+.record-screen__quick-card .record-screen__prompt-tool {
+  border-color: rgba(223, 230, 216, 0.14);
+  background: rgba(223, 230, 216, 0.08);
+  color: #dfe6d8;
+}
+
+.record-screen__quick-card .record-screen__prompt-tool svg:first-child {
+  color: var(--gym-lime);
 }
