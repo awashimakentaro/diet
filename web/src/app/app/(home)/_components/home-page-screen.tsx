@@ -6,7 +6,7 @@
  */
 
 import { motion, useReducedMotion } from 'framer-motion';
-import { Camera, Dumbbell } from 'lucide-react';
+import { Camera } from 'lucide-react';
 import Link from 'next/link';
 import { useState, type JSX } from 'react';
 
@@ -21,7 +21,6 @@ import { paths } from '@/config/paths';
 export function HomePageScreen(): JSX.Element {
   const { summary, dailyEnergy, weightLogs, isLoading } = useHomeScreen();
   const [selectedWeightLogId, setSelectedWeightLogId] = useState<string | null>(null);
-  const hasTodayRecord = summary.kcal > 0 || summary.macros.some((macro) => macro.current > 0);
   const hasWeightLogs = weightLogs.length > 0;
   const reduceMotion = useReducedMotion();
   const sectionTransition = reduceMotion
@@ -50,26 +49,15 @@ export function HomePageScreen(): JSX.Element {
             transition={sectionTransition}
           >
             <div className="home-screen__hero-stack">
-              <section className="home-screen__action-card">
-                <div>
-                  <p className="home-screen__eyebrow">Quick Start</p>
-                  <h2>写真で記録する。</h2>
-                  <span>{hasTodayRecord ? '今日の続きも、写真か一言で足せます。' : 'まずは今日の食事を1つ残すところから。'}</span>
-                </div>
-                <Link className="home-screen__record-link" href={paths.app.record.getHref()}>
-                  <Camera aria-hidden="true" size={19} strokeWidth={2.5} />
-                  記録する
-                </Link>
-              </section>
-
-              {!hasTodayRecord ? (
-                <section className="home-screen__empty-card" aria-label="今日の記録がない状態">
-                  <strong>今日の記録はまだありません</strong>
-                  <span>写真を追加すると AI が候補を作ります。細かい PFC は後から直せます。</span>
-                </section>
-              ) : null}
-
-              <RecordSummaryCard summary={summary} />
+              <RecordSummaryCard
+                action={(
+                  <Link className="home-screen__record-link" href={paths.app.record.getHref()}>
+                    <Camera aria-hidden="true" size={19} strokeWidth={2.5} />
+                    記録する
+                  </Link>
+                )}
+                summary={summary}
+              />
               <DailyEnergyCard
                 balanceKcal={dailyEnergy.balanceKcal}
                 bmr={dailyEnergy.bmr}
@@ -80,12 +68,6 @@ export function HomePageScreen(): JSX.Element {
             </div>
 
             <div className="home-screen__side-stack">
-              <section className="home-screen__gym-card" aria-label="PFC Tracker のコンセプト">
-                <Dumbbell aria-hidden="true" size={28} strokeWidth={2.4} />
-                <strong>NO MORE</strong>
-                <span>面倒な食事管理。</span>
-              </section>
-
               <motion.section
                 animate={{ opacity: 1, y: 0 }}
                 className="home-screen__card home-screen__card--weight"

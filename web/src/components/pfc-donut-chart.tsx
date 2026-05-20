@@ -1,6 +1,4 @@
-/**
- * web/src/features/record/components/pfc-donut-chart.tsx
- *
+/*
  * 【責務】
  * たんばく質(P)、脂質(F)、炭水化物(C)のエネルギー比率をドーナツグラフで描画する。
  */
@@ -34,12 +32,13 @@ export function PfcDonutChart({
                     width: size,
                     height: size,
                     borderRadius: '50%',
-                    background: 'var(--slate-100)',
+                    background: 'rgba(223, 230, 216, 0.12)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontSize: '12px',
-                    color: 'var(--slate-400)'
+                    color: 'var(--gym-lime)',
+                    fontWeight: 800,
                 }}
             >
                 No Data
@@ -97,7 +96,7 @@ export function PfcDonutChart({
                 />
 
                 {/* Center Hole for Donut effect */}
-                <circle cx="50" cy="50" fill="white" r="28" />
+                <circle cx="50" cy="50" fill="#11170d" r="28" />
             </svg>
 
             <div
@@ -110,8 +109,8 @@ export function PfcDonutChart({
                     pointerEvents: 'none'
                 }}
             >
-                <p style={{ fontSize: '10px', color: 'var(--slate-400)', margin: 0 }}>P</p>
-                <p style={{ fontSize: '14px', fontWeight: 'bold', color: 'var(--slate-800)', margin: 0 }}>
+                <p style={{ fontSize: '10px', color: 'rgba(223, 230, 216, 0.72)', margin: 0 }}>P</p>
+                <p style={{ fontSize: '14px', fontWeight: 'bold', color: 'var(--gym-lime)', margin: 0 }}>
                     {Math.round(pRatio * 100)}%
                 </p>
             </div>

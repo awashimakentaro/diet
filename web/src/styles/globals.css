@@ -3883,7 +3883,7 @@ input {
 }
 
 .home-screen .record-screen__summary-card {
-  border-color: rgba(223, 230, 216, 0.12);
+  border-color: #dfe6d8;
   background: rgba(8, 13, 7, 0.82);
   color: #dfe6d8;
   box-shadow: 0 24px 54px rgba(0, 0, 0, 0.24);

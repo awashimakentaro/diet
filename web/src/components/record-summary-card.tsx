@@ -4,7 +4,7 @@
  */
 
 import { motion, useReducedMotion } from 'framer-motion';
-import type { JSX } from 'react';
+import type { JSX, ReactNode } from 'react';
 
 import { PfcDonutChart } from './pfc-donut-chart';
 
@@ -24,10 +24,12 @@ export type NutritionSummary = {
 
 type RecordSummaryCardProps = {
   summary: NutritionSummary;
+  action?: ReactNode;
 };
 
 export function RecordSummaryCard({
   summary,
+  action = null,
 }: RecordSummaryCardProps): JSX.Element {
   const reduceMotion = useReducedMotion();
 
@@ -52,6 +54,11 @@ export function RecordSummaryCard({
                 <span>/ {summary.goalKcal} kcal</span>
               </div>
             </div>
+            {action !== null ? (
+              <div className="record-screen__summary-action">
+                {action}
+              </div>
+            ) : null}
           </div>
         </div>
 
