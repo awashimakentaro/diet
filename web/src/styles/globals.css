@@ -1,19 +1,6 @@
-/**
- * web/app/globals.css
- *
+/*
  * 【責務】
  * Web 版全体のトーン、レイアウト、共通 UI スタイルを定義する。
- *
- * 【使用箇所】
- * - web/app/layout.tsx から全ページへ読み込まれる。
- *
- * 【やらないこと】
- * - 個別ページのデータ定義
- * - ルーティング
- * - 実行時ロジック
- *
- * 【他ファイルとの関係】
- * - web/src/components 配下のクラス名と対応し、モバイル版に近い見た目を提供する。
  */
 
 :root {
@@ -83,19 +70,64 @@ body {
 
 .landing-screen {
   min-height: 100vh;
+  color: #f8fafc;
   background:
-    radial-gradient(circle at top left, rgba(219, 234, 254, 0.72), transparent 28%),
-    linear-gradient(180deg, #fcfdff 0%, #f7f9fc 100%);
+    linear-gradient(90deg, rgba(248, 250, 252, 0.055) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(248, 250, 252, 0.055) 1px, transparent 1px),
+    radial-gradient(circle at 78% 18%, rgba(206, 255, 41, 0.28), transparent 25%),
+    radial-gradient(circle at 12% 78%, rgba(255, 107, 53, 0.2), transparent 24%),
+    linear-gradient(135deg, #080a07 0%, #141810 48%, #080a07 100%);
+  background-size: 48px 48px, 48px 48px, auto, auto, auto;
+  overflow: hidden;
+}
+
+.landing-screen::before {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  background:
+    linear-gradient(120deg, transparent 0 58%, rgba(206, 255, 41, 0.1) 58% 59%, transparent 59%),
+    radial-gradient(rgba(248, 250, 252, 0.12) 0.8px, transparent 0.8px);
+  background-size: auto, 7px 7px;
+  opacity: 0.55;
+  animation: landing-grid-drift 18s linear infinite;
+}
+
+.landing-screen__live-comments {
+  position: fixed;
+  inset: 15% 0 auto;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.landing-screen__live-comment {
+  position: absolute;
+  top: var(--comment-top);
+  left: 0;
+  width: max-content;
+  color: rgba(248, 250, 252, 0.92);
+  font-size: clamp(1.05rem, 2.2vw, 1.75rem);
+  font-weight: 900;
+  letter-spacing: 0;
+  text-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.72),
+    0 0 18px rgba(206, 255, 41, 0.36);
+  transform: translateX(100vw);
+  animation: landing-live-comment 10s linear var(--comment-delay) both;
 }
 
 .landing-screen__hero,
 .landing-screen__section {
+  position: relative;
   width: min(calc(100% - 32px), 1200px);
   margin: 0 auto;
 }
 
 .landing-screen__hero {
-  padding: 28px 0 48px;
+  display: grid;
+  min-height: 100vh;
+  padding: 18px 0 40px;
 }
 
 .landing-screen__topbar {
@@ -103,21 +135,35 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 36px;
+  margin-bottom: 32px;
 }
 
 .landing-screen__brand {
   display: inline-flex;
   align-items: center;
+  gap: 10px;
   text-decoration: none;
 }
 
+.landing-screen__brand-icon {
+  display: inline-grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid rgba(206, 255, 41, 0.36);
+  border-radius: 12px;
+  background: #ceff29;
+  color: #080a07;
+  box-shadow: 0 0 34px rgba(206, 255, 41, 0.28);
+  animation: landing-pulse 2.8s ease-in-out infinite;
+}
+
 .landing-screen__brand-mark {
-  color: #101828;
+  color: #f8fafc;
   font-family: var(--font-heading);
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 900;
-  letter-spacing: -0.05em;
+  letter-spacing: 0;
 }
 
 .landing-screen__auth-actions,
@@ -133,163 +179,367 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 46px;
-  padding: 0 18px;
+  gap: 8px;
+  min-height: 52px;
+  padding: 0 24px;
+  border: 1px solid rgba(248, 250, 252, 0.18);
   border-radius: 999px;
   text-decoration: none;
   font-size: 0.92rem;
   font-weight: 800;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+.landing-screen__auth-link:hover,
+.landing-screen__cta:hover {
+  transform: translateY(-3px);
 }
 
 .landing-screen__auth-link--secondary,
 .landing-screen__cta--secondary {
-  border: 1px solid #dbe4f0;
-  background: rgba(255, 255, 255, 0.88);
-  color: #334155;
+  background: rgba(248, 250, 252, 0.08);
+  color: #f8fafc;
+  box-shadow: inset 0 0 0 1px rgba(248, 250, 252, 0.1);
+  backdrop-filter: blur(16px);
 }
 
 .landing-screen__auth-link--primary,
 .landing-screen__cta--primary {
-  background: linear-gradient(135deg, var(--blue-500), var(--blue-700));
-  color: #ffffff;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+  border-color: #ceff29;
+  background: #ceff29;
+  color: #080a07;
+  box-shadow: 0 18px 34px rgba(206, 255, 41, 0.24);
+  animation: landing-cta-glow 3.2s ease-in-out infinite;
+}
+
+.landing-screen__cta--primary:hover {
+  box-shadow: 0 22px 42px rgba(206, 255, 41, 0.3);
 }
 
 .landing-screen__hero-grid {
   display: grid;
-  gap: 24px;
+  gap: 32px;
+  align-items: center;
+  align-self: center;
 }
 
-.landing-screen__hero-copy,
-.landing-screen__hero-card {
-  padding: 32px;
-  border: 1px solid rgba(219, 234, 254, 0.88);
-  border-radius: 32px;
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
+.landing-screen__hero-copy {
+  position: relative;
+  z-index: 2;
+  padding: 0;
+  animation: landing-copy-in 700ms ease-out both;
 }
 
 .landing-screen__eyebrow {
-  margin: 0 0 12px;
-  color: #4f7cff;
+  width: fit-content;
+  margin: 0 0 18px;
+  padding: 9px 12px;
+  border: 1px solid rgba(206, 255, 41, 0.34);
+  border-radius: 999px;
+  background: rgba(206, 255, 41, 0.1);
+  color: #ceff29;
   font-size: 11px;
   font-weight: 900;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.12em;
 }
 
 .landing-screen__hero-copy h1,
-.landing-screen__section-head h2,
-.landing-screen__step-copy h3,
-.landing-screen__hero-card-copy strong {
+.landing-screen__section-head h2 {
   margin: 0;
   font-family: var(--font-heading);
-  color: #101828;
+  color: #f8fafc;
 }
 
 .landing-screen__hero-copy h1 {
-  font-size: clamp(2.3rem, 6vw, 4.6rem);
-  line-height: 0.98;
-  letter-spacing: -0.08em;
+  max-width: 850px;
+  font-size: clamp(3.7rem, 9.5vw, 9rem);
+  line-height: 0.88;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.landing-screen__hero-copy h1 span,
+.landing-screen__section-head h2 span {
+  display: block;
+}
+
+.landing-screen__hero-copy h1 span {
+  color: #ceff29;
+  font-size: 0.46em;
+  line-height: 1.04;
+  text-transform: none;
+  white-space: nowrap;
 }
 
 .landing-screen__lead {
-  margin: 18px 0 0;
+  margin: 24px 0 0;
   max-width: 620px;
-  color: #475467;
-  font-size: 1rem;
-  line-height: 1.8;
+  color: rgba(248, 250, 252, 0.78);
+  font-size: clamp(1rem, 1.7vw, 1.2rem);
+  font-weight: 700;
+  line-height: 1.75;
 }
 
 .landing-screen__hero-actions {
-  margin-top: 28px;
+  margin-top: 32px;
 }
 
-.landing-screen__hero-card {
-  display: grid;
-  gap: 20px;
-  align-content: start;
+.landing-screen__impact {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  min-height: 560px;
+  border: 1px solid rgba(248, 250, 252, 0.14);
+  border-radius: 36px;
+  background: rgba(248, 250, 252, 0.04);
+  box-shadow:
+    0 34px 90px rgba(0, 0, 0, 0.38),
+    inset 0 0 0 1px rgba(206, 255, 41, 0.08);
+  animation: landing-float 5.5s ease-in-out infinite;
 }
 
-.landing-screen__hero-card-copy {
-  display: grid;
-  gap: 8px;
+.landing-screen__impact::before {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  content: "";
+  background:
+    linear-gradient(90deg, rgba(8, 10, 7, 0.24) 0%, transparent 46%),
+    radial-gradient(circle at 18% 82%, rgba(206, 255, 41, 0.2), transparent 24%);
 }
 
-.landing-screen__hero-card-copy p,
-.landing-screen__step-copy p {
-  margin: 0;
-  color: #4f7cff;
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 0.14em;
-}
-
-.landing-screen__hero-card-copy strong {
-  font-size: 1.4rem;
-  letter-spacing: -0.05em;
-}
-
-.landing-screen__hero-card-copy span,
-.landing-screen__step-copy span {
-  color: #667085;
-  font-size: 0.94rem;
-  line-height: 1.7;
-}
-
-.landing-screen__hero-image,
-.landing-screen__step-image {
+.landing-screen__athlete-image {
+  display: block;
   width: 100%;
-  border-radius: 24px;
+  height: 100%;
+  min-height: 560px;
   object-fit: cover;
-  background: #f8fafc;
+  object-position: 58% center;
+  transform: scale(1.03);
+  animation: landing-image-breathe 8s ease-in-out infinite;
 }
 
-.landing-screen__hero-image {
-  min-height: 260px;
-}
-
-.landing-screen__section {
-  padding: 0 0 56px;
-}
-
-.landing-screen__section-head {
+.landing-screen__speech-stack {
+  position: absolute;
+  right: 20px;
+  bottom: 22px;
+  z-index: 2;
   display: grid;
   gap: 8px;
-  margin-bottom: 20px;
+  justify-items: end;
+  max-width: 280px;
 }
 
-.landing-screen__section-head h2 {
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
-  letter-spacing: -0.06em;
+.landing-screen__speech-bubble {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+  padding: 16px 18px;
+  border: 1px solid rgba(206, 255, 41, 0.44);
+  border-radius: 22px 22px 6px 22px;
+  background: #ceff29;
+  color: #080a07;
+  font-size: 0.95rem;
+  font-weight: 900;
+  line-height: 1.45;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.36);
+  opacity: 0;
+  transform: translateX(130%) rotate(5deg);
 }
 
-.landing-screen__steps {
-  display: grid;
-  gap: 18px;
+.landing-screen__speech-bubble--first {
+  font-size: 1.18rem;
+  line-height: 1.1;
+  animation: landing-bubble-pop 620ms cubic-bezier(0.2, 1.1, 0.24, 1) 2.1s forwards;
 }
 
-.landing-screen__step-card {
-  display: grid;
-  gap: 18px;
-  padding: 24px;
-  border: 1px solid rgba(219, 234, 254, 0.88);
-  border-radius: 28px;
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.05);
+.landing-screen__speech-bubble--second {
+  animation: landing-bubble-pop 620ms cubic-bezier(0.2, 1.1, 0.24, 1) 3.15s forwards;
 }
 
-.landing-screen__step-copy {
-  display: grid;
-  gap: 10px;
+.landing-screen__speech-bubble::after {
+  position: absolute;
+  right: 18px;
+  bottom: -10px;
+  width: 18px;
+  height: 18px;
+  background: #ceff29;
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+  content: "";
 }
 
-.landing-screen__step-copy h3 {
-  font-size: 1.4rem;
-  letter-spacing: -0.04em;
+@keyframes landing-copy-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.landing-screen__step-image {
-  min-height: 220px;
+@keyframes landing-grid-drift {
+  from {
+    background-position: 0 0, 0 0;
+  }
+
+  to {
+    background-position: 0 0, 28px 28px;
+  }
+}
+
+@keyframes landing-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 26px rgba(206, 255, 41, 0.2);
+  }
+
+  50% {
+    box-shadow: 0 0 44px rgba(206, 255, 41, 0.42);
+  }
+}
+
+@keyframes landing-cta-glow {
+  0%,
+  100% {
+    box-shadow: 0 18px 34px rgba(206, 255, 41, 0.24);
+  }
+
+  50% {
+    box-shadow: 0 22px 48px rgba(206, 255, 41, 0.38);
+  }
+}
+
+@keyframes landing-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes landing-image-breathe {
+  0%,
+  100% {
+    transform: scale(1.03);
+  }
+
+  50% {
+    transform: scale(1.07);
+  }
+}
+
+@keyframes landing-bubble-pop {
+  0% {
+    opacity: 0;
+    transform: translateX(130%) rotate(5deg) scale(0.92);
+  }
+
+  74% {
+    opacity: 1;
+    transform: translateX(-8px) rotate(-2deg) scale(1.04);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0) rotate(0deg) scale(1);
+  }
+}
+
+@keyframes landing-live-comment {
+  from {
+    transform: translateX(100vw);
+  }
+
+  to {
+    transform: translateX(-110%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-screen::before,
+  .landing-screen__brand-icon,
+  .landing-screen__cta--primary,
+  .landing-screen__hero-copy,
+  .landing-screen__impact,
+  .landing-screen__athlete-image,
+  .landing-screen__speech-bubble,
+  .landing-screen__live-comment {
+    animation: none;
+  }
+
+  .landing-screen__speech-bubble {
+    opacity: 1;
+    transform: none;
+  }
+
+  .landing-screen__live-comment {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .landing-screen__hero {
+    padding-top: 16px;
+    padding-bottom: 28px;
+  }
+
+  .landing-screen__live-comments {
+    top: 11%;
+  }
+
+  .landing-screen__live-comment {
+    font-size: 1.05rem;
+  }
+
+  .landing-screen__topbar {
+    margin-bottom: 42px;
+  }
+
+  .landing-screen__hero-copy h1 {
+    font-size: clamp(3.25rem, 18vw, 4.8rem);
+    line-height: 0.9;
+  }
+
+  .landing-screen__lead {
+    max-width: 340px;
+    font-size: 0.98rem;
+  }
+
+  .landing-screen__impact {
+    min-height: 360px;
+    margin-top: 16px;
+    border-radius: 28px;
+  }
+
+  .landing-screen__athlete-image {
+    min-height: 360px;
+    object-position: 58% center;
+  }
+
+  .landing-screen__speech-stack {
+    right: 12px;
+    bottom: 12px;
+    max-width: 230px;
+  }
+
+  .landing-screen__speech-bubble {
+    padding: 13px 15px;
+    font-size: 0.86rem;
+  }
+
+  .landing-screen__speech-bubble--first {
+    font-size: 1.08rem;
+  }
 }
 
 a {
@@ -1110,12 +1360,16 @@ input {
 
 @media (min-width: 768px) {
   .landing-screen__hero-grid {
-    grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.85fr);
-    align-items: start;
+    grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+    align-items: center;
   }
 
   .landing-screen__steps {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .landing-screen__feature-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .skeleton-hero-grid {

@@ -1,39 +1,30 @@
 'use client';
 
-/**
- * web/src/app/_components/landing-page-screen.tsx
- *
+/*
  * 【責務】
  * 公開トップ `/` 専用の LP を描画し、ログイン / 新規登録 / アプリ遷移導線を配置する。
  */
 
+import { ArrowRight, Dumbbell } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import type { JSX } from 'react';
+import type { CSSProperties, JSX } from 'react';
 
 import { useWebAuth } from '@/app/provider';
 import { paths } from '@/config/paths';
 
-const LANDING_STEPS = [
-  {
-    eyebrow: 'STEP 1',
-    title: '写真やテキストから、食事をすぐ記録',
-    description: '料理写真か一言メモを送るだけで、AI が食品候補と栄養情報の下書きを作成します。',
-    image: '/tutorial/step1.png',
-  },
-  {
-    eyebrow: 'STEP 2',
-    title: 'プロフィールから目標を整える',
-    description: '体重や活動量を入力すると、PFC と摂取カロリーの目標を保存して管理できます。',
-    image: '/tutorial/step2.png',
-  },
-  {
-    eyebrow: 'STEP 3',
-    title: '履歴と体重推移を見返して改善',
-    description: '食事履歴、食品ライブラリ、栄養状況、体重推移を一つの流れで振り返れます。',
-    image: '/tutorial/step3.png',
-  },
+const LIVE_COMMENTS = [
+  'カロリー管理は楽にできるのが一番ですからねぇ😎',
+  '筋トレ友達に「俺今カロリーとpfc管理だるすぎるから簡単にそれらを記録するアプリ作ってんだぁ」って言ったら「厳しって( ・∇・)」って怒られた。悲しい',
+  '昨日二郎を食べてしまいました...会津若松の二郎ラーメン美味しいからみんな食べようね。',
 ] as const;
+
+function buildLiveCommentStyle(index: number): CSSProperties {
+  return {
+    '--comment-delay': `${2.6 + index * 3.2}s`,
+    '--comment-top': `${index * 46}px`,
+  } as CSSProperties;
+}
 
 export function LandingPageScreen(): JSX.Element {
   const { status } = useWebAuth();
@@ -41,30 +32,45 @@ export function LandingPageScreen(): JSX.Element {
 
   return (
     <main className="landing-screen">
+      <div className="landing-screen__live-comments" aria-hidden="true">
+        {LIVE_COMMENTS.map((comment, index) => (
+          <span className="landing-screen__live-comment" key={comment} style={buildLiveCommentStyle(index)}>
+            {comment}
+          </span>
+        ))}
+      </div>
       <section className="landing-screen__hero">
         <header className="landing-screen__topbar">
           <Link className="landing-screen__brand" href={paths.home.getHref()}>
+            <span className="landing-screen__brand-icon">
+              <Dumbbell aria-hidden="true" size={18} strokeWidth={2.5} />
+            </span>
             <span className="landing-screen__brand-mark">PFC TRACKER</span>
           </Link>
         </header>
 
         <div className="landing-screen__hero-grid">
           <div className="landing-screen__hero-copy">
-            <p className="landing-screen__eyebrow">AI FOOD TRACKING</p>
-            <h1>食事管理を、迷わず続けられる形にする。</h1>
+            <p className="landing-screen__eyebrow">AI FOOD LOG / TRAINING LIFE</p>
+            <h1>
+              NO MORE
+              <span>面倒な食事管理。</span>
+            </h1>
             <p className="landing-screen__lead">
-              写真やテキストから食事を記録し、PFC バランス、履歴、体重推移まで一つの流れで管理できる食事記録アプリです。
+              写真から記録して、PFC とトレーニングの流れだけ見る。細かい入力に時間を使わないための食事管理アプリ。
             </p>
 
             <div className="landing-screen__hero-actions">
               {isSignedIn ? (
                 <Link className="landing-screen__cta landing-screen__cta--primary" href={paths.app.root.getHref()}>
                   Home を開く
+                  <ArrowRight aria-hidden="true" size={17} strokeWidth={2.6} />
                 </Link>
               ) : (
                 <>
                   <Link className="landing-screen__cta landing-screen__cta--primary" href={paths.auth.register.getHref()}>
                     新規登録して始める
+                    <ArrowRight aria-hidden="true" size={17} strokeWidth={2.6} />
                   </Link>
                   <Link className="landing-screen__cta landing-screen__cta--secondary" href={paths.auth.login.getHref()}>
                     ログイン
@@ -74,46 +80,22 @@ export function LandingPageScreen(): JSX.Element {
             </div>
           </div>
 
-          <div className="landing-screen__hero-card">
-            <div className="landing-screen__hero-card-copy">
-              <p>使い方の流れ</p>
-              <strong>最初の2分で準備完了</strong>
-              <span>登録後はプロフィールを入力し、そのまま `/app` の Home から使い始められます。</span>
-            </div>
+          <div className="landing-screen__impact">
             <Image
-              alt="PFC Tracker の使い方"
-              className="landing-screen__hero-image"
-              height={480}
-              src="/tutorial/step1.png"
-              width={480}
+              priority
+              alt="ジムでスマートフォンを見ながら食事管理をするトレーニング中の男性"
+              className="landing-screen__athlete-image"
+              height={1024}
+              src="/landing/gym-athlete-hero.png"
+              width={1536}
             />
-          </div>
-        </div>
-      </section>
-
-      <section className="landing-screen__section">
-        <div className="landing-screen__section-head">
-          <p className="landing-screen__eyebrow">HOW IT WORKS</p>
-          <h2>使い方</h2>
-        </div>
-
-        <div className="landing-screen__steps">
-          {LANDING_STEPS.map((step) => (
-            <article className="landing-screen__step-card" key={step.title}>
-              <div className="landing-screen__step-copy">
-                <p>{step.eyebrow}</p>
-                <h3>{step.title}</h3>
-                <span>{step.description}</span>
+            <div className="landing-screen__speech-stack" aria-label="PFC Tracker のひとこと">
+              <div className="landing-screen__speech-bubble landing-screen__speech-bubble--first">楽だよ！</div>
+              <div className="landing-screen__speech-bubble landing-screen__speech-bubble--second">
+                めんどくさがりでも続くよ
               </div>
-              <Image
-                alt={step.title}
-                className="landing-screen__step-image"
-                height={360}
-                src={step.image}
-                width={360}
-              />
-            </article>
-          ))}
+            </div>
+          </div>
         </div>
       </section>
     </main>
