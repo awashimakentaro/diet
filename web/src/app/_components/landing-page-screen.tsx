@@ -17,12 +17,22 @@ const LIVE_COMMENTS = [
   'カロリー管理は楽にできるのが一番ですからねぇ😎',
   '筋トレ友達に「俺今カロリーとpfc管理だるすぎるから簡単にそれらを記録するアプリ作ってんだぁ」って言ったら「厳しって( ・∇・)」って怒られた。悲しい',
   '昨日二郎を食べてしまいました...会津若松の二郎ラーメン美味しいからみんな食べようね。',
+  'このコメントたちかわいい好き',
+  'feadbackが欲しい',
+  '早くrefactしないといけないのにskillsが楽しい困った。',
+  'プログラミングできるようになりたいなー',
 ] as const;
 
-function buildLiveCommentStyle(index: number): CSSProperties {
+const LIVE_COMMENT_LANES = 4;
+const LIVE_COMMENT_LANES_DATA = Array.from({ length: LIVE_COMMENT_LANES }, (_, laneIndex) => (
+  LIVE_COMMENTS.filter((_, commentIndex) => commentIndex % LIVE_COMMENT_LANES === laneIndex)
+));
+
+function buildLiveCommentLaneStyle(index: number, commentCount: number): CSSProperties {
   return {
-    '--comment-delay': `${2.6 + index * 3.2}s`,
-    '--comment-top': `${index * 46}px`,
+    '--comment-delay': `${2.2 + index * 1.4}s`,
+    '--comment-duration': `${Math.max(18, commentCount * 9)}s`,
+    '--comment-top': `${index * 48}px`,
   } as CSSProperties;
 }
 
@@ -32,13 +42,6 @@ export function LandingPageScreen(): JSX.Element {
 
   return (
     <main className="landing-screen">
-      <div className="landing-screen__live-comments" aria-hidden="true">
-        {LIVE_COMMENTS.map((comment, index) => (
-          <span className="landing-screen__live-comment" key={comment} style={buildLiveCommentStyle(index)}>
-            {comment}
-          </span>
-        ))}
-      </div>
       <section className="landing-screen__hero">
         <header className="landing-screen__topbar">
           <Link className="landing-screen__brand" href={paths.home.getHref()}>
@@ -89,6 +92,23 @@ export function LandingPageScreen(): JSX.Element {
               src="/landing/gym-athlete-hero.png"
               width={1536}
             />
+            <div className="landing-screen__live-comments" aria-hidden="true">
+              {LIVE_COMMENT_LANES_DATA.map((comments, index) => (
+                <div
+                  className="landing-screen__live-comment-lane"
+                  key={`comment-lane-${index}`}
+                  style={buildLiveCommentLaneStyle(index, comments.length)}
+                >
+                  <div className="landing-screen__live-comment-track">
+                    {comments.map((comment) => (
+                      <span className="landing-screen__live-comment" key={comment}>
+                        {comment}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
             <div className="landing-screen__speech-stack" aria-label="PFC Tracker のひとこと">
               <div className="landing-screen__speech-bubble landing-screen__speech-bubble--first">楽だよ！</div>
               <div className="landing-screen__speech-bubble landing-screen__speech-bubble--second">

@@ -18,6 +18,7 @@ import { useSettingsScreen } from '@/features/settings/hooks';
 
 export function SettingsPageScreen(): JSX.Element {
   const router = useRouter();
+  const onboardingHref = `/setup/onboarding?view=guide&redirectTo=${encodeURIComponent(paths.app.settings.getHref())}`;
   const reduceMotion = useReducedMotion();
   const {
     manualTargets,
@@ -109,7 +110,7 @@ export function SettingsPageScreen(): JSX.Element {
               <SettingsAccountCard
                 email={accountEmail}
                 isSigningOut={isSigningOut}
-                onOpenTutorial={() => router.push(paths.home.getHref())}
+                onOpenTutorial={() => router.push(onboardingHref)}
                 onSignOut={handleSignOut}
               />
             </motion.div>

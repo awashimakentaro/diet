@@ -15,9 +15,10 @@ import { paths } from '@/config/paths';
 
 type AuthLayoutProps = {
   children: ReactNode;
+  signedInRedirectTo?: string | null;
 };
 
-export function AuthLayout({ children }: AuthLayoutProps) {
+export function AuthLayout({ children, signedInRedirectTo = null }: AuthLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -34,10 +35,10 @@ export function AuthLayout({ children }: AuthLayoutProps) {
   useEffect(() => {
     if (status === 'signed-in' && user !== null) {
       router.replace(
-        `${redirectTo ? `${decodeURIComponent(redirectTo)}` : paths.app.root.getHref()}`,
+        signedInRedirectTo ?? `${redirectTo ? `${decodeURIComponent(redirectTo)}` : paths.app.root.getHref()}`,
       );
     }
-  }, [status, user, router, redirectTo]);
+  }, [status, user, router, redirectTo, signedInRedirectTo]);
 
   return (
     <main className="auth-page">

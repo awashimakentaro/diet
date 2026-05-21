@@ -8,7 +8,7 @@ import { paths } from '@/config/paths';
 import { OnboardingPageScreen } from './_components/onboarding-page-screen';
 
 function normalizeRedirectTo(candidate: string | null): string {
-  if (candidate === null || candidate.startsWith('/app/') === false) {
+  if (candidate === null || (candidate !== paths.app.root.getHref() && candidate.startsWith('/app/') === false)) {
     return paths.app.record.getHref();
   }
 
@@ -22,6 +22,7 @@ function normalizeRedirectTo(candidate: string | null): string {
 type OnboardingPageProps = {
   searchParams?: Promise<{
     redirectTo?: string | string[];
+    view?: string | string[];
   }>;
 };
 
@@ -32,7 +33,16 @@ export default async function OnboardingPage({
   const redirectToParam = Array.isArray(resolvedSearchParams?.redirectTo)
     ? resolvedSearchParams.redirectTo[0] ?? null
     : resolvedSearchParams?.redirectTo ?? null;
+  const viewParam = Array.isArray(resolvedSearchParams?.view)
+    ? resolvedSearchParams.view[0] ?? null
+    : resolvedSearchParams?.view ?? null;
   const redirectTo = normalizeRedirectTo(redirectToParam);
 
-  return <OnboardingPageScreen redirectTo={redirectTo} />;
+  return (
+    <OnboardingPageScreen
+      allowExistingProfile={viewParam === 'guide'}
+      guideOnly={viewParam === 'guide'}
+      redirectTo={redirectTo}
+    />
+  );
 }

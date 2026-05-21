@@ -8,7 +8,7 @@
  *
  * 【使用されるエージェント / 処理フロー】
  * - Next.js App Router から `/auth/register` ルートで呼ばれる。
- * - 登録成功後は Home へ遷移させる。
+ * - 登録成功後はオンボーディングへ遷移させる。
  *
  * 【やらないこと】
  * - 認証 API の直接実装
@@ -29,10 +29,11 @@ import { AuthLayout } from '../_components/auth-layout';
 
 function RegisterPageContent(): JSX.Element {
   const router = useRouter();
+  const onboardingHref = `/setup/onboarding?redirectTo=${encodeURIComponent(paths.app.root.getHref())}`;
 
   return (
-    <AuthLayout>
-      <RegisterForm onSuccess={() => router.replace(paths.app.root.getHref())} />
+    <AuthLayout signedInRedirectTo={onboardingHref}>
+      <RegisterForm onSuccess={() => router.replace(onboardingHref)} />
     </AuthLayout>
   );
 }

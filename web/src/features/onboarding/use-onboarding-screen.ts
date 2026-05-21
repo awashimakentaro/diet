@@ -28,6 +28,11 @@ import { calculateGoalFromProfile } from '../settings/utils/calculate-goal-from-
 import { getUserProfile } from '../settings/api/get-user-profile';
 import { saveSettingsGoal } from '../settings/api/save-settings-goal';
 import { saveUserProfile } from '../settings/api/save-user-profile';
+import {
+  buildProfileValuesFromRow,
+  toActivityLevel,
+  toGenderValue,
+} from '../settings/utils/profile-goal/normalize-profile-values';
 
 type ActivityLevel = 'low' | 'moderate' | 'high';
 type Gender = 'male' | 'female';
@@ -44,6 +49,8 @@ type OnboardingProfileValues = {
 };
 
 type UseOnboardingScreenParams = {
+  allowExistingProfile?: boolean;
+  onSubmitComplete?: () => void;
   redirectTo: string;
 };
 
@@ -56,6 +63,7 @@ type UseOnboardingScreenResult = {
   handleProfileValueChange: (field: keyof OnboardingProfileValues, value: string) => void;
   handleGenderChange: (value: Gender) => void;
   handleActivityChange: (value: ActivityLevel) => void;
+  handleSkip: () => void;
   handleSubmitProfile: () => Promise<void>;
 };
 
@@ -75,6 +83,8 @@ function toNumberOrNull(value: string): number | null {
 }
 
 export function useOnboardingScreen({
+  allowExistingProfile = false,
+  onSubmitComplete,
   redirectTo,
 }: UseOnboardingScreenParams): UseOnboardingScreenResult {
   const router = useRouter();
@@ -109,8 +119,15 @@ export function useOnboardingScreen({
           return;
         }
 
-        if (profile !== null) {
+        if (profile !== null && !allowExistingProfile) {
           router.replace(redirectTo);
+          return;
+        }
+
+        if (profile !== null) {
+          setProfileValues(buildProfileValuesFromRow(profile));
+          setGender(toGenderValue(profile.gender ?? 'male'));
+          setActivityLevel(toActivityLevel(profile.activity_level));
           return;
         }
 
@@ -132,7 +149,7 @@ export function useOnboardingScreen({
     return () => {
       isMounted = false;
     };
-  }, [redirectTo, router, user?.email, user?.id]);
+  }, [allowExistingProfile, redirectTo, router, user?.email, user?.id]);
 
   function handleProfileValueChange(field: keyof OnboardingProfileValues, value: string): void {
     setProfileValues((current) => ({ ...current, [field]: value }));
@@ -144,6 +161,10 @@ export function useOnboardingScreen({
 
   function handleActivityChange(value: ActivityLevel): void {
     setActivityLevel(value);
+  }
+
+  function handleSkip(): void {
+    router.replace(redirectTo);
   }
 
   async function handleSubmitProfile(): Promise<void> {
@@ -191,7 +212,11 @@ export function useOnboardingScreen({
       });
 
       await saveSettingsGoal(goal);
-      router.replace(redirectTo);
+      if (onSubmitComplete !== undefined) {
+        onSubmitComplete();
+      } else {
+        router.replace(redirectTo);
+      }
     } catch (error) {
       setFeedbackMessage(error instanceof Error ? error.message : 'プロフィールの保存に失敗しました。');
     } finally {
@@ -208,6 +233,7 @@ export function useOnboardingScreen({
     handleProfileValueChange,
     handleGenderChange,
     handleActivityChange,
+    handleSkip,
     handleSubmitProfile,
   };
 }
