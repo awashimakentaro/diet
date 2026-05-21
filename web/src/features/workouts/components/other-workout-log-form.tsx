@@ -4,7 +4,7 @@
 
 'use client';
 
-import { Bike, Save } from 'lucide-react';
+import { Bike } from 'lucide-react';
 import type { ChangeEvent, JSX } from 'react';
 
 import type { OtherWorkoutFormValues } from '../types';
@@ -14,7 +14,6 @@ type OtherWorkoutLogFormProps = {
   isSaving: boolean;
   onValueChange: (field: keyof OtherWorkoutFormValues, value: string) => void;
   onAddToday: () => void;
-  onSaveMenu: () => void;
 };
 
 export function OtherWorkoutLogForm({
@@ -22,7 +21,6 @@ export function OtherWorkoutLogForm({
   isSaving,
   onValueChange,
   onAddToday,
-  onSaveMenu,
 }: OtherWorkoutLogFormProps): JSX.Element {
   function createChangeHandler(field: keyof OtherWorkoutFormValues) {
     return (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
@@ -35,6 +33,9 @@ export function OtherWorkoutLogForm({
       <div className="workouts-screen__card-head">
         <p className="workouts-screen__eyebrow">Other Workout</p>
         <h2 className="workouts-screen__section-title">その他ワークアウト</h2>
+        <span className="workouts-screen__section-copy">
+          AI推定を使わず、自分で時間と消費カロリーを入力して今日の記録に追加します。散歩や自転車など、筋トレ以外の運動に使えます。
+        </span>
       </div>
 
       <div className="workouts-screen__form-grid">
@@ -57,16 +58,10 @@ export function OtherWorkoutLogForm({
         <textarea onChange={createChangeHandler('note')} rows={2} value={values.note} />
       </label>
 
-      <div className="workouts-screen__split-actions">
-        <button className="workouts-screen__secondary-button" disabled={isSaving} onClick={onSaveMenu} type="button">
-          <Save size={16} strokeWidth={2.2} />
-          <span>保存する</span>
-        </button>
-        <button className="workouts-screen__primary-button" disabled={isSaving} onClick={onAddToday} type="button">
-          {isSaving ? <span className="record-screen__loading-spinner record-screen__loading-spinner--inline" /> : <Bike size={16} strokeWidth={2.2} />}
-          <span>{isSaving ? '保存中...' : '今日の記録に追加'}</span>
-        </button>
-      </div>
+      <button className="workouts-screen__primary-button" disabled={isSaving} onClick={onAddToday} type="button">
+        {isSaving ? <span className="record-screen__loading-spinner record-screen__loading-spinner--inline" /> : <Bike size={16} strokeWidth={2.2} />}
+        <span>{isSaving ? '保存中...' : '今日の記録に追加'}</span>
+      </button>
     </section>
   );
 }

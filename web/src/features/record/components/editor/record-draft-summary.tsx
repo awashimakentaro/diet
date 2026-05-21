@@ -20,17 +20,22 @@ export function RecordDraftSummary({
     <div className="record-screen__draft-summary">
       <article className="record-screen__draft-summary-card record-screen__draft-summary-card--kcal">
         <span>Total</span>
-        <strong>{totals.kcal} kcal</strong>
+        <strong>
+          {totals.kcal}
+          <span>kcal</span>
+        </strong>
       </article>
-      <span className="food-card__macro food-card__macro--p">
-        P {totals.protein}g
-      </span>
-      <span className="food-card__macro food-card__macro--f">
-        F {totals.fat}g
-      </span>
-      <span className="food-card__macro food-card__macro--c">
-        C {totals.carbs}g
-      </span>
+      <div className="record-screen__draft-macro-row">
+        <span className="food-card__macro food-card__macro--p">
+          P {totals.protein}g
+        </span>
+        <span className="food-card__macro food-card__macro--f">
+          F {totals.fat}g
+        </span>
+        <span className="food-card__macro food-card__macro--c">
+          C {totals.carbs}g
+        </span>
+      </div>
     </div>
   );
 }

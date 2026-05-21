@@ -2110,6 +2110,8 @@ input {
 
 .record-screen__main {
   display: grid;
+  max-width: 100%;
+  overflow-x: hidden;
   gap: 24px;
   padding: 16px 24px 220px;
 }
@@ -2456,6 +2458,10 @@ input {
 .record-screen__editor-shell {
   display: grid;
   gap: 0;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
   border-radius: 36px;
   background: rgba(232, 236, 228, 0.92);
   box-shadow: 0 32px 70px rgba(15, 23, 42, 0.2);
@@ -2464,6 +2470,7 @@ input {
 .record-screen__editor {
   display: grid;
   gap: 32px;
+  min-width: 0;
   border-top-left-radius: 36px;
   border-top-right-radius: 36px;
   padding: 24px 24px 32px;
@@ -2471,6 +2478,7 @@ input {
 
 .record-screen__editor-body {
   display: grid;
+  min-width: 0;
   gap: 24px;
 }
 
@@ -2612,20 +2620,35 @@ input {
 
 .record-screen__field-group {
   display: grid;
+  min-width: 0;
   gap: 16px;
 }
 
 .record-screen__draft-summary {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 18px;
-  align-items: baseline;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  align-items: stretch;
+}
+
+.record-screen__draft-macro-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, max-content));
+  gap: 8px;
+  align-items: center;
+  justify-content: start;
 }
 
 .record-screen__draft-summary-card {
   display: flex;
+  min-width: 0;
   align-items: baseline;
+  justify-content: space-between;
   gap: 6px;
+  padding: 12px 14px;
+  border: 1px solid rgba(223, 230, 216, 0.1);
+  border-radius: 16px;
+  background: rgba(223, 230, 216, 0.06);
 }
 
 .record-screen__draft-summary-card span {
@@ -2637,11 +2660,22 @@ input {
 }
 
 .record-screen__draft-summary-card strong {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
   color: #101828;
   font-size: 0.98rem;
   line-height: 1.1;
   font-weight: 900;
   letter-spacing: -0.02em;
+}
+
+.record-screen__draft-summary-card strong span {
+  color: inherit;
+  font-size: 0.72em;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: lowercase;
 }
 
 .record-screen__field-label {
@@ -2699,6 +2733,7 @@ input {
 
 .record-screen__item-stack {
   display: grid;
+  min-width: 0;
   gap: 16px;
 }
 
@@ -2707,13 +2742,15 @@ input {
 }
 
 .record-screen__item-stack--manual {
-  grid-template-columns: minmax(0, 420px);
+  grid-template-columns: minmax(0, 1fr);
   align-items: start;
   justify-content: start;
 }
 
 .record-screen__item-card {
   position: relative;
+  width: 100%;
+  min-width: 0;
   border: 1px solid rgba(243, 244, 246, 0.5);
   border-radius: 40px;
   background: #e8ece4;
@@ -2835,23 +2872,29 @@ input {
 
 .record-screen__macro-edit-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: 1fr;
+  gap: 8px;
   margin-top: 24px;
 }
 
 .record-screen__macro-edit {
   display: grid;
-  gap: 8px;
+  grid-template-columns: 28px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
 }
 
 .record-screen__macro-chip {
   margin: 0;
-  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 9px;
   text-align: center;
-  font-size: 8px;
+  font-size: 0.7rem;
   font-weight: 800;
-  line-height: 20px;
+  line-height: 1;
   text-transform: uppercase;
 }
 
@@ -2875,14 +2918,15 @@ input {
 }
 
 .record-screen__macro-input input {
-  padding-right: 28px;
+  height: 38px;
+  padding-right: 30px;
   text-align: left;
 }
 
 .record-screen__macro-input span {
   position: absolute;
   right: 10px;
-  top: 15px;
+  top: 12px;
   color: #d1d5dc;
   font-size: 8px;
   font-weight: 800;
@@ -2904,6 +2948,7 @@ input {
 
 .record-screen__add-panel {
   display: grid;
+  min-width: 0;
   gap: 16px;
   padding: 18px;
   border: 1px solid #e5e7eb;
@@ -3078,6 +3123,7 @@ input {
 
 .record-screen__confirm-button {
   display: flex;
+  min-width: 0;
   justify-content: center;
   align-items: center;
   gap: 12px;
@@ -3965,7 +4011,7 @@ input {
 }
 
 .workouts-screen__exercise-head strong {
-  color: #101828;
+  color: #dfe6d8;
   font-size: 0.9rem;
   font-weight: 900;
 }
@@ -4009,6 +4055,44 @@ input {
   background: #dce8d2;
   color: #155dfc;
   font-weight: 900;
+}
+
+.workouts-screen__form-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.workouts-screen__ai-loading {
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  padding: 34px 22px;
+  border: 1px solid rgba(223, 230, 216, 0.12);
+  border-radius: 24px;
+  background: rgba(223, 230, 216, 0.06);
+  text-align: center;
+}
+
+.workouts-screen__ai-loading-copy {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+}
+
+.workouts-screen__ai-loading-copy h3 {
+  margin: 0;
+  color: #dfe6d8;
+  font-size: 1.15rem;
+  font-weight: 900;
+}
+
+.workouts-screen__ai-loading-copy p {
+  margin: 0;
+  max-width: 420px;
+  color: rgba(223, 230, 216, 0.64);
+  font-size: 0.9rem;
+  line-height: 1.6;
 }
 
 .workouts-screen__split-actions {
@@ -5848,17 +5932,18 @@ input {
 
 .profile-activity__grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
 }
 
 .profile-activity__btn {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  min-height: 72px;
-  padding: 12px 8px;
+  justify-content: center;
+  gap: 3px;
+  min-height: 58px;
+  padding: 8px 6px;
   border: 2px solid transparent;
   border-radius: 18px;
   background: var(--slate-50);
@@ -5879,18 +5964,19 @@ input {
 }
 
 .profile-activity__emoji {
-  font-size: 22px;
+  font-size: 17px;
   line-height: 1;
 }
 
 .profile-activity__btn strong {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
 }
 
 .profile-activity__caption {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 600;
+  line-height: 1.15;
   opacity: 0.65;
 }
 
@@ -7457,8 +7543,7 @@ input {
   .record-screen__split-fields,
   .record-screen__macro-edit-grid,
   .settings-screen__target-grid,
-  .profile-actions,
-  .profile-activity__grid {
+  .profile-actions {
     grid-template-columns: 1fr;
   }
 
@@ -7625,6 +7710,9 @@ input {
 .record-screen__workspace-title,
 .record-screen__editor-title,
 .record-screen__add-panel-title,
+.record-screen__workspace-guide strong,
+.record-screen__draft-summary-card strong,
+.record-screen__draft-summary-card strong span,
 .record-screen__headline strong,
 .record-screen__macro-values strong,
 .record-screen__macro-label,
@@ -7661,6 +7749,7 @@ input {
 
 .record-screen__headline span,
 .record-screen__macro-values span,
+.record-screen__draft-summary-card>span,
 .record-screen__workspace-copy,
 .record-screen__workspace-guide p,
 .record-screen__add-option span,
@@ -7698,6 +7787,7 @@ input {
 .record-screen__prompt-input,
 .record-screen__name-input,
 .record-screen__date-input,
+.record-screen__item-name,
 .record-screen__mini-field input,
 .record-screen__macro-input input,
 .record-screen__add-prompt-input,

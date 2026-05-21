@@ -71,9 +71,12 @@ export function MealEditorItemCard<FormValues extends FieldValues>({
 
       <div className="record-screen__macro-edit-grid">
         <div className="record-screen__macro-edit">
-          <p className="record-screen__macro-chip record-screen__macro-chip--protein">P</p>
+          <span className="record-screen__macro-chip record-screen__macro-chip--protein">
+            P
+          </span>
           <div className="record-screen__macro-input">
             <input
+              aria-label={`食品 ${index + 1} のたんぱく質`}
               placeholder="0"
               type="text"
               {...register(`items.${index}.protein` as Path<FormValues>)}
@@ -82,9 +85,12 @@ export function MealEditorItemCard<FormValues extends FieldValues>({
           </div>
         </div>
         <div className="record-screen__macro-edit">
-          <p className="record-screen__macro-chip record-screen__macro-chip--fat">F</p>
+          <span className="record-screen__macro-chip record-screen__macro-chip--fat">
+            F
+          </span>
           <div className="record-screen__macro-input">
             <input
+              aria-label={`食品 ${index + 1} の脂質`}
               placeholder="0"
               type="text"
               {...register(`items.${index}.fat` as Path<FormValues>)}
@@ -93,9 +99,12 @@ export function MealEditorItemCard<FormValues extends FieldValues>({
           </div>
         </div>
         <div className="record-screen__macro-edit">
-          <p className="record-screen__macro-chip record-screen__macro-chip--carbs">C</p>
+          <span className="record-screen__macro-chip record-screen__macro-chip--carbs">
+            C
+          </span>
           <div className="record-screen__macro-input">
             <input
+              aria-label={`食品 ${index + 1} の炭水化物`}
               placeholder="0"
               type="text"
               {...register(`items.${index}.carbs` as Path<FormValues>)}

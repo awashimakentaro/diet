@@ -26,9 +26,8 @@ export function WorkoutsPageScreen(): JSX.Element {
     handleExerciseValueChange,
     handleAddExercise,
     handleRemoveExercise,
-    handleCreateMenu,
+    handleCreateMenuLog,
     handleCreateOtherWorkoutLog,
-    handleSaveOtherWorkoutMenu,
   } = useWorkoutsScreen();
   const sectionTransition = reduceMotion
     ? { duration: 0 }
@@ -54,13 +53,13 @@ export function WorkoutsPageScreen(): JSX.Element {
           <div className="workouts-screen__menu-column">
             <WorkoutMenuForm
               isSaving={isSaving}
-              onSubmit={() => {
-                void handleCreateMenu();
-              }}
               onAddExercise={handleAddExercise}
               onExerciseValueChange={handleExerciseValueChange}
               onRemoveExercise={handleRemoveExercise}
               onValueChange={handleValueChange}
+              onLogToday={() => {
+                void handleCreateMenuLog();
+              }}
               values={formValues}
             />
 
@@ -68,9 +67,6 @@ export function WorkoutsPageScreen(): JSX.Element {
               isSaving={isSavingOtherWorkout}
               onAddToday={() => {
                 void handleCreateOtherWorkoutLog();
-              }}
-              onSaveMenu={() => {
-                void handleSaveOtherWorkoutMenu();
               }}
               onValueChange={handleOtherWorkoutValueChange}
               values={otherWorkoutValues}

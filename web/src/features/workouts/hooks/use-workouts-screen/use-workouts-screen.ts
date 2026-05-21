@@ -12,6 +12,7 @@ import { getUserProfile } from '@/features/settings/api/get-user-profile';
 
 import { createOtherWorkoutLog } from '../../api/create-other-workout-log';
 import { createOtherWorkoutMenu } from '../../api/create-other-workout-menu';
+import { createWorkoutLog } from '../../api/create-workout-log';
 import { createWorkoutMenu } from '../../api/create-workout-menu';
 import { deleteWorkoutLog } from '../../api/delete-workout-log';
 import { deleteWorkoutMenu } from '../../api/delete-workout-menu';
@@ -44,6 +45,7 @@ export type UseWorkoutsScreenResult = {
   handleAddExercise: () => void;
   handleRemoveExercise: (index: number) => void;
   handleCreateMenu: () => Promise<void>;
+  handleCreateMenuLog: () => Promise<void>;
   handleDeleteMenu: (menuId: string) => Promise<void>;
   handleLogMenu: (menu: WorkoutMenu) => Promise<void>;
   handleDeleteLog: (logId: string) => Promise<void>;
@@ -203,6 +205,54 @@ export function useWorkoutsScreen(): UseWorkoutsScreenResult {
     }
   }
 
+  async function handleCreateMenuLog(): Promise<void> {
+    const result = buildWorkoutMenuPayload(formValues);
+
+    if (!result.ok) {
+      setFeedbackTone('error');
+      setFeedbackMessage('未入力または数値が不正な項目があります。');
+      return;
+    }
+
+    setIsSaving(true);
+    setFeedbackMessage(null);
+
+    try {
+      const profile = await getUserProfile();
+      const currentWeightKg = Number(profile?.current_weight_kg);
+
+      if (!Number.isFinite(currentWeightKg) || currentWeightKg <= 0) {
+        throw new Error('プロフィールに現在の体重を保存してください。');
+      }
+
+      const estimate = await requestWorkoutCalorieEstimate({
+        menuName: result.payload.name,
+        exercises: result.payload.exercises,
+        durationMinutes: result.payload.durationMinutes,
+        intensity: result.payload.intensity,
+        currentWeightKg,
+      });
+
+      await createWorkoutLog({
+        ...result.payload,
+        burnedKcal: estimate.burnedKcal,
+      });
+      await mutateTodayLogs();
+      setFormValues(DEFAULT_FORM_VALUES);
+      setFeedbackTone('success');
+      setFeedbackMessage(
+        estimate.source === 'openai'
+          ? '保存しました。履歴タブで今日の筋トレ記録を確認できます。'
+          : '保存しました。履歴タブで今日の筋トレ記録を確認できます。',
+      );
+    } catch (error) {
+      setFeedbackTone('error');
+      setFeedbackMessage(error instanceof Error ? error.message : '今日の記録への追加に失敗しました。');
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
   async function handleDeleteMenu(menuId: string): Promise<void> {
     setActiveMenuId(menuId);
     setFeedbackMessage(null);
@@ -271,7 +321,7 @@ export function useWorkoutsScreen(): UseWorkoutsScreenResult {
       await mutateTodayLogs();
       setOtherWorkoutValues(DEFAULT_OTHER_WORKOUT_VALUES);
       setFeedbackTone('success');
-      setFeedbackMessage('ワークアウトを今日の記録に追加しました。');
+      setFeedbackMessage('保存しました。履歴タブで今日のワークアウト記録を確認できます。');
     } catch (error) {
       setFeedbackTone('error');
       setFeedbackMessage(error instanceof Error ? error.message : 'ワークアウト記録の保存に失敗しました。');
@@ -325,6 +375,7 @@ export function useWorkoutsScreen(): UseWorkoutsScreenResult {
     handleAddExercise,
     handleRemoveExercise,
     handleCreateMenu,
+    handleCreateMenuLog,
     handleDeleteMenu,
     handleLogMenu,
     handleDeleteLog,
