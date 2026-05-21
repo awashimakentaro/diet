@@ -8,28 +8,35 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import type { JSX } from 'react';
 
-import { FoodsScreenSkeleton } from '@/components/app-skeleton';
 import { AppTopBar } from '@/components/app-top-bar';
 import { FoodEntryEditorPanel } from '@/features/foods/components/editor';
 import { FoodLibraryCard } from '@/features/foods/components/library-card';
 import { FoodsSearchBar } from '@/features/foods/components/search-bar';
 import { useFoodsScreen } from '@/features/foods/hooks';
+import { WorkoutLogEditorPanel } from '@/features/workouts/components/workout-log-editor-panel';
+import { WorkoutMenuLibraryCard } from '@/features/workouts/components/workout-menu-library-card';
 
 export function FoodsPageScreen(): JSX.Element {
   const reduceMotion = useReducedMotion();
   const {
     visibleEntries,
+    visibleWorkoutMenus,
+    activeLibraryView,
     searchTerm,
     feedbackMessage,
     feedbackTone,
     savingEntryId,
+    activeWorkoutMenuId,
+    editingWorkoutMenu,
+    workoutMenuEditorValues,
     editingEntry,
     editingForm,
     editingItemFields,
     editingDraftTotals,
     isSavingEdit,
+    isSavingWorkoutMenuEdit,
+    handleSelectLibraryView,
     handleSearchChange,
-    handleAddFood,
     handleOpenEditor,
     handleCloseEditor,
     handleAddEditorItem,
@@ -37,7 +44,12 @@ export function FoodsPageScreen(): JSX.Element {
     handleSaveEditor,
     handleDeleteEntry,
     handleReuseEntry,
-    isLoading,
+    handleDeleteWorkoutMenu,
+    handleOpenWorkoutMenuEditor,
+    handleCloseWorkoutMenuEditor,
+    handleWorkoutMenuEditorValueChange,
+    handleSaveWorkoutMenuEditor,
+    handleReuseWorkoutMenu,
   } = useFoodsScreen();
   const sectionTransition = reduceMotion
     ? { duration: 0 }
@@ -47,24 +59,18 @@ export function FoodsPageScreen(): JSX.Element {
     <div className="foods-screen">
       <AppTopBar />
 
-      {isLoading ? (
-        <main className="foods-screen__main" style={{ opacity: 1 }}>
-          <FoodsScreenSkeleton />
-        </main>
-      ) : (
-        <motion.main
-          animate={{ opacity: 1, y: 0 }}
-          className="foods-screen__main"
-          initial={{ opacity: 0, y: 18 }}
-          transition={sectionTransition}
-        >
+      <motion.main
+        animate={{ opacity: 1, y: 0 }}
+        className="foods-screen__main"
+        initial={{ opacity: 0, y: 18 }}
+        transition={sectionTransition}
+      >
           <motion.div
             animate={{ opacity: 1, y: 0 }}
             initial={{ opacity: 0, y: 20 }}
             transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.06 }}
           >
             <FoodsSearchBar
-              onAddFood={handleAddFood}
               onSearchChange={handleSearchChange}
               searchTerm={searchTerm}
             />
@@ -74,8 +80,69 @@ export function FoodsPageScreen(): JSX.Element {
             <p className="eyebrow">{feedbackMessage}</p>
           ) : null}
 
+          <div className="foods-screen__view-switch" role="tablist" aria-label="保存済みデータ">
+            <button
+              aria-selected={activeLibraryView === 'foods'}
+              className={activeLibraryView === 'foods' ? 'foods-screen__view-button foods-screen__view-button--active' : 'foods-screen__view-button'}
+              onClick={() => handleSelectLibraryView('foods')}
+              role="tab"
+              type="button"
+            >
+              食品
+            </button>
+            <button
+              aria-selected={activeLibraryView === 'workouts'}
+              className={activeLibraryView === 'workouts' ? 'foods-screen__view-button foods-screen__view-button--active' : 'foods-screen__view-button'}
+              onClick={() => handleSelectLibraryView('workouts')}
+              role="tab"
+              type="button"
+            >
+              筋トレメニュー
+            </button>
+          </div>
+
           <section className="foods-screen__list">
-            {visibleEntries.length === 0 ? (
+            {activeLibraryView === 'workouts' ? (
+              visibleWorkoutMenus.length === 0 ? (
+                <motion.div
+                  animate={{ opacity: 1, y: 0 }}
+                  className="foods-screen__empty"
+                  initial={{ opacity: 0, y: 20 }}
+                  transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.1 }}
+                >
+                  <h2>{searchTerm.trim().length > 0 ? '一致する筋トレメニューがありません' : '筋トレメニューはまだ空です'}</h2>
+                  <p>
+                    {searchTerm.trim().length > 0
+                      ? '検索語を短くするか、履歴タブからワークアウトを保存できます。'
+                      : '履歴タブで実施したワークアウトを保存すると、次回からすぐ再利用できます。'}
+                  </p>
+                </motion.div>
+              ) : (
+                visibleWorkoutMenus.map((menu, index) => (
+                  <motion.div
+                    animate={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, y: 18 }}
+                    key={menu.id}
+                    transition={{
+                      ...sectionTransition,
+                      delay: reduceMotion ? 0 : 0.12 + index * 0.03,
+                    }}
+                  >
+                    <WorkoutMenuLibraryCard
+                      isSaving={activeWorkoutMenuId === menu.id}
+                      menu={menu}
+                      onDelete={(menuId) => {
+                        void handleDeleteWorkoutMenu(menuId);
+                      }}
+                      onEdit={handleOpenWorkoutMenuEditor}
+                      onReuse={(targetMenu) => {
+                        void handleReuseWorkoutMenu(targetMenu);
+                      }}
+                    />
+                  </motion.div>
+                ))
+              )
+            ) : visibleEntries.length === 0 ? (
               <motion.div
                 animate={{ opacity: 1, y: 0 }}
                 className="foods-screen__empty"
@@ -88,9 +155,6 @@ export function FoodsPageScreen(): JSX.Element {
                     ? '検索語を短くするか、よく使う食品として新しく追加できます。'
                     : '鶏むね丼、プロテイン、いつもの朝食などを保存しておくと、次回からすぐ再利用できます。'}
                 </p>
-                <button className="foods-screen__empty-action" onClick={handleAddFood} type="button">
-                  食品を追加する
-                </button>
               </motion.div>
             ) : (
               visibleEntries.map((entry, index) => (
@@ -114,8 +178,7 @@ export function FoodsPageScreen(): JSX.Element {
               ))
             )}
           </section>
-        </motion.main>
-      )}
+      </motion.main>
 
       {editingEntry !== null ? (
         <FoodEntryEditorPanel
@@ -131,6 +194,19 @@ export function FoodsPageScreen(): JSX.Element {
             void handleSaveEditor();
           }}
           onRemoveItem={handleRemoveEditorItem}
+        />
+      ) : null}
+
+      {editingWorkoutMenu !== null ? (
+        <WorkoutLogEditorPanel
+          isSaving={isSavingWorkoutMenuEdit}
+          onChange={handleWorkoutMenuEditorValueChange}
+          onClose={handleCloseWorkoutMenuEditor}
+          onSave={() => {
+            void handleSaveWorkoutMenuEditor();
+          }}
+          title="筋トレメニューを編集"
+          values={workoutMenuEditorValues}
         />
       ) : null}
     </div>

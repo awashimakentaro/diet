@@ -8,27 +8,38 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import type { JSX } from 'react';
 
-import { HistoryScreenSkeleton } from '@/components/app-skeleton';
 import { AppTopBar } from '@/components/app-top-bar';
 import { HistoryDateChip } from '@/features/history/components/date-chip';
 import { HistoryEntryCard } from '@/features/history/components/entry-card';
 import { HistoryMealEditorPanel } from '@/features/history/components/editor';
 import { useHistoryScreen } from '@/features/history/hooks';
+import { TodayWorkoutLogList } from '@/features/workouts/components/today-workout-log-list';
+import { WorkoutLogEditorPanel } from '@/features/workouts/components/workout-log-editor-panel';
+import { WorkoutLogHistoryCard } from '@/features/workouts/components/workout-log-history-card';
 import { RecordSummaryCard } from '@/components/record-summary-card';
 
 export function HistoryPageScreen(): JSX.Element {
   const reduceMotion = useReducedMotion();
   const {
     meals,
+    workoutLogs,
     summary,
     selectedDateValue,
     selectedDateLabel,
+    activeView,
     feedbackMessage,
     feedbackTone,
     editingMeal,
     isSavingEdit,
     savingMealId,
+    activeWorkoutLogId,
+    savingWorkoutLogId,
+    editingWorkoutLog,
+    workoutEditorValues,
+    isSavingWorkoutEdit,
     savedMealIds,
+    workoutBurnedKcal,
+    handleSelectView,
     handleSelectDateKey,
     handleShiftDate,
     handleSelectToday,
@@ -37,7 +48,12 @@ export function HistoryPageScreen(): JSX.Element {
     handleCloseEditMeal,
     handleUpdateMeal,
     handleSaveMeal,
-    isLoading,
+    handleDeleteWorkoutLog,
+    handleOpenEditWorkoutLog,
+    handleCloseEditWorkoutLog,
+    handleWorkoutEditorValueChange,
+    handleUpdateWorkoutLog,
+    handleSaveWorkoutLog,
   } = useHistoryScreen();
   const sectionTransition = reduceMotion
     ? { duration: 0 }
@@ -47,17 +63,12 @@ export function HistoryPageScreen(): JSX.Element {
     <div className="history-screen">
       <AppTopBar />
 
-      {isLoading ? (
-        <main className="history-screen__main" style={{ opacity: 1 }}>
-          <HistoryScreenSkeleton />
-        </main>
-      ) : (
-        <motion.main
-          animate={{ opacity: 1, y: 0 }}
-          className="history-screen__main"
-          initial={{ opacity: 0, y: 18 }}
-          transition={sectionTransition}
-        >
+      <motion.main
+        animate={{ opacity: 1, y: 0 }}
+        className="history-screen__main"
+        initial={{ opacity: 0, y: 18 }}
+        transition={sectionTransition}
+      >
           <div className="history-screen__layout">
             <motion.aside
               animate={{ opacity: 1, y: 0 }}
@@ -66,6 +77,18 @@ export function HistoryPageScreen(): JSX.Element {
               transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.06 }}
             >
               <RecordSummaryCard summary={summary} />
+
+              <TodayWorkoutLogList
+                activeLogId={activeWorkoutLogId}
+                burnedKcal={workoutBurnedKcal}
+                eyebrow="Workout History"
+                logs={workoutLogs}
+                onDeleteLog={(logId) => {
+                  void handleDeleteWorkoutLog(logId);
+                }}
+                showLogs={false}
+                title={`${selectedDateLabel} のワークアウト`}
+              />
             </motion.aside>
 
             <motion.section
@@ -94,32 +117,88 @@ export function HistoryPageScreen(): JSX.Element {
                 </p>
               ) : null}
 
-              <section className="history-screen__list">
-                {meals.map((meal, index) => (
-                  <motion.div
-                    animate={{ opacity: 1, y: 0 }}
-                    initial={{ opacity: 0, y: 18 }}
-                    key={meal.id}
-                    transition={{
-                      ...sectionTransition,
-                      delay: reduceMotion ? 0 : 0.18 + index * 0.03,
-                    }}
-                  >
-                    <HistoryEntryCard
-                      isSaved={savedMealIds.includes(meal.id)}
-                      isSaving={savingMealId === meal.id}
-                      meal={meal}
-                      onDelete={handleDeleteMeal}
-                      onEdit={handleOpenEditMeal}
-                      onSave={handleSaveMeal}
-                    />
-                  </motion.div>
-                ))}
-              </section>
+              <div className="history-screen__view-switch" role="tablist" aria-label="履歴表示">
+                <button
+                  aria-selected={activeView === 'foods'}
+                  className={activeView === 'foods' ? 'history-screen__view-button history-screen__view-button--active' : 'history-screen__view-button'}
+                  onClick={() => handleSelectView('foods')}
+                  role="tab"
+                  type="button"
+                >
+                  食品
+                </button>
+                <button
+                  aria-selected={activeView === 'workouts'}
+                  className={activeView === 'workouts' ? 'history-screen__view-button history-screen__view-button--active' : 'history-screen__view-button'}
+                  onClick={() => handleSelectView('workouts')}
+                  role="tab"
+                  type="button"
+                >
+                  トレーニング
+                </button>
+              </div>
+
+              {activeView === 'foods' ? (
+                <section className="history-screen__list" role="tabpanel">
+                  {meals.length === 0 ? (
+                    <p className="workouts-screen__empty-copy">この日の食品記録はまだありません。</p>
+                  ) : (
+                    meals.map((meal, index) => (
+                      <motion.div
+                        animate={{ opacity: 1, y: 0 }}
+                        initial={{ opacity: 0, y: 18 }}
+                        key={meal.id}
+                        transition={{
+                          ...sectionTransition,
+                          delay: reduceMotion ? 0 : 0.18 + index * 0.03,
+                        }}
+                      >
+                        <HistoryEntryCard
+                          isSaved={savedMealIds.includes(meal.id)}
+                          isSaving={savingMealId === meal.id}
+                          meal={meal}
+                          onDelete={handleDeleteMeal}
+                          onEdit={handleOpenEditMeal}
+                          onSave={handleSaveMeal}
+                        />
+                      </motion.div>
+                    ))
+                  )}
+                </section>
+              ) : (
+                <section className="history-screen__list" role="tabpanel">
+                  {workoutLogs.length === 0 ? (
+                    <p className="workouts-screen__empty-copy">この日のワークアウト記録はまだありません。</p>
+                  ) : (
+                    workoutLogs.map((log, index) => (
+                      <motion.div
+                        animate={{ opacity: 1, y: 0 }}
+                        initial={{ opacity: 0, y: 18 }}
+                        key={log.id}
+                        transition={{
+                          ...sectionTransition,
+                          delay: reduceMotion ? 0 : 0.18 + index * 0.03,
+                        }}
+                      >
+                        <WorkoutLogHistoryCard
+                          isSaving={savingWorkoutLogId === log.id}
+                          log={log}
+                          onDelete={(logId) => {
+                            void handleDeleteWorkoutLog(logId);
+                          }}
+                          onEdit={handleOpenEditWorkoutLog}
+                          onSave={(targetLog) => {
+                            void handleSaveWorkoutLog(targetLog);
+                          }}
+                        />
+                      </motion.div>
+                    ))
+                  )}
+                </section>
+              )}
             </motion.section>
           </div>
-        </motion.main>
-      )}
+      </motion.main>
 
       {editingMeal !== null ? (
         <HistoryMealEditorPanel
@@ -127,6 +206,18 @@ export function HistoryPageScreen(): JSX.Element {
           meal={editingMeal}
           onClose={handleCloseEditMeal}
           onSave={(values) => handleUpdateMeal(editingMeal.id, values)}
+        />
+      ) : null}
+
+      {editingWorkoutLog !== null ? (
+        <WorkoutLogEditorPanel
+          isSaving={isSavingWorkoutEdit}
+          onChange={handleWorkoutEditorValueChange}
+          onClose={handleCloseEditWorkoutLog}
+          onSave={() => {
+            void handleUpdateWorkoutLog();
+          }}
+          values={workoutEditorValues}
         />
       ) : null}
     </div>

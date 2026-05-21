@@ -72,7 +72,7 @@ export function SettingsManualTargetCard({
           ))}
         </div>
 
-        <button className="app-btn app-btn--primary" onClick={onSubmit} type="button">
+        <button className="settings-screen__primary-button" onClick={onSubmit} type="button">
           {isSaving ? <span className="record-screen__loading-spinner record-screen__loading-spinner--inline" /> : null}
           <span>{isSaving ? '保存中...' : isSaved ? '保存しました。' : '設定を更新する'}</span>
         </button>

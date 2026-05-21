@@ -2,26 +2,23 @@
 
 /*
  * 【責務】
- * `/app` Home ルート専用のトップバー、サマリー、体重推移、下部ナビを組み立てる。
+ * `/app` Home ルート専用のトップバー、栄養状況、今日のワークアウト、カロリー収支を組み立てる。
  */
 
 import { motion, useReducedMotion } from 'framer-motion';
 import { Camera } from 'lucide-react';
 import Link from 'next/link';
-import { useState, type JSX } from 'react';
+import { type JSX } from 'react';
 
-import { HomeScreenSkeleton } from '@/components/app-skeleton';
 import { AppTopBar } from '@/components/app-top-bar';
-import { WeightTrendChart } from '@/features/home/components/weight-trend-chart';
 import { DailyEnergyCard } from '@/features/home/components/daily-energy-card';
 import { useHomeScreen } from '@/features/home/use-home-screen';
+import { TodayWorkoutLogList } from '@/features/workouts/components/today-workout-log-list';
 import { RecordSummaryCard } from '@/components/record-summary-card';
 import { paths } from '@/config/paths';
 
 export function HomePageScreen(): JSX.Element {
-  const { summary, dailyEnergy, weightLogs, isLoading } = useHomeScreen();
-  const [selectedWeightLogId, setSelectedWeightLogId] = useState<string | null>(null);
-  const hasWeightLogs = weightLogs.length > 0;
+  const { summary, dailyEnergy, todayWorkoutLogs, todayWorkoutBurnedKcal } = useHomeScreen();
   const reduceMotion = useReducedMotion();
   const sectionTransition = reduceMotion
     ? { duration: 0 }
@@ -31,32 +28,34 @@ export function HomePageScreen(): JSX.Element {
     <div className="home-screen">
       <AppTopBar />
 
-      {isLoading ? (
-        <main className="home-screen__main" style={{ opacity: 1 }}>
-          <HomeScreenSkeleton />
-        </main>
-      ) : (
-        <motion.main
-          animate={{ opacity: 1, y: 0 }}
-          className="home-screen__main"
-          initial={{ opacity: 0, y: 14 }}
-          transition={sectionTransition}
-        >
+      <motion.main
+        animate={{ opacity: 1, y: 0 }}
+        className="home-screen__main"
+        initial={{ opacity: 0, y: 14 }}
+        transition={sectionTransition}
+      >
           <motion.section
             animate={{ opacity: 1, y: 0 }}
             className="home-screen__hero-grid"
             initial={{ opacity: 0, y: 18 }}
             transition={sectionTransition}
           >
-            <div className="home-screen__hero-stack">
-              <RecordSummaryCard
-                action={(
-                  <Link className="home-screen__record-link" href={paths.app.record.getHref()}>
-                    <Camera aria-hidden="true" size={19} strokeWidth={2.5} />
-                    記録する
-                  </Link>
-                )}
-                summary={summary}
+            <RecordSummaryCard
+              action={(
+                <Link className="home-screen__record-link" href={paths.app.record.getHref()}>
+                  <Camera aria-hidden="true" size={19} strokeWidth={2.5} />
+                  記録する
+                </Link>
+              )}
+              summary={summary}
+            />
+            <div className="home-screen__side-stack">
+              <TodayWorkoutLogList
+                activeLogId={null}
+                burnedKcal={todayWorkoutBurnedKcal}
+                logs={todayWorkoutLogs}
+                onDeleteLog={() => undefined}
+                showLogs={false}
               />
               <DailyEnergyCard
                 balanceKcal={dailyEnergy.balanceKcal}
@@ -66,59 +65,8 @@ export function HomePageScreen(): JSX.Element {
                 workoutKcal={dailyEnergy.workoutKcal}
               />
             </div>
-
-            <div className="home-screen__side-stack">
-              <motion.section
-                animate={{ opacity: 1, y: 0 }}
-                className="home-screen__card home-screen__card--weight"
-                initial={{ opacity: 0, y: 20 }}
-                transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.08 }}
-              >
-                <div className="home-screen__card-head">
-                  <p className="home-screen__eyebrow">Body Progress</p>
-                  <h2 className="home-screen__section-title">体重推移</h2>
-                </div>
-
-                <div className="home-screen__weight-summary">
-                  <div>
-                    <span>最新体重</span>
-                    <strong>{weightLogs.at(-1)?.currentWeightKg ?? '--'} kg</strong>
-                  </div>
-                  <div>
-                    <span>目標体重</span>
-                    <strong>{weightLogs.at(-1)?.targetWeightKg ?? '--'} kg</strong>
-                  </div>
-                  {hasWeightLogs ? (
-                    <div className="home-screen__weight-summary-slot">
-                      <WeightTrendChart
-                        onSelectPoint={setSelectedWeightLogId}
-                        points={weightLogs}
-                        selectedPointId={selectedWeightLogId ?? weightLogs.at(-1)?.id ?? null}
-                        variant="callout"
-                      />
-                    </div>
-                  ) : null}
-                </div>
-
-                {hasWeightLogs ? (
-                  <WeightTrendChart
-                    onSelectPoint={setSelectedWeightLogId}
-                    points={weightLogs}
-                    selectedPointId={selectedWeightLogId ?? weightLogs.at(-1)?.id ?? null}
-                  />
-                ) : (
-                  <div className="home-screen__weight-empty home-screen__weight-empty--action">
-                    <p>設定で現在体重と目標体重を保存すると、ここに推移が表示されます。</p>
-                    <Link className="home-screen__record-link home-screen__record-link--ghost" href={paths.app.settings.getHref()}>
-                      設定を開く
-                    </Link>
-                  </div>
-                )}
-              </motion.section>
-            </div>
           </motion.section>
-        </motion.main>
-      )}
+      </motion.main>
     </div>
   );
 }

@@ -52,8 +52,7 @@ export function RecordQuickInputCard({
           <textarea
             className="record-screen__prompt-input"
             placeholder="例: 昼に鶏むね丼と味噌汁。写真だけでもOK"
-            rows={4}
-            style={{ height: '100px' }}
+            rows={3}
             {...promptRegistration}
           />
         </div>
@@ -85,7 +84,10 @@ export function RecordQuickInputCard({
             {isAnalyzing ? (
               <div className="loading-spinner loading-spinner--small" />
             ) : (
-              <Send size={18} strokeWidth={2.1} />
+              <>
+                <span>解析</span>
+                <Send size={17} strokeWidth={2.1} />
+              </>
             )}
           </button>
         </div>

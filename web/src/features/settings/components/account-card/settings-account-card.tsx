@@ -17,7 +17,7 @@
  * - useWebAuth の user / signOut を表示用途で利用する。
  */
 
-import { BadgeCheck } from 'lucide-react';
+import { BadgeCheck, BookOpenText, LogOut } from 'lucide-react';
 import type { JSX } from 'react';
 
 type SettingsAccountCardProps = {
@@ -49,20 +49,26 @@ export function SettingsAccountCard({
           </div>
         </div>
 
-        <button className="app-btn app-btn--secondary" onClick={onOpenTutorial} type="button">
-          使い方を見る
-        </button>
+        <div className="settings-screen__account-actions">
+          <button className="settings-screen__account-button" onClick={onOpenTutorial} type="button">
+            <BookOpenText size={16} strokeWidth={2.2} />
+            <span>使い方を見る</span>
+          </button>
 
-        <button className="app-btn app-btn--secondary" disabled={isSigningOut} onClick={onSignOut} type="button">
-          {isSigningOut ? (
-            <>
+          <button
+            className="settings-screen__account-button settings-screen__account-button--danger"
+            disabled={isSigningOut}
+            onClick={onSignOut}
+            type="button"
+          >
+            {isSigningOut ? (
               <span className="record-screen__loading-spinner record-screen__loading-spinner--inline" />
-              <span>ログアウト中...</span>
-            </>
-          ) : (
-            'ログアウト'
-          )}
-        </button>
+            ) : (
+              <LogOut size={16} strokeWidth={2.2} />
+            )}
+            <span>{isSigningOut ? 'ログアウト中...' : 'ログアウト'}</span>
+          </button>
+        </div>
       </div>
     </section>
   );

@@ -30,7 +30,7 @@ export type UseFoodEntryActionsResult = {
   savingEntryId: string | null;
   isSavingEdit: boolean;
   clearFeedback: () => void;
-  handleAddFood: () => void;
+  setFeedback: (message: string, tone: FoodFeedbackTone) => void;
   handleSaveEditor: (entryId: string | null, form: UseFormReturn<MealFormValues>) => Promise<boolean>;
   handleDeleteEntry: (entryId: string) => Promise<void>;
   handleReuseEntry: (entryId: string) => Promise<void>;
@@ -58,10 +58,6 @@ export function useFoodEntryActions({
   function clearFeedback(): void {
     setFeedbackMessage(null);
     setFeedbackTone('info');
-  }
-
-  function handleAddFood(): void {
-    setFeedback('食品追加フォームの接続は次に行います。', 'info');
   }
 
   async function handleSaveEditor(
@@ -126,7 +122,7 @@ export function useFoodEntryActions({
     savingEntryId,
     isSavingEdit,
     clearFeedback,
-    handleAddFood,
+    setFeedback,
     handleSaveEditor,
     handleDeleteEntry,
     handleReuseEntry,

@@ -109,7 +109,9 @@ export function PfcDonutChart({
                     pointerEvents: 'none'
                 }}
             >
-                <p style={{ fontSize: '10px', color: 'rgba(223, 230, 216, 0.72)', margin: 0 }}>P</p>
+                <p style={{ fontSize: '8px', color: 'rgba(223, 230, 216, 0.72)', margin: 0, whiteSpace: 'nowrap' }}>
+                    たんぱく質
+                </p>
                 <p style={{ fontSize: '14px', fontWeight: 'bold', color: 'var(--gym-lime)', margin: 0 }}>
                     {Math.round(pRatio * 100)}%
                 </p>

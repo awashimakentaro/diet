@@ -9,9 +9,7 @@ import type { JSX } from 'react';
 
 import { AppTopBar } from '@/components/app-top-bar';
 import { OtherWorkoutLogForm } from '@/features/workouts/components/other-workout-log-form';
-import { TodayWorkoutLogList } from '@/features/workouts/components/today-workout-log-list';
 import { WorkoutMenuForm } from '@/features/workouts/components/workout-menu-form';
-import { WorkoutMenuList } from '@/features/workouts/components/workout-menu-list';
 import { useWorkoutsScreen } from '@/features/workouts/hooks';
 
 export function WorkoutsPageScreen(): JSX.Element {
@@ -19,14 +17,8 @@ export function WorkoutsPageScreen(): JSX.Element {
   const {
     formValues,
     otherWorkoutValues,
-    menus,
-    todayLogs,
-    todayBurnedKcal,
     feedbackMessage,
     feedbackTone,
-    activeMenuId,
-    activeLogId,
-    isLoading,
     isSaving,
     isSavingOtherWorkout,
     handleValueChange,
@@ -35,9 +27,6 @@ export function WorkoutsPageScreen(): JSX.Element {
     handleAddExercise,
     handleRemoveExercise,
     handleCreateMenu,
-    handleDeleteMenu,
-    handleLogMenu,
-    handleDeleteLog,
     handleCreateOtherWorkoutLog,
     handleSaveOtherWorkoutMenu,
   } = useWorkoutsScreen();
@@ -55,61 +44,36 @@ export function WorkoutsPageScreen(): JSX.Element {
         initial={{ opacity: 0, y: 18 }}
         transition={sectionTransition}
       >
-        <section className="workouts-screen__header">
-          <p className="workouts-screen__eyebrow">Workout Agent</p>
-          <h1>筋トレ</h1>
-        </section>
-
         {feedbackMessage !== null ? (
           <p className={feedbackTone === 'error' ? 'workouts-screen__feedback workouts-screen__feedback--error' : 'workouts-screen__feedback'}>
             {feedbackMessage}
           </p>
         ) : null}
 
-        <section className="workouts-screen__grid" aria-busy={isLoading}>
-          <WorkoutMenuForm
-            isSaving={isSaving}
-            onSubmit={() => {
-              void handleCreateMenu();
-            }}
-            onAddExercise={handleAddExercise}
-            onExerciseValueChange={handleExerciseValueChange}
-            onRemoveExercise={handleRemoveExercise}
-            onValueChange={handleValueChange}
-            values={formValues}
-          />
-
-          <TodayWorkoutLogList
-            activeLogId={activeLogId}
-            burnedKcal={todayBurnedKcal}
-            logs={todayLogs}
-            onDeleteLog={(logId) => {
-              void handleDeleteLog(logId);
-            }}
-          />
-
-          <OtherWorkoutLogForm
-            isSaving={isSavingOtherWorkout}
-            onAddToday={() => {
-              void handleCreateOtherWorkoutLog();
-            }}
-            onSaveMenu={() => {
-              void handleSaveOtherWorkoutMenu();
-            }}
-            onValueChange={handleOtherWorkoutValueChange}
-            values={otherWorkoutValues}
-          />
-
-          <div className="workouts-screen__list-column">
-            <WorkoutMenuList
-              activeMenuId={activeMenuId}
-              menus={menus}
-              onDeleteMenu={(menuId) => {
-                void handleDeleteMenu(menuId);
+        <section className="workouts-screen__grid">
+          <div className="workouts-screen__menu-column">
+            <WorkoutMenuForm
+              isSaving={isSaving}
+              onSubmit={() => {
+                void handleCreateMenu();
               }}
-              onLogMenu={(menu) => {
-                void handleLogMenu(menu);
+              onAddExercise={handleAddExercise}
+              onExerciseValueChange={handleExerciseValueChange}
+              onRemoveExercise={handleRemoveExercise}
+              onValueChange={handleValueChange}
+              values={formValues}
+            />
+
+            <OtherWorkoutLogForm
+              isSaving={isSavingOtherWorkout}
+              onAddToday={() => {
+                void handleCreateOtherWorkoutLog();
               }}
+              onSaveMenu={() => {
+                void handleSaveOtherWorkoutMenu();
+              }}
+              onValueChange={handleOtherWorkoutValueChange}
+              values={otherWorkoutValues}
             />
           </div>
         </section>

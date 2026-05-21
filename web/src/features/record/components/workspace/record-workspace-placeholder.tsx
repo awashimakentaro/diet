@@ -12,7 +12,7 @@ export function RecordWorkspacePlaceholder(): JSX.Element {
         <p className="record-screen__field-label">workspace</p>
         <h2 className="record-screen__workspace-title">下書きカードの表示エリア</h2>
         <p className="record-screen__workspace-copy">
-          左のプロンプト入力からテキストや写真を送ると、解析結果をここにまとめて表示します。
+          下の入力欄からテキストや写真を送ると、解析結果をここにまとめて表示します。
           手動入力を選ぶと、空のカードから直接編集できます。
         </p>
       </div>

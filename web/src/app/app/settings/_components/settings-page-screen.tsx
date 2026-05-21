@@ -13,7 +13,6 @@ import { AppTopBar } from '@/components/app-top-bar';
 import { paths } from '@/config/paths';
 import { SettingsAccountCard } from '@/features/settings/components/account-card';
 import { SettingsManualTargetCard } from '@/features/settings/components/manual-target-card';
-import { SettingsNotificationCard } from '@/features/settings/components/notification-card';
 import { SettingsProfileCard } from '@/features/settings/components/profile-card';
 import { useSettingsScreen } from '@/features/settings/hooks';
 
@@ -26,8 +25,6 @@ export function SettingsPageScreen(): JSX.Element {
     gender,
     activityLevel,
     accountEmail,
-    notificationsEnabled,
-    selectedReminder,
     isSaving,
     isSigningOut,
     activeSaveAction,
@@ -39,9 +36,6 @@ export function SettingsPageScreen(): JSX.Element {
     handleManualTargetSubmit,
     handleSaveProfile,
     handleRunAutoCalculate,
-    handleToggleNotificationEnabled,
-    handleSelectReminder,
-    handleSaveNotification,
     handleSignOut,
   } = useSettingsScreen();
   const sectionTransition = reduceMotion
@@ -111,20 +105,6 @@ export function SettingsPageScreen(): JSX.Element {
               animate={{ opacity: 1, y: 0 }}
               initial={{ opacity: 0, y: 14 }}
               transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.14 }}
-            >
-              <SettingsNotificationCard
-                enabled={notificationsEnabled}
-                onSave={handleSaveNotification}
-                onSelectReminder={handleSelectReminder}
-                onToggleEnabled={handleToggleNotificationEnabled}
-                selectedReminder={selectedReminder}
-              />
-            </motion.div>
-
-            <motion.div
-              animate={{ opacity: 1, y: 0 }}
-              initial={{ opacity: 0, y: 14 }}
-              transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.18 }}
             >
               <SettingsAccountCard
                 email={accountEmail}

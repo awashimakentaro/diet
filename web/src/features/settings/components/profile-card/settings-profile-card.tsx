@@ -54,13 +54,19 @@ type RowSpec = {
   inputMode?: 'text' | 'decimal';
 };
 
-const ROW_SPECS: RowSpec[] = [
+const ACCOUNT_ROW_SPECS: RowSpec[] = [
   { field: 'username', label: 'USERNAME', suffix: '', icon: <IdCard size={16} strokeWidth={2} />, inputMode: 'text' },
   { field: 'displayName', label: '表示名', suffix: '', icon: <User size={16} strokeWidth={2} />, inputMode: 'text' },
   { field: 'bio', label: 'ひとこと', suffix: '', icon: <NotebookPen size={16} strokeWidth={2} />, inputMode: 'text' },
+];
+
+const BODY_ROW_SPECS: RowSpec[] = [
   { field: 'age', label: '年齢', suffix: '歳', icon: <User size={16} strokeWidth={2} /> },
   { field: 'heightCm', label: '身長', suffix: 'cm', icon: <Ruler size={16} strokeWidth={2} /> },
   { field: 'currentWeightKg', label: '現在の体重', suffix: 'kg', icon: <Weight size={16} strokeWidth={2} /> },
+];
+
+const GOAL_ROW_SPECS: RowSpec[] = [
   { field: 'targetWeightKg', label: '目標の体重', suffix: 'kg', icon: <Goal size={16} strokeWidth={2} /> },
   { field: 'targetDays', label: '目標達成日数', suffix: '日', icon: <Timer size={16} strokeWidth={2} /> },
 ];
@@ -91,43 +97,20 @@ export function SettingsProfileCard({
     };
   }
 
-  return (
-    <section className="settings-screen__section">
-      <div className="settings-screen__section-head">
-        <p className="eyebrow">体格情報 + 自動計算</p>
-        <span>プロフィール保存と目標の自動計算は別々に実行できます。</span>
-      </div>
+  function renderFields(rows: RowSpec[]): JSX.Element {
+    return (
+      <div className="profile-fields">
+        {rows.map((row) => {
+          const inputId = `settings-profile-${row.field}`;
 
-      <div className="settings-screen__card settings-screen__card--profile app-card">
-        {/* Gender Segmented Control */}
-        <div className="profile-gender-picker">
-          <button
-            className={gender === 'male' ? 'profile-gender-picker__btn profile-gender-picker__btn--active' : 'profile-gender-picker__btn'}
-            onClick={() => onGenderChange('male')}
-            type="button"
-          >
-            <span className="profile-gender-picker__emoji">👨</span>
-            <span>男性</span>
-          </button>
-          <button
-            className={gender === 'female' ? 'profile-gender-picker__btn profile-gender-picker__btn--active' : 'profile-gender-picker__btn'}
-            onClick={() => onGenderChange('female')}
-            type="button"
-          >
-            <span className="profile-gender-picker__emoji">👩</span>
-            <span>女性</span>
-          </button>
-        </div>
-
-        {/* Profile Input Fields */}
-        <div className="profile-fields">
-          {ROW_SPECS.map((row) => (
+          return (
             <div className="profile-field" key={row.field}>
               <div className="profile-field__icon">{row.icon}</div>
-              <label className="profile-field__label">{row.label}</label>
+              <label className="profile-field__label" htmlFor={inputId}>{row.label}</label>
               <div className="profile-field__input-wrapper">
                 <input
                   className={row.inputMode === 'text' ? 'profile-field__input profile-field__input--text' : 'profile-field__input'}
+                  id={inputId}
                   inputMode={row.inputMode ?? 'decimal'}
                   onChange={createChangeHandler(row.field)}
                   type="text"
@@ -138,33 +121,81 @@ export function SettingsProfileCard({
                 ) : null}
               </div>
             </div>
-          ))}
+          );
+        })}
+      </div>
+    );
+  }
+
+  return (
+    <section className="settings-screen__section">
+      <div className="settings-screen__section-head">
+        <p className="eyebrow">体格情報 + 自動計算</p>
+        <span>プロフィール保存と目標の自動計算は別々に実行できます。</span>
+      </div>
+
+      <div className="settings-screen__card settings-screen__card--profile app-card">
+        <div className="profile-section">
+          <p className="profile-section__title">アカウント表示情報</p>
+          {renderFields(ACCOUNT_ROW_SPECS)}
         </div>
 
-        {/* Activity Level */}
-        <div className="profile-activity">
-          <p className="profile-activity__label">
-            <Flame size={14} strokeWidth={2.2} />
-            <span>運動レベル</span>
-          </p>
+        <div className="profile-section">
+          <p className="profile-section__title">体格情報</p>
+          <div className="profile-gender-picker" aria-label="性別">
+            <button
+              aria-pressed={gender === 'male'}
+              className={gender === 'male' ? 'profile-gender-picker__btn profile-gender-picker__btn--active' : 'profile-gender-picker__btn'}
+              onClick={() => onGenderChange('male')}
+              type="button"
+            >
+              <span className="profile-gender-picker__emoji">👨</span>
+              <span>男性</span>
+            </button>
+            <button
+              aria-pressed={gender === 'female'}
+              className={gender === 'female' ? 'profile-gender-picker__btn profile-gender-picker__btn--active' : 'profile-gender-picker__btn'}
+              onClick={() => onGenderChange('female')}
+              type="button"
+            >
+              <span className="profile-gender-picker__emoji">👩</span>
+              <span>女性</span>
+            </button>
+          </div>
+          {renderFields(BODY_ROW_SPECS)}
+        </div>
 
-          <div className="profile-activity__grid">
-            {ACTIVITY_OPTIONS.map((option) => (
-              <button
-                className={activityLevel === option.value ? 'profile-activity__btn profile-activity__btn--active' : 'profile-activity__btn'}
-                key={option.value}
-                onClick={() => onActivityChange(option.value)}
-                type="button"
-              >
-                <span className="profile-activity__emoji">{option.emoji}</span>
-                <strong>{option.label}</strong>
-                <span className="profile-activity__caption">{option.caption}</span>
-              </button>
-            ))}
+        <div className="profile-section">
+          <p className="profile-section__title">目標条件</p>
+          {renderFields(GOAL_ROW_SPECS)}
+        </div>
+
+        <div className="profile-section">
+          <p className="profile-section__title">運動レベル</p>
+          <div className="profile-activity">
+            <p className="profile-activity__label">
+              <Flame size={14} strokeWidth={2.2} />
+              <span>活動量を選択</span>
+            </p>
+
+            <div className="profile-activity__grid">
+              {ACTIVITY_OPTIONS.map((option) => (
+                <button
+                  aria-pressed={activityLevel === option.value}
+                  className={activityLevel === option.value ? 'profile-activity__btn profile-activity__btn--active' : 'profile-activity__btn'}
+                  key={option.value}
+                  onClick={() => onActivityChange(option.value)}
+                  type="button"
+                >
+                  <span className="profile-activity__emoji">{option.emoji}</span>
+                  <strong>{option.label}</strong>
+                  <span className="profile-activity__caption">{option.caption}</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Action Buttons */}
         <div className="profile-actions">
           <button
             className="profile-actions__btn profile-actions__btn--calc"

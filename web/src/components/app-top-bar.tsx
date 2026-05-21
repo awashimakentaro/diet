@@ -41,11 +41,13 @@ export function AppTopBar(): JSX.Element {
           </Link>
         </div>
 
-        {status === 'signed-in' ? (
+        {status === 'signed-in' || status === 'checking' ? (
           <button
             aria-label="アカウントを編集"
-            className="app-top-bar__avatar-button"
-            onClick={openSheet}
+            aria-busy={status === 'checking'}
+            className={status === 'checking' ? 'app-top-bar__avatar-button app-top-bar__avatar-button--checking' : 'app-top-bar__avatar-button'}
+            disabled={status === 'checking'}
+            onClick={status === 'signed-in' ? openSheet : undefined}
             type="button"
           >
             <AccountAvatarBadge />

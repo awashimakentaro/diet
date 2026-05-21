@@ -32,6 +32,7 @@ export function RecordSummaryCard({
   action = null,
 }: RecordSummaryCardProps): JSX.Element {
   const reduceMotion = useReducedMotion();
+  const remainingKcal = Math.max(summary.goalKcal - summary.kcal, 0);
 
   return (
     <motion.section
@@ -53,6 +54,9 @@ export function RecordSummaryCard({
                 <strong>{summary.kcal}</strong>
                 <span>/ {summary.goalKcal} kcal</span>
               </div>
+              <p className="record-screen__summary-note">
+                目標まであと {remainingKcal} kcal
+              </p>
             </div>
             {action !== null ? (
               <div className="record-screen__summary-action">

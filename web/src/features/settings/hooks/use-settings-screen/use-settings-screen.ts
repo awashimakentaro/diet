@@ -4,7 +4,7 @@
  * Settings 画面で使うフォーム・保存・アカウント hook を合成する。
  */
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useWebAuth } from '@/app/provider';
 
@@ -49,6 +49,7 @@ export type UseSettingsScreenResult = {
   isSigningOut: boolean;
   activeSaveAction: SettingsSaveAction;
   saveStatus: SettingsSaveStatus;
+  isLoading: boolean;
   handleManualTargetChange: (field: keyof ManualTargetValues, value: string) => void;
   handleProfileValueChange: (field: keyof ProfileValues, value: string) => void;
   handleGenderChange: (value: Gender) => void;
@@ -83,15 +84,18 @@ export function useSettingsScreen(): UseSettingsScreenResult {
   const notification = useNotificationSettings();
   const saveState = useSettingsSaveStatus();
   const account = useSettingsAccount({ email: user?.email, signOut });
+  const [isLoading, setIsLoading] = useState(true);
   const { setManualTargets } = manualGoal;
   const { setActivityLevel, setGender, setProfileValues } = profileGoal;
 
   useEffect(() => {
     if (!user?.id) {
+      setIsLoading(false);
       return;
     }
 
     let isMounted = true;
+    setIsLoading(true);
 
     async function loadSettings(): Promise<void> {
       try {
@@ -122,6 +126,10 @@ export function useSettingsScreen(): UseSettingsScreenResult {
       } catch {
         if (!isMounted) {
           return;
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
         }
       }
     }
@@ -222,6 +230,7 @@ export function useSettingsScreen(): UseSettingsScreenResult {
     isSigningOut: account.isSigningOut,
     activeSaveAction: saveState.activeSaveAction,
     saveStatus: saveState.saveStatus,
+    isLoading,
     handleManualTargetChange: manualGoal.handleManualTargetChange,
     handleProfileValueChange: profileGoal.handleProfileValueChange,
     handleGenderChange: profileGoal.handleGenderChange,

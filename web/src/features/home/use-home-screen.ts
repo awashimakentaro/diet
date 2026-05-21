@@ -2,7 +2,7 @@
 
 /*
  * 【責務】
- * Home 画面に表示する当日サマリー、カロリー収支、体重推移を組み立てる。
+ * Home 画面に表示する当日サマリー、今日のワークアウト、カロリー収支を組み立てる。
  */
 
 import useSWR from 'swr';
@@ -15,13 +15,14 @@ import { listDailySummary } from '../summary/api/list-daily-summary';
 import { listCurrentGoal } from '../settings/api/list-current-goal';
 import { getUserProfile } from '../settings/api/get-user-profile';
 import { listTodayWorkoutLogs } from '../workouts/api/list-today-workout-logs';
+import type { WorkoutLog } from '../workouts/types';
 import { buildDailyEnergySummary } from './utils/build-daily-energy-summary';
-import { listUserWeightLogs, type UserWeightLogPoint } from './api/list-user-weight-logs';
 
 export type UseHomeScreenResult = {
   summary: NutritionSummary;
   dailyEnergy: ReturnType<typeof buildDailyEnergySummary>;
-  weightLogs: UserWeightLogPoint[];
+  todayWorkoutLogs: WorkoutLog[];
+  todayWorkoutBurnedKcal: number;
   isLoading: boolean;
 };
 
@@ -30,13 +31,6 @@ export function useHomeScreen(): UseHomeScreenResult {
   const { data: todaySummary, isLoading: isTodayLoading } = useSWR(
     `/summary/daily/${todayKey}`,
     () => listDailySummary(todayKey),
-  );
-  const { data: weightLogs = [], isLoading: isWeightLoading } = useSWR(
-    '/home/user-weight-logs/12',
-    () => listUserWeightLogs(12),
-    {
-      fallbackData: [],
-    },
   );
   const { data: goal, isLoading: isGoalLoading } = useSWR(
     '/settings/current-goal',
@@ -56,15 +50,17 @@ export function useHomeScreen(): UseHomeScreenResult {
       fallbackData: [],
     },
   );
+  const todayWorkoutBurnedKcal = todayWorkoutLogs.reduce((sum, log) => sum + log.burnedKcal, 0);
 
   return {
     summary: buildNutritionSummary(todaySummary ?? null, goal ?? null),
     dailyEnergy: buildDailyEnergySummary(
       profile,
       todaySummary?.totals.kcal ?? 0,
-      todayWorkoutLogs.reduce((sum, log) => sum + log.burnedKcal, 0),
+      todayWorkoutBurnedKcal,
     ),
-    weightLogs,
-    isLoading: isTodayLoading || isWeightLoading || isGoalLoading || isProfileLoading || isWorkoutLoading,
+    todayWorkoutLogs,
+    todayWorkoutBurnedKcal,
+    isLoading: isTodayLoading || isGoalLoading || isProfileLoading || isWorkoutLoading,
   };
 }

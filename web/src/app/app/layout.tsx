@@ -10,6 +10,7 @@ import { usePathname, useRouter } from 'next/navigation';
 
 import { useWebAuth } from '@/app/provider';
 import { AppBottomNav } from '@/components/app-bottom-nav';
+import { AppTopBar } from '@/components/app-top-bar';
 import { paths } from '@/config/paths';
 
 type AuthenticatedAppLayoutProps = {
@@ -50,12 +51,21 @@ export default function AuthenticatedAppLayout({
 
   if (status === 'checking') {
     return (
-      <main className="auth-page auth-page--loading">
-        <div className="auth-card auth-card--minimal">
-          <div className="loading-spinner" />
-          <p className="auth-loading-text">セッションを確認中...</p>
-        </div>
-      </main>
+      <div className="app-session-check">
+        <AppTopBar />
+        <main className="app-session-check__main" aria-live="polite">
+          <section className="app-session-check__panel">
+            <div className="app-session-check__orb" aria-hidden="true">
+              <span className="app-session-check__spinner" />
+            </div>
+            <div className="app-session-check__copy">
+              <p className="app-session-check__eyebrow">PFC TRACKER</p>
+              <h1>セッションを確認中</h1>
+              <p>今日の記録へ戻る準備をしています。</p>
+            </div>
+          </section>
+        </main>
+      </div>
     );
   }
 
