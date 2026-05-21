@@ -547,6 +547,15 @@ body {
     font-size: 0.78rem;
   }
 
+  .landing-screen__live-comments {
+    inset: 16px 0 auto;
+    height: min(48%, 170px);
+  }
+
+  .landing-screen__live-comment-track {
+    gap: 72px;
+  }
+
   .landing-screen__topbar {
     margin-bottom: 42px;
   }
@@ -6897,10 +6906,6 @@ input {
 @media (max-width: 767px) {
   .landing-screen {
     background-size: 34px 34px, 34px 34px, auto, auto, auto;
-  }
-
-  .landing-screen__live-comments {
-    display: none;
   }
 
   .landing-screen__hero {
