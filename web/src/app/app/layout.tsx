@@ -28,6 +28,8 @@ function buildRedirectPath(pathname: string): string {
   return pathname;
 }
 
+const LOGOUT_REDIRECT_FLAG = 'pfc-tracker:logout-redirect-home';
+
 /**
  * `/app/*` 配下を認証付きレイアウトとして描画する。
  * 呼び出し元: Next.js App Router。
@@ -45,6 +47,14 @@ export default function AuthenticatedAppLayout({
 
   useEffect(() => {
     if (status === 'signed-out') {
+      const shouldRedirectHome = window.sessionStorage.getItem(LOGOUT_REDIRECT_FLAG) === '1';
+
+      if (shouldRedirectHome) {
+        window.sessionStorage.removeItem(LOGOUT_REDIRECT_FLAG);
+        router.replace(paths.home.getHref());
+        return;
+      }
+
       router.replace(paths.auth.login.getHref(redirectPath));
     }
   }, [redirectPath, router, status]);

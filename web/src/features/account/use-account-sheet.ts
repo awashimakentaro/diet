@@ -28,6 +28,8 @@ import { getUserProfile } from '@/features/settings/api/get-user-profile';
 
 import { saveAccountProfile } from './api/save-account-profile';
 
+const LOGOUT_REDIRECT_FLAG = 'pfc-tracker:logout-redirect-home';
+
 type AccountFormValues = {
   username: string;
   displayName: string;
@@ -149,6 +151,7 @@ export function useAccountSheet(): UseAccountSheetResult {
   async function handleSignOut(): Promise<void> {
     try {
       setIsSigningOut(true);
+      window.sessionStorage.setItem(LOGOUT_REDIRECT_FLAG, '1');
       await signOut();
       setIsOpen(false);
       router.replace(paths.home.getHref());

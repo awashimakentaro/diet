@@ -9,6 +9,8 @@ import { useRouter } from 'next/navigation';
 
 import { paths } from '@/config/paths';
 
+const LOGOUT_REDIRECT_FLAG = 'pfc-tracker:logout-redirect-home';
+
 type UseSettingsAccountParams = {
   email: string | undefined;
   signOut: () => Promise<void>;
@@ -30,6 +32,7 @@ export function useSettingsAccount({
   async function handleSignOut(): Promise<void> {
     try {
       setIsSigningOut(true);
+      window.sessionStorage.setItem(LOGOUT_REDIRECT_FLAG, '1');
       await signOut();
       router.replace(paths.home.getHref());
     } finally {
