@@ -3,6 +3,21 @@ export const paths = {
     getHref: () => '/',
   },//urlを返すための関数　paths.home.getHref()　とかけば/が帰る
 
+  legal: {
+    terms: {
+      getHref: () => '/terms',
+    },
+    privacy: {
+      getHref: () => '/privacy',
+    },
+    commerce: {
+      getHref: () => '/commerce',
+    },
+    contact: {
+      getHref: () => '/contact',
+    },
+  },
+
   auth: {
     login: {
       getHref: (redirectTo?: string | null) =>

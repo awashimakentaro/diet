@@ -118,6 +118,13 @@ export function LandingPageScreen(): JSX.Element {
           </div>
         </div>
       </section>
+
+      <footer className="landing-screen__footer">
+        <Link href={paths.legal.terms.getHref()}>利用規約</Link>
+        <Link href={paths.legal.privacy.getHref()}>プライバシーポリシー</Link>
+        <Link href={paths.legal.commerce.getHref()}>特定商取引法に基づく表記</Link>
+        <Link href={paths.legal.contact.getHref()}>お問い合わせ</Link>
+      </footer>
     </main>
   );
 }

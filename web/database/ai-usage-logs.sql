@@ -35,6 +35,7 @@ create table if not exists public.user_entitlements (
   stripe_customer_id text unique,
   stripe_subscription_id text unique,
   subscription_status text,
+  cancel_at_period_end boolean not null default false,
   current_period_end timestamptz,
   updated_at timestamptz not null default now()
 );
@@ -53,6 +54,9 @@ alter table public.user_entitlements
 
 alter table public.user_entitlements
   add column if not exists subscription_status text;
+
+alter table public.user_entitlements
+  add column if not exists cancel_at_period_end boolean not null default false;
 
 alter table public.user_entitlements
   add column if not exists current_period_end timestamptz;

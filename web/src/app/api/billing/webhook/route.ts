@@ -47,11 +47,16 @@ function getPeriodEnd(value: unknown): string | null {
   return typeof value === 'number' ? new Date(value * 1000).toISOString() : null;
 }
 
+function getBoolean(value: unknown): boolean {
+  return typeof value === 'boolean' ? value : false;
+}
+
 async function upsertProEntitlement(params: {
   userId: string;
   customerId: string | null;
   subscriptionId: string | null;
   status: string | null;
+  cancelAtPeriodEnd: boolean;
   currentPeriodEnd: string | null;
 }) {
   const admin = createSupabaseAdminClient();
@@ -68,6 +73,7 @@ async function upsertProEntitlement(params: {
       stripe_customer_id: params.customerId,
       stripe_subscription_id: params.subscriptionId,
       subscription_status: params.status,
+      cancel_at_period_end: isActive ? params.cancelAtPeriodEnd : false,
       current_period_end: params.currentPeriodEnd,
       updated_at: new Date().toISOString(),
     });
@@ -98,6 +104,7 @@ export async function POST(request: Request) {
           customerId: getString(object.customer),
           subscriptionId: getString(object.subscription),
           status: 'active',
+          cancelAtPeriodEnd: false,
           currentPeriodEnd: null,
         });
       }
@@ -112,6 +119,7 @@ export async function POST(request: Request) {
           customerId: getString(object.customer),
           subscriptionId: getString(object.id),
           status: getString(object.status),
+          cancelAtPeriodEnd: getBoolean(object.cancel_at_period_end),
           currentPeriodEnd: getPeriodEnd(object.current_period_end),
         });
       }

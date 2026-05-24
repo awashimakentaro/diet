@@ -23,6 +23,11 @@ type UserEntitlementRow = {
   plan: string | null;
   ai_weekly_limit: number | null;
   ai_unlimited: boolean | null;
+  stripe_customer_id?: string | null;
+  stripe_subscription_id?: string | null;
+  subscription_status?: string | null;
+  cancel_at_period_end?: boolean | null;
+  current_period_end?: string | null;
 };
 
 const DEFAULT_EMAIL = 'TestUser@test.com';
@@ -221,7 +226,7 @@ async function getEntitlement(
 ): Promise<UserEntitlementRow | null> {
   const { data, error } = await client
     .from('user_entitlements')
-    .select('role, plan, ai_weekly_limit, ai_unlimited')
+    .select('role, plan, ai_weekly_limit, ai_unlimited, stripe_customer_id, stripe_subscription_id, subscription_status, cancel_at_period_end, current_period_end')
     .eq('user_id', userId)
     .maybeSingle<UserEntitlementRow>();
 
