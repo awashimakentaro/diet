@@ -21,18 +21,15 @@
  */
 
 import { Suspense, type JSX } from 'react';
-import { useRouter } from 'next/navigation';
 
 import { LoginForm } from '@/features/auth/components/login-form';
 import { paths } from '@/config/paths';
 import { AuthLayout } from '../_components/auth-layout';
 
 function LoginPageContent(): JSX.Element {
-  const router = useRouter();
-
   return (
     <AuthLayout>
-      <LoginForm onSuccess={() => router.replace(paths.app.root.getHref())} />
+      <LoginForm redirectTo={paths.app.root.getHref()} />
     </AuthLayout>
   );
 }

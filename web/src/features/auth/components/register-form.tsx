@@ -1,119 +1,107 @@
 /* 【責務】
- * 新規登録フォームを描画し、認証成功時のコールバックへつなぐ。
+ * Google 新規登録ボタンを描画し、Supabase OAuth へつなぐ。
  */
 
 'use client';
 
-import * as Label from '@radix-ui/react-label';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useState, type FocusEvent } from 'react';
-import { useForm } from 'react-hook-form';
+import { useState } from 'react';
 
 import { useAuth } from '@/app/provider';
-import { signUpSchema, type SignUpInput } from '@/lib/auth';
+
+const TEST_ACCOUNT_EMAIL = 'TestUser@test.com';
+const TEST_ACCOUNT_PASSWORD = 'testtest';
+const isTestLoginEnabled = process.env.NODE_ENV !== 'production'
+  || process.env.NEXT_PUBLIC_ENABLE_TEST_LOGIN === 'true';
 
 type RegisterFormProps = {
-  onSuccess: () => void;
+  demoRedirectTo: string;
+  redirectTo: string;
 };
 
-export function RegisterForm({ onSuccess }: RegisterFormProps) {
-  const { signUp } = useAuth();
+export function RegisterForm({ demoRedirectTo, redirectTo }: RegisterFormProps) {
+  const { signIn, signInWithGoogle } = useAuth();
   const [message, setMessage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const form = useForm<SignUpInput>({
-    resolver: zodResolver(signUpSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-    },
-  });
-  const emailRegistration = form.register('email');
-
-  function normalizeEmail(value: string): string {
-    return value.trim().toLowerCase();
-  }
-
-  function handleEmailBlur(event: FocusEvent<HTMLInputElement>): void {
-    form.setValue('email', normalizeEmail(event.target.value), {
-      shouldDirty: true,
-      shouldValidate: false,
-    });
-    void emailRegistration.onBlur(event);
-  }
-
-  async function handleSubmit(values: SignUpInput): Promise<void> {
+  async function handleGoogleSignUp(): Promise<void> {
     setMessage(null);
+    setIsSubmitting(true);
 
     try {
-      const result = await signUp({
-        ...values,
-        email: normalizeEmail(values.email),
-      });
-
-      if (result.session === null) {
-        setMessage('確認メールを送信しました。メール確認後にログインしてください。');
-        return;
-      }
-
-      onSuccess();
+      await signInWithGoogle(redirectTo);
     } catch (error) {
+      setIsSubmitting(false);
       setMessage(
         error instanceof Error
           ? error.message
-          : '新規登録に失敗しました。入力内容を確認してください。',
+          : 'Google での登録に失敗しました。時間をおいて再度お試しください。',
+      );
+    }
+  }
+
+  async function handleTestSignIn(): Promise<void> {
+    setMessage(null);
+    setIsSubmitting(true);
+
+    try {
+      await signIn({
+        email: TEST_ACCOUNT_EMAIL,
+        password: TEST_ACCOUNT_PASSWORD,
+      });
+      window.location.assign(demoRedirectTo);
+    } catch (error) {
+      setIsSubmitting(false);
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : 'テストアカウントでのログインに失敗しました。',
       );
     }
   }
 
   return (
-    <form className="auth-form" noValidate onSubmit={form.handleSubmit(handleSubmit)}>
-      <div className="auth-field">
-        <Label.Root htmlFor="email">メールアドレス</Label.Root>
-        <input
-          aria-invalid={form.formState.errors.email ? 'true' : 'false'}
-          autoComplete="email"
-          id="email"
-          placeholder="diet@example.com"
-          type="email"
-          {...emailRegistration}
-          onBlur={handleEmailBlur}
-        />
-        {form.formState.errors.email ? (
-          <p className="auth-message" role="alert">{form.formState.errors.email.message}</p>
-        ) : null}
-      </div>
+    <div className="auth-form">
+      <section className="auth-method auth-method--primary">
+        <div className="auth-method__copy">
+          <span>通常利用</span>
+          <p>Google アカウントで登録して、初期設定へ進みます。</p>
+        </div>
+        <button
+          className="auth-google-button"
+          disabled={isSubmitting}
+          onClick={() => {
+            void handleGoogleSignUp();
+          }}
+          type="button"
+        >
+          <span className="auth-google-button__mark" aria-hidden="true">G</span>
+          <span>{isSubmitting ? 'Google に接続中...' : 'Google で始める'}</span>
+        </button>
+        <p className="auth-oauth-note">
+          メールアドレスとパスワードは Google の認証画面で入力します。
+        </p>
+      </section>
 
-      <div className="auth-field">
-        <Label.Root htmlFor="password">パスワード</Label.Root>
-        <input
-          aria-invalid={form.formState.errors.password ? 'true' : 'false'}
-          autoComplete="new-password"
-          id="password"
-          placeholder="6文字以上で入力"
-          type="password"
-          {...form.register('password')}
-        />
-        {form.formState.errors.password ? (
-          <p className="auth-message" role="alert">{form.formState.errors.password.message}</p>
-        ) : null}
-      </div>
+      {isTestLoginEnabled ? (
+        <section className="auth-method auth-method--demo">
+          <div className="auth-method__copy">
+            <span>開発 / お試し用</span>
+            <p>固定のテストアカウントでアプリを確認します。</p>
+          </div>
+          <button
+            className="auth-demo-button"
+            disabled={isSubmitting}
+            onClick={() => {
+              void handleTestSignIn();
+            }}
+            type="button"
+          >
+            テストアカウントで入る
+          </button>
+        </section>
+      ) : null}
 
       {message !== null ? <p className="auth-message" role="alert">{message}</p> : null}
-
-      <button
-        className="primary-button"
-        disabled={form.formState.isSubmitting}
-        type="submit"
-      >
-        {form.formState.isSubmitting ? (
-          <>
-            <span className="record-screen__loading-spinner record-screen__loading-spinner--inline" />
-            <span>送信中...</span>
-          </>
-        ) : (
-          'アカウントを作成する'
-        )}
-      </button>
-    </form>
+    </div>
   );
 }

@@ -49,6 +49,7 @@ app-example
 /mobile/dist/
 /mobile/web-build/
 /mobile/.dist/
-/web/storybook-static/
-
+/web/storybook-static
+/web/memo/
 *storybook.log
+client_secret_*.json

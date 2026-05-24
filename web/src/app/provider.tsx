@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { createContext, useContext } from "react";
 import type { User } from "@supabase/supabase-js";
 
-import { login, logout, signUp, useUser } from "@/lib/auth";
+import { login, logout, signInWithGoogle, signUp, useUser } from "@/lib/auth";
 
 type AuthStatus = "checking" | "signed-in" | "signed-out";
 
@@ -12,6 +12,7 @@ type AuthContextValue = {
   user: User | null | undefined;
   status: AuthStatus;
   signIn: (input: { email: string; password: string }) => Promise<void>;
+  signInWithGoogle: (redirectTo: string) => Promise<void>;
   signOut: () => Promise<void>;
   signUp: (input: { email: string; password: string }) => Promise<Awaited<ReturnType<typeof signUp>>>;
 };
@@ -26,6 +27,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function signIn(input: { email: string; password: string }) {
     await login(input);
     await mutate();
+  }
+
+  async function handleSignInWithGoogle(redirectTo: string) {
+    await signInWithGoogle(redirectTo);
   }
 
   async function handleSignOut() {
@@ -45,6 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         status,
         signIn,
+        signInWithGoogle: handleSignInWithGoogle,
         signOut: handleSignOut,
         signUp: handleSignUp,
       }}

@@ -21,19 +21,17 @@
  */
 
 import { Suspense, type JSX } from 'react';
-import { useRouter } from 'next/navigation';
 
 import { RegisterForm } from '@/features/auth/components/register-form';
 import { paths } from '@/config/paths';
 import { AuthLayout } from '../_components/auth-layout';
 
 function RegisterPageContent(): JSX.Element {
-  const router = useRouter();
   const onboardingHref = `/setup/onboarding?redirectTo=${encodeURIComponent(paths.app.root.getHref())}`;
 
   return (
     <AuthLayout signedInRedirectTo={onboardingHref}>
-      <RegisterForm onSuccess={() => router.replace(onboardingHref)} />
+      <RegisterForm demoRedirectTo={paths.app.root.getHref()} redirectTo={onboardingHref} />
     </AuthLayout>
   );
 }
