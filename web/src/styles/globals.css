@@ -2685,6 +2685,14 @@ input {
   cursor: pointer;
 }
 
+.record-screen__prompt-tool--disabled {
+  background: rgba(223, 230, 216, 0.12);
+  color: rgba(223, 230, 216, 0.52);
+  cursor: not-allowed;
+  filter: grayscale(1);
+  pointer-events: none;
+}
+
 .record-screen__prompt-tool svg:first-child {
   color: #155dfc;
 }
@@ -2703,6 +2711,14 @@ input {
   color: #e8ece4;
   font-size: 12px;
   font-weight: 900;
+}
+
+.record-screen__prompt-submit--disabled {
+  border-color: rgba(223, 230, 216, 0.14);
+  background: rgba(223, 230, 216, 0.16);
+  color: rgba(223, 230, 216, 0.58);
+  box-shadow: none;
+  filter: grayscale(1);
 }
 
 .record-screen__editor-shell {
@@ -2785,6 +2801,33 @@ input {
   color: #667085;
   font-size: 0.9rem;
   line-height: 1.6;
+}
+
+.record-screen__ai-limit-note {
+  margin: 2px 0 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(206, 255, 41, 0.22);
+  border-radius: 14px;
+  background: rgba(206, 255, 41, 0.08);
+  color: #dfe6d8;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.55;
+}
+
+.record-screen__ai-limit-note--reached {
+  border-color: rgba(223, 230, 216, 0.18);
+  background: rgba(223, 230, 216, 0.08);
+  color: rgba(223, 230, 216, 0.72);
+}
+
+.record-screen__workspace-placeholder--limited {
+  gap: 18px;
+}
+
+.record-screen__workspace-guide--limited {
+  border-color: rgba(223, 230, 216, 0.16);
+  background: rgba(223, 230, 216, 0.08);
 }
 
 .record-screen__workspace-guides {
@@ -4316,7 +4359,9 @@ input {
 .workouts-screen__ai-loading {
   display: grid;
   justify-items: center;
+  align-content: center;
   gap: 18px;
+  min-height: 260px;
   padding: 34px 22px;
   border: 1px solid rgba(223, 230, 216, 0.12);
   border-radius: 24px;
@@ -4343,6 +4388,42 @@ input {
   color: rgba(223, 230, 216, 0.64);
   font-size: 0.9rem;
   line-height: 1.6;
+}
+
+.workouts-screen__ai-limit-card {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid rgba(223, 230, 216, 0.16);
+  border-radius: 22px;
+  background: rgba(223, 230, 216, 0.08);
+}
+
+.workouts-screen__ai-limit-card svg {
+  margin-top: 4px;
+  color: var(--gym-lime);
+}
+
+.workouts-screen__ai-limit-card div {
+  display: grid;
+  gap: 8px;
+}
+
+.workouts-screen__ai-limit-card h3 {
+  margin: 0;
+  color: #dfe6d8;
+  font-size: 1.12rem;
+  font-weight: 900;
+}
+
+.workouts-screen__ai-limit-card p,
+.workouts-screen__ai-limit-card span {
+  margin: 0;
+  color: rgba(223, 230, 216, 0.66);
+  font-size: 0.9rem;
+  font-weight: 800;
+  line-height: 1.65;
 }
 
 .workouts-screen__split-actions {
@@ -7981,6 +8062,24 @@ input {
   background: var(--gym-lime);
 }
 
+.record-screen__quick-card .record-screen__prompt-tool--disabled,
+.record-screen__quick-card .record-screen__prompt-submit--disabled {
+  border-color: rgba(223, 230, 216, 0.18);
+  background: rgba(223, 230, 216, 0.42);
+  color: #080b07;
+  box-shadow: none;
+  filter: grayscale(1);
+}
+
+.record-screen__quick-card .record-screen__prompt-tool--disabled {
+  opacity: 0.64;
+}
+
+.record-screen__quick-card .record-screen__prompt-tool--disabled svg:first-child,
+.record-screen__quick-card .record-screen__prompt-submit--disabled svg:first-child {
+  color: #080b07;
+}
+
 .settings-screen__switch--on i {
   background: #080b07;
 }
@@ -8084,4 +8183,18 @@ input {
 
 .record-screen__quick-card .record-screen__prompt-tool svg:first-child {
   color: var(--gym-lime);
+}
+
+.record-screen__quick-card .record-screen__prompt-tool--disabled,
+.record-screen__quick-card .record-screen__prompt-submit--disabled {
+  border-color: rgba(223, 230, 216, 0.18);
+  background: rgba(223, 230, 216, 0.42);
+  color: #080b07;
+  box-shadow: none;
+  filter: grayscale(1);
+}
+
+.record-screen__quick-card .record-screen__prompt-tool--disabled svg:first-child,
+.record-screen__quick-card .record-screen__prompt-submit--disabled svg:first-child {
+  color: #080b07;
 }

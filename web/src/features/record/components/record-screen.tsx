@@ -42,6 +42,7 @@ export function RecordScreen(): JSX.Element {
     onRemoveAttachment: workspace.handleRemoveAttachment,
     onRemoveItem: workspace.handleRemoveItem,
     promptRegistration,
+    mealAiLimit: workspace.mealAiLimit,
     workspaceMode: workspace.workspaceMode,
   };
   const quickInputProps = {
@@ -54,6 +55,7 @@ export function RecordScreen(): JSX.Element {
     onRemoveAttachment: quickInput.handleRemoveAttachment,
     promptRegistration,
     sectionTransition,
+    mealAiLimit: quickInput.mealAiLimit,
     workspaceMode: quickInput.workspaceMode,
   };
 

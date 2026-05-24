@@ -21,6 +21,7 @@ export function WorkoutsPageScreen(): JSX.Element {
     feedbackTone,
     isSaving,
     isSavingOtherWorkout,
+    workoutAiLimit,
     handleValueChange,
     handleOtherWorkoutValueChange,
     handleExerciseValueChange,
@@ -52,6 +53,7 @@ export function WorkoutsPageScreen(): JSX.Element {
         <section className="workouts-screen__grid">
           <div className="workouts-screen__menu-column">
             <WorkoutMenuForm
+              aiLimit={workoutAiLimit}
               isSaving={isSaving}
               onAddExercise={handleAddExercise}
               onExerciseValueChange={handleExerciseValueChange}

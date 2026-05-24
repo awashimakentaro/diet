@@ -23,6 +23,7 @@ type RecordQuickInputCardProps = {
   attachments: PromptAttachment[];
   onAttachmentChange: (event: ChangeEvent<HTMLInputElement>) => boolean;
   onRemoveAttachment: (attachmentId: string) => void;
+  isAiLimitReached: boolean;
 };
 
 export function RecordQuickInputCard({
@@ -34,6 +35,7 @@ export function RecordQuickInputCard({
   attachments,
   onAttachmentChange,
   onRemoveAttachment,
+  isAiLimitReached,
 }: RecordQuickInputCardProps): JSX.Element {
   return (
     <section className="record-screen__quick-card">
@@ -60,6 +62,7 @@ export function RecordQuickInputCard({
         <div className="record-screen__prompt-toolbar">
           <div className="record-screen__prompt-tools">
             <RecordPhotoInputTools
+              disabled={isAiLimitReached}
               onAttachmentChange={onAttachmentChange}
               onPhotoRecord={onPhotoRecord}
             />
@@ -76,8 +79,12 @@ export function RecordQuickInputCard({
 
           <button
             aria-label="入力内容を反映"
-            className={isAnalyzing ? 'record-screen__prompt-submit record-screen__prompt-submit--loading' : 'record-screen__prompt-submit'}
-            disabled={isAnalyzing}
+            className={[
+              'record-screen__prompt-submit',
+              isAnalyzing ? 'record-screen__prompt-submit--loading' : '',
+              isAiLimitReached ? 'record-screen__prompt-submit--disabled' : '',
+            ].filter(Boolean).join(' ')}
+            disabled={isAnalyzing || isAiLimitReached}
             onClick={onApplyPrompt}
             type="button"
           >

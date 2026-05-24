@@ -22,6 +22,13 @@ type RecordQuickInputSectionProps = {
   onRemoveAttachment: (attachmentId: string) => void;
   promptRegistration: UseFormRegisterReturn;
   sectionTransition: { duration: number; ease?: 'easeOut' };
+  mealAiLimit: {
+    isLoading: boolean;
+    used: number;
+    limit: number;
+    isUnlimited: boolean;
+    isReached: boolean;
+  };
 };
 
 export function RecordQuickInputSection({
@@ -35,6 +42,7 @@ export function RecordQuickInputSection({
   onRemoveAttachment,
   promptRegistration,
   sectionTransition,
+  mealAiLimit,
 }: RecordQuickInputSectionProps): JSX.Element | null {
   if (workspaceMode !== 'idle' || isAnalyzing) {
     return null;
@@ -49,6 +57,7 @@ export function RecordQuickInputSection({
       <RecordQuickInputCard
         attachments={attachments}
         isAnalyzing={isAnalyzing}
+        isAiLimitReached={mealAiLimit.isReached}
         onApplyPrompt={onApplyPrompt}
         onAttachmentChange={onAttachmentChange}
         onOpenManualInput={onOpenManualInput}

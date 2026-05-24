@@ -12,6 +12,7 @@ import { useRecordScreenFeedback } from './use-record-screen-feedback';
 import { useRecordForm } from '../use-record-form';
 import { useRecordScreenPrompt } from './use-record-screen-prompt';
 import { useRecordScreenSave } from './use-record-screen-save';
+import { useRecordAiUsageLimit } from '../use-record-ai-usage-limit';
 
 type WorkspaceMode = 'idle' | 'manual' | 'generated';
 type FeedbackTone = 'info' | 'error';
@@ -39,6 +40,13 @@ export type UseRecordScreenResult = {
     handleAddItem: () => void;
     handleRemoveItem: (index: number) => void;
     handleConfirmDraft: () => void;
+    mealAiLimit: {
+      isLoading: boolean;
+      used: number;
+      limit: number;
+      isUnlimited: boolean;
+      isReached: boolean;
+    };
   };
   quickInput: {
     workspaceMode: WorkspaceMode;
@@ -48,6 +56,13 @@ export type UseRecordScreenResult = {
     handlePhotoRecord: () => void;
     handleAttachmentChange: ReturnType<typeof usePromptAttachments>['handleAttachmentChange'];
     handleRemoveAttachment: ReturnType<typeof usePromptAttachments>['handleRemoveAttachment'];
+    mealAiLimit: {
+      isLoading: boolean;
+      used: number;
+      limit: number;
+      isUnlimited: boolean;
+      isReached: boolean;
+    };
   };
   prompt: {
     handleApplyPrompt: () => void;
@@ -60,6 +75,7 @@ export function useRecordScreen(): UseRecordScreenResult {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [draftOriginalText, setDraftOriginalText] = useState('');
+  const mealAiLimit = useRecordAiUsageLimit();
   const { attachments, handleAttachmentChange, handleRemoveAttachment, clearAttachments } = usePromptAttachments();
   const {
     feedbackMessage,
@@ -88,6 +104,7 @@ export function useRecordScreen(): UseRecordScreenResult {
     setDraftOriginalText,
     setWorkspaceMode,
     setFeedback,
+    onUsageChanged: mealAiLimit.refresh,
   });
   const { handleConfirmDraft } = useRecordScreenSave({
     form,
@@ -147,6 +164,7 @@ export function useRecordScreen(): UseRecordScreenResult {
       handleAddItem,
       handleRemoveItem,
       handleConfirmDraft,
+      mealAiLimit,
     },
     quickInput: {
       workspaceMode,
@@ -156,6 +174,7 @@ export function useRecordScreen(): UseRecordScreenResult {
       handlePhotoRecord,
       handleAttachmentChange,
       handleRemoveAttachment,
+      mealAiLimit,
     },
     prompt: {
       handleApplyPrompt,

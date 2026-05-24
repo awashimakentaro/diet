@@ -19,6 +19,7 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import useSWR from 'swr';
 
 import type { WebMeal } from '@/domain/web-diet-schema';
@@ -108,7 +109,9 @@ const DEFAULT_WORKOUT_EDITOR_VALUES: WorkoutLogEditorValues = {
 };
 
 export function useHistoryScreen(): UseHistoryScreenResult {
-  const [activeView, setActiveView] = useState<'foods' | 'workouts'>('foods');
+  const searchParams = useSearchParams();
+  const initialView = searchParams.get('view') === 'workouts' ? 'workouts' : 'foods';
+  const [activeView, setActiveView] = useState<'foods' | 'workouts'>(initialView);
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
   const [feedbackTone, setFeedbackTone] = useState<'info' | 'error'>('info');
   const [editingMealId, setEditingMealId] = useState<string | null>(null);

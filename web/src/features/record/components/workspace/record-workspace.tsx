@@ -35,6 +35,13 @@ type RecordWorkspaceProps = {
   onConfirm: () => void;
   onAttachmentChange: (event: ChangeEvent<HTMLInputElement>) => boolean;
   onRemoveAttachment: (attachmentId: string) => void;
+  mealAiLimit: {
+    isLoading: boolean;
+    used: number;
+    limit: number;
+    isUnlimited: boolean;
+    isReached: boolean;
+  };
 };
 
 export function RecordWorkspace({
@@ -56,13 +63,14 @@ export function RecordWorkspace({
   onConfirm,
   onAttachmentChange,
   onRemoveAttachment,
+  mealAiLimit,
 }: RecordWorkspaceProps): JSX.Element {
   if (isAnalyzing) {
     return <RecordWorkspaceLoading />;
   }
 
   if (workspaceMode === 'idle') {
-    return <RecordWorkspacePlaceholder />;
+    return <RecordWorkspacePlaceholder mealAiLimit={mealAiLimit} />;
   }
 
   return (

@@ -4,9 +4,11 @@
 
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import useSWR from 'swr';
 
+import { paths } from '@/config/paths';
 import { getTodayKey } from '@/lib/web-date';
 import { getUserProfile } from '@/features/settings/api/get-user-profile';
 
@@ -23,6 +25,7 @@ import { requestWorkoutCalorieEstimate } from '../../api/request-workout-calorie
 import type { OtherWorkoutFormValues, WorkoutMenu, WorkoutMenuFormValues } from '../../types';
 import { buildOtherWorkoutLogPayload } from '../../utils/build-other-workout-log-payload';
 import { buildWorkoutMenuPayload } from '../../utils/build-workout-menu-payload';
+import { useWorkoutAiUsageLimit } from '../use-workout-ai-usage-limit';
 
 type FeedbackTone = 'success' | 'error';
 
@@ -39,6 +42,13 @@ export type UseWorkoutsScreenResult = {
   isLoading: boolean;
   isSaving: boolean;
   isSavingOtherWorkout: boolean;
+  workoutAiLimit: {
+    isLoading: boolean;
+    used: number;
+    limit: number;
+    isUnlimited: boolean;
+    isReached: boolean;
+  };
   handleValueChange: (field: keyof WorkoutMenuFormValues, value: string) => void;
   handleOtherWorkoutValueChange: (field: keyof OtherWorkoutFormValues, value: string) => void;
   handleExerciseValueChange: (index: number, field: keyof WorkoutMenuFormValues['exercises'][number], value: string) => void;
@@ -76,7 +86,9 @@ const DEFAULT_OTHER_WORKOUT_VALUES: OtherWorkoutFormValues = {
 };
 
 export function useWorkoutsScreen(): UseWorkoutsScreenResult {
+  const router = useRouter();
   const todayKey = getTodayKey();
+  const workoutAiLimit = useWorkoutAiUsageLimit();
   const [formValues, setFormValues] = useState<WorkoutMenuFormValues>(DEFAULT_FORM_VALUES);
   const [otherWorkoutValues, setOtherWorkoutValues] = useState<OtherWorkoutFormValues>(DEFAULT_OTHER_WORKOUT_VALUES);
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
@@ -190,6 +202,7 @@ export function useWorkoutsScreen(): UseWorkoutsScreenResult {
         estimatedBurnedKcal: estimate.burnedKcal,
       });
       await mutateMenus();
+      await workoutAiLimit.refresh();
       setFormValues(DEFAULT_FORM_VALUES);
       setFeedbackTone('success');
       setFeedbackMessage(
@@ -238,6 +251,7 @@ export function useWorkoutsScreen(): UseWorkoutsScreenResult {
         burnedKcal: estimate.burnedKcal,
       });
       await mutateTodayLogs();
+      await workoutAiLimit.refresh();
       setFormValues(DEFAULT_FORM_VALUES);
       setFeedbackTone('success');
       setFeedbackMessage(
@@ -245,7 +259,9 @@ export function useWorkoutsScreen(): UseWorkoutsScreenResult {
           ? '保存しました。履歴タブで今日の筋トレ記録を確認できます。'
           : '保存しました。履歴タブで今日の筋トレ記録を確認できます。',
       );
+      router.push(`${paths.app.history.getHref()}?view=workouts`);
     } catch (error) {
+      await workoutAiLimit.refresh();
       setFeedbackTone('error');
       setFeedbackMessage(error instanceof Error ? error.message : '今日の記録への追加に失敗しました。');
     } finally {
@@ -369,6 +385,7 @@ export function useWorkoutsScreen(): UseWorkoutsScreenResult {
     isLoading: isMenusLoading || isLogsLoading,
     isSaving,
     isSavingOtherWorkout,
+    workoutAiLimit,
     handleValueChange,
     handleOtherWorkoutValueChange,
     handleExerciseValueChange,

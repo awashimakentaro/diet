@@ -36,8 +36,13 @@ type UseRecordScreenPromptParams = {
   setDraftOriginalText: (value: string) => void;
   setWorkspaceMode: (value: WorkspaceMode) => void;
   setFeedback: (feedback: { message: string | null; tone: FeedbackTone }) => void;
+  onUsageChanged?: () => void | Promise<void>;
   analysisGateway?: RecordAnalysisGateway;
 };
+
+function isAiUsageLimitError(error: unknown): boolean {
+  return error instanceof Error && error.message.includes('1日') && error.message.includes('回まで');
+}
 
 export function useRecordScreenPrompt({
   form,
@@ -52,6 +57,7 @@ export function useRecordScreenPrompt({
   setDraftOriginalText,
   setWorkspaceMode,
   setFeedback,
+  onUsageChanged,
   analysisGateway = requestRecordAnalysis,
 }: UseRecordScreenPromptParams): {
   handleApplyPrompt: () => Promise<void>;
@@ -101,6 +107,7 @@ export function useRecordScreenPrompt({
       setWorkspaceMode(nextState.nextWorkspaceMode);
       setFeedback(nextState.feedback);
       clearAttachments();
+      await onUsageChanged?.();
     } catch (error) {
       Sentry.withScope((scope) => {
         scope.setTag('feature', 'record');
@@ -110,6 +117,16 @@ export function useRecordScreenPrompt({
         scope.setExtra('workspaceMode', workspaceMode);
         Sentry.captureException(error);
       });
+
+      if (isAiUsageLimitError(error)) {
+        setFeedback({
+          message: error instanceof Error ? error.message : '食事AI解析は1日3回までです。明日またお試しください。',
+          tone: 'error',
+        });
+        await onUsageChanged?.();
+        return;
+      }
+
       const nextState = buildRecordAnalysisFailureState({
         error,
         prompt: trimmedPrompt,
