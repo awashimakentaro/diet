@@ -40,7 +40,12 @@ export async function fetchValidatedJson<TSchema extends z.ZodTypeAny>(
   const response = await fetcher(input, init);
 
   if (!response.ok) {
-    throw new Error(`Request failed: ${response.status}`);
+    const payload = await response.json().catch(() => null) as { message?: unknown } | null;
+    const message = typeof payload?.message === 'string'
+      ? payload.message
+      : `Request failed: ${response.status}`;
+
+    throw new Error(message);
   }
 
   const payload = await response.json();

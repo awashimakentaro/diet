@@ -5,12 +5,14 @@
 import { NextResponse } from 'next/server';
 
 import { workoutCalorieEstimateRequestSchema } from '@/features/workouts/schemas/workout-calorie-estimate-schema';
+import { AiUsageLimitExceededError, consumeAiUsageLimit } from '@/lib/ai-usage-limit';
 import { estimateWorkoutCalories } from '@/lib/openai-workout-calorie-estimate';
 
 export async function POST(request: Request): Promise<Response> {
   try {
     const payload = await request.json();
     const parsed = workoutCalorieEstimateRequestSchema.parse(payload);
+    await consumeAiUsageLimit(request, 'workout');
     const estimate = await estimateWorkoutCalories(parsed);
 
     return NextResponse.json(estimate);
@@ -20,7 +22,7 @@ export async function POST(request: Request): Promise<Response> {
 
     return NextResponse.json(
       { message },
-      { status: 400 },
+      { status: error instanceof AiUsageLimitExceededError ? 429 : 400 },
     );
   }
 }

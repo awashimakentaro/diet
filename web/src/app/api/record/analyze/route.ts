@@ -23,6 +23,7 @@ import * as Sentry from '@sentry/nextjs';
 
 import { mealAnalysisRequestSchema as recordAnalysisRequestSchema } from '@/features/shared/meal-analysis/schemas';
 import { analyzeRecordDraft } from '@/features/record/server/analyze-record-draft';
+import { AiUsageLimitExceededError, consumeAiUsageLimit } from '@/lib/ai-usage-limit';
 import { ensureServerSentryInitialized } from '@/lib/monitoring/ensure-sentry-server';
 import { serverLogger } from '@/lib/monitoring/server-logger';
 
@@ -37,10 +38,13 @@ export async function POST(request: Request): Promise<Response> {
   try {
     const payload = await request.json();
     const parsed = recordAnalysisRequestSchema.parse(payload);
+    const usage = await consumeAiUsageLimit(request, 'meal');
     serverLogger.info({
       event: 'record_analyze_started',
       promptLength: parsed.prompt.trim().length,
       imageCount: parsed.images?.length ?? 0,
+      remaining: usage.remaining,
+      userId: usage.userId,
     });
     const draft = await analyzeRecordDraft(parsed.prompt, parsed.images);
     serverLogger.info({
@@ -70,7 +74,7 @@ export async function POST(request: Request): Promise<Response> {
 
     return NextResponse.json(
       { message },
-      { status: 400 },
+      { status: error instanceof AiUsageLimitExceededError ? 429 : 400 },
     );
   }
 }
