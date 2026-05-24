@@ -11,9 +11,9 @@ test('未ログインで record を開くとログイン画面へ戻る', async 
 
   await expect(page).toHaveURL(/\/auth\/login\?redirectTo=%2Fapp%2Frecord/);
   await expect(
-    page.getByRole('heading', { level: 1, name: 'Diet Web にログイン' }),
+    page.getByRole('heading', { level: 1, name: 'ログイン' }),
   ).toBeVisible();
   await expect(
-    page.getByRole('button', { name: 'ログインする' }),
+    page.getByRole('button', { name: 'Google でログイン' }),
   ).toBeVisible();
 });

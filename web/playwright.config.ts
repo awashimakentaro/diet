@@ -23,7 +23,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npx next dev -H 127.0.0.1 -p 3000',
+    command: 'node_modules/.bin/next dev -H 127.0.0.1 -p 3000',
     url: 'http://127.0.0.1:3000',
     reuseExistingServer: !process.env.CI,
     env: {
@@ -32,6 +32,10 @@ export default defineConfig({
       NEXT_PUBLIC_SUPABASE_ANON_KEY: 'test-anon-key',
       OPENAI_API_KEY: 'test-openai-key',
       NEXT_PUBLIC_MEALS_RETENTION_DAYS: '30',
+      STRIPE_SECRET_KEY: 'sk_test_e2e',
+      STRIPE_PRO_PRICE_ID: 'price_e2e',
+      STRIPE_WEBHOOK_SECRET: 'whsec_e2e',
+      SUPABASE_SERVICE_ROLE_KEY: 'test-service-role-key',
     },
   },
 });
