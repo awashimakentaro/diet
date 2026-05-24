@@ -27,11 +27,35 @@ create policy "Users can read own AI usage logs"
 create table if not exists public.user_entitlements (
   user_id uuid primary key references auth.users(id) on delete cascade,
   role text not null default 'user',
+  plan text not null default 'free' check (plan in ('free', 'pro')),
+  ai_weekly_limit integer not null default 5 check (ai_weekly_limit >= 0),
   ai_meal_daily_limit integer check (ai_meal_daily_limit is null or ai_meal_daily_limit >= 0),
   ai_workout_daily_limit integer check (ai_workout_daily_limit is null or ai_workout_daily_limit >= 0),
   ai_unlimited boolean not null default false,
+  stripe_customer_id text unique,
+  stripe_subscription_id text unique,
+  subscription_status text,
+  current_period_end timestamptz,
   updated_at timestamptz not null default now()
 );
+
+alter table public.user_entitlements
+  add column if not exists plan text not null default 'free' check (plan in ('free', 'pro'));
+
+alter table public.user_entitlements
+  add column if not exists ai_weekly_limit integer not null default 5 check (ai_weekly_limit >= 0);
+
+alter table public.user_entitlements
+  add column if not exists stripe_customer_id text unique;
+
+alter table public.user_entitlements
+  add column if not exists stripe_subscription_id text unique;
+
+alter table public.user_entitlements
+  add column if not exists subscription_status text;
+
+alter table public.user_entitlements
+  add column if not exists current_period_end timestamptz;
 
 alter table public.user_entitlements enable row level security;
 
@@ -44,11 +68,13 @@ create policy "Users can read own entitlements"
 
 -- 権限の付与・変更は Supabase SQL Editor や管理者用 service role から行う。
 -- 例:
--- insert into public.user_entitlements (user_id, role, ai_unlimited)
--- select id, 'tester', true
+-- insert into public.user_entitlements (user_id, role, plan, ai_weekly_limit, ai_unlimited)
+-- select id, 'tester', 'pro', 20, false
 -- from auth.users
 -- where lower(email) = lower('TestUser@test.com')
 -- on conflict (user_id) do update
 -- set role = excluded.role,
+--     plan = excluded.plan,
+--     ai_weekly_limit = excluded.ai_weekly_limit,
 --     ai_unlimited = excluded.ai_unlimited,
 --     updated_at = now();

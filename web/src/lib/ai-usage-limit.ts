@@ -8,8 +8,8 @@ type AiUsageLimitResult = {
 };
 
 type UserEntitlementRow = {
-  ai_meal_daily_limit: number | null;
-  ai_workout_daily_limit: number | null;
+  plan: string | null;
+  ai_weekly_limit: number | null;
   ai_unlimited: boolean | null;
 };
 
@@ -20,10 +20,8 @@ export class AiUsageLimitExceededError extends Error {
   }
 }
 
-const AI_FEATURE_LIMITS: Record<AiFeature, number> = {
-  meal: 3,
-  workout: 3,
-};
+const FREE_WEEKLY_AI_LIMIT = 5;
+const PRO_WEEKLY_AI_LIMIT = 20;
 
 function getBearerToken(request: Request): string | null {
   const authorization = request.headers.get('authorization');
@@ -35,16 +33,39 @@ function getBearerToken(request: Request): string | null {
   return authorization.slice('bearer '.length).trim();
 }
 
-function getJstDayStartIso(now = new Date()): string {
+function getJstWeekStartIso(now = new Date()): string {
   const jstOffsetMs = 9 * 60 * 60 * 1000;
   const jstNow = new Date(now.getTime() + jstOffsetMs);
+  const jstDay = jstNow.getUTCDay();
+  const daysSinceMonday = (jstDay + 6) % 7;
   const startUtcMs = Date.UTC(
     jstNow.getUTCFullYear(),
     jstNow.getUTCMonth(),
     jstNow.getUTCDate(),
-  ) - jstOffsetMs;
+  ) - (daysSinceMonday * 24 * 60 * 60 * 1000) - jstOffsetMs;
 
   return new Date(startUtcMs).toISOString();
+}
+
+function getJstNextWeekStartLabel(now = new Date()): string {
+  const jstOffsetMs = 9 * 60 * 60 * 1000;
+  const weekStart = new Date(getJstWeekStartIso(now));
+  const nextWeekStart = new Date(weekStart.getTime() + (7 * 24 * 60 * 60 * 1000));
+  const jstNextWeekStart = new Date(nextWeekStart.getTime() + jstOffsetMs);
+
+  return `${jstNextWeekStart.getUTCMonth() + 1}/${jstNextWeekStart.getUTCDate()} 0:00`;
+}
+
+function resolveWeeklyLimit(entitlement: UserEntitlementRow | null): number {
+  if (typeof entitlement?.ai_weekly_limit === 'number' && entitlement.ai_weekly_limit >= 0) {
+    return entitlement.ai_weekly_limit;
+  }
+
+  if (entitlement?.plan === 'pro') {
+    return PRO_WEEKLY_AI_LIMIT;
+  }
+
+  return FREE_WEEKLY_AI_LIMIT;
 }
 
 function createAuthorizedSupabaseClient(accessToken: string) {
@@ -93,7 +114,7 @@ export async function consumeAiUsageLimit(
 
   const { data: entitlement, error: entitlementError } = await client
     .from('user_entitlements')
-    .select('ai_meal_daily_limit, ai_workout_daily_limit, ai_unlimited')
+    .select('plan, ai_weekly_limit, ai_unlimited')
     .eq('user_id', userId)
     .maybeSingle<UserEntitlementRow>();
 
@@ -108,20 +129,14 @@ export async function consumeAiUsageLimit(
     };
   }
 
-  const customLimit = feature === 'meal'
-    ? entitlement?.ai_meal_daily_limit
-    : entitlement?.ai_workout_daily_limit;
-  const limit = typeof customLimit === 'number' && customLimit >= 0
-    ? customLimit
-    : AI_FEATURE_LIMITS[feature];
+  const limit = resolveWeeklyLimit(entitlement ?? null);
 
-  const dayStartIso = getJstDayStartIso();
+  const weekStartIso = getJstWeekStartIso();
   const { count, error: countError } = await client
     .from('ai_usage_logs')
     .select('id', { count: 'exact', head: true })
     .eq('user_id', userId)
-    .eq('feature', feature)
-    .gte('created_at', dayStartIso);
+    .gte('created_at', weekStartIso);
 
   if (countError) {
     throw new Error(countError.message);
@@ -130,8 +145,8 @@ export async function consumeAiUsageLimit(
   const usedCount = count ?? 0;
 
   if (usedCount >= limit) {
-    const featureLabel = feature === 'meal' ? '食事AI解析' : '筋トレAI推定';
-    throw new AiUsageLimitExceededError(`${featureLabel}は1日${limit}回までです。明日またお試しください。`);
+    const resetLabel = getJstNextWeekStartLabel();
+    throw new AiUsageLimitExceededError(`今週のAI使用回数は${limit}回までです。次のリセットは${resetLabel}です。Proなら週20回まで使えます。`);
   }
 
   const { error: insertError } = await client

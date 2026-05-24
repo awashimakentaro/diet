@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation';
 import { AppTopBar } from '@/components/app-top-bar';
 import { paths } from '@/config/paths';
 import { SettingsAccountCard } from '@/features/settings/components/account-card';
+import { SettingsBillingCard } from '@/features/settings/components/billing-card';
 import { SettingsManualTargetCard } from '@/features/settings/components/manual-target-card';
 import { SettingsProfileCard } from '@/features/settings/components/profile-card';
 import { useSettingsScreen } from '@/features/settings/hooks';
@@ -106,6 +107,14 @@ export function SettingsPageScreen(): JSX.Element {
               animate={{ opacity: 1, y: 0 }}
               initial={{ opacity: 0, y: 14 }}
               transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.14 }}
+            >
+              <SettingsBillingCard />
+            </motion.div>
+
+            <motion.div
+              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 14 }}
+              transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.18 }}
             >
               <SettingsAccountCard
                 email={accountEmail}

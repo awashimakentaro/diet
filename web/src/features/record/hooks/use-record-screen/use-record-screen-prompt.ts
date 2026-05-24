@@ -41,7 +41,7 @@ type UseRecordScreenPromptParams = {
 };
 
 function isAiUsageLimitError(error: unknown): boolean {
-  return error instanceof Error && error.message.includes('1日') && error.message.includes('回まで');
+  return error instanceof Error && error.message.includes('AI使用回数') && error.message.includes('回まで');
 }
 
 export function useRecordScreenPrompt({
@@ -120,7 +120,7 @@ export function useRecordScreenPrompt({
 
       if (isAiUsageLimitError(error)) {
         setFeedback({
-          message: error instanceof Error ? error.message : '食事AI解析は1日3回までです。明日またお試しください。',
+          message: error instanceof Error ? error.message : '今週のAI使用回数を使い切りました。',
           tone: 'error',
         });
         await onUsageChanged?.();

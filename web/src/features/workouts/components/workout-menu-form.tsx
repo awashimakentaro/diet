@@ -71,9 +71,9 @@ export function WorkoutMenuForm({
             <p className="workouts-screen__eyebrow">AI LIMIT</p>
             <h3>今日のAI推定はもう使えません</h3>
             <p>
-              筋トレAI推定は1日{aiLimit.limit}回までです。明日になるとWorkout MenuからのAI推定をまた使えます。
+              無料プランのAI利用は食事・筋トレを合わせて週{aiLimit.limit}回までです。次の月曜0:00に回数が復活します。
             </p>
-            <span>その他ワークアウトでは、消費カロリーを自分で入力して今日の記録に追加できます。</span>
+            <span>その他ワークアウトは引き続き使えます。ProにするとAI利用上限が週20回になります。</span>
           </div>
         </section>
       ) : isSaving ? (

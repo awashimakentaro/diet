@@ -25,7 +25,7 @@ export function RecordWorkspacePlaceholder({
           <p className="record-screen__field-label">AI LIMIT</p>
           <h2 className="record-screen__workspace-title">今日のAI解析は上限に達しました</h2>
           <p className="record-screen__workspace-copy">
-            食事AI解析は1日{mealAiLimit.limit}回までです。明日になると写真・テキスト解析をまた使えます。
+            無料プランのAI利用は食事・筋トレを合わせて週{mealAiLimit.limit}回までです。次の月曜0:00に回数が復活します。
           </p>
         </div>
 
@@ -33,7 +33,7 @@ export function RecordWorkspacePlaceholder({
           <Ban size={18} strokeWidth={2.2} />
           <div>
             <strong>今できること</strong>
-            <p>手動入力は引き続き使えます。食事名・分量・PFC を直接入力して今日の記録に追加できます。</p>
+            <p>手動入力は引き続き使えます。ProにするとAI利用上限が週20回になります。</p>
           </div>
         </article>
       </section>

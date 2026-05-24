@@ -6485,6 +6485,48 @@ input {
   gap: 10px;
 }
 
+.settings-screen__billing-card {
+  display: grid;
+  gap: 16px;
+}
+
+.settings-screen__billing-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.settings-screen__billing-meter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid rgba(223, 230, 216, 0.12);
+  border-radius: 16px;
+  background: rgba(223, 230, 216, 0.06);
+}
+
+.settings-screen__billing-meter span {
+  color: rgba(223, 230, 216, 0.64);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.settings-screen__billing-meter strong {
+  color: var(--gym-lime);
+  font-size: 1rem;
+  font-weight: 900;
+}
+
+.settings-screen__billing-copy {
+  margin: 0;
+  color: rgba(223, 230, 216, 0.64);
+  font-size: 0.88rem;
+  font-weight: 800;
+  line-height: 1.65;
+}
+
 .settings-screen__account-button {
   display: inline-flex;
   align-items: center;

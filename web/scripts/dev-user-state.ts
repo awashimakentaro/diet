@@ -20,13 +20,13 @@ type AuthUser = {
 
 type UserEntitlementRow = {
   role: string | null;
-  ai_meal_daily_limit: number | null;
-  ai_workout_daily_limit: number | null;
+  plan: string | null;
+  ai_weekly_limit: number | null;
   ai_unlimited: boolean | null;
 };
 
 const DEFAULT_EMAIL = 'TestUser@test.com';
-const DEFAULT_LIMIT = 3;
+const DEFAULT_LIMIT = 5;
 const JST_OFFSET_MS = 9 * 60 * 60 * 1000;
 
 loadEnvConfig(process.cwd());
@@ -65,17 +65,6 @@ function getFeature(): AiFeature | 'both' {
   return feature;
 }
 
-function getLimit(name: string): number {
-  const value = getArg(name);
-  const parsed = Number(value);
-
-  if (!value || !Number.isInteger(parsed) || parsed < 0) {
-    throw new Error(`--${name} は0以上の整数で指定してください。`);
-  }
-
-  return parsed;
-}
-
 function getOptionalLimit(name: string, fallback: number): number {
   const value = getArg(name);
 
@@ -92,13 +81,15 @@ function getOptionalLimit(name: string, fallback: number): number {
   return parsed;
 }
 
-function getJstDayStartIso(now = new Date()): string {
+function getJstWeekStartIso(now = new Date()): string {
   const jstNow = new Date(now.getTime() + JST_OFFSET_MS);
+  const jstDay = jstNow.getUTCDay();
+  const daysSinceMonday = (jstDay + 6) % 7;
   const startUtcMs = Date.UTC(
     jstNow.getUTCFullYear(),
     jstNow.getUTCMonth(),
     jstNow.getUTCDate(),
-  ) - JST_OFFSET_MS;
+  ) - (daysSinceMonday * 24 * 60 * 60 * 1000) - JST_OFFSET_MS;
 
   return new Date(startUtcMs).toISOString();
 }
@@ -157,7 +148,7 @@ async function findUserByEmail(client: ReturnType<typeof createAdminClient>, ema
   throw new Error(`${email} のユーザーが見つかりません。先にログイン/登録してください。`);
 }
 
-async function deleteTodayAiUsage(
+async function deleteWeeklyAiUsage(
   client: ReturnType<typeof createAdminClient>,
   userId: string,
   feature: AiFeature | 'both',
@@ -166,7 +157,7 @@ async function deleteTodayAiUsage(
     .from('ai_usage_logs')
     .delete()
     .eq('user_id', userId)
-    .gte('created_at', getJstDayStartIso());
+    .gte('created_at', getJstWeekStartIso());
 
   if (feature !== 'both') {
     query = query.eq('feature', feature);
@@ -179,13 +170,13 @@ async function deleteTodayAiUsage(
   }
 }
 
-async function fillTodayAiUsage(
+async function fillWeeklyAiUsage(
   client: ReturnType<typeof createAdminClient>,
   userId: string,
   feature: AiFeature | 'both',
   limit: number,
 ) {
-  await deleteTodayAiUsage(client, userId, feature);
+  await deleteWeeklyAiUsage(client, userId, feature);
 
   const features: AiFeature[] = feature === 'both' ? ['meal', 'workout'] : [feature];
   const rows = features.flatMap((item) => Array.from({ length: limit }, (_, index) => ({
@@ -215,7 +206,7 @@ async function getUsageCount(
     .select('id', { count: 'exact', head: true })
     .eq('user_id', userId)
     .eq('feature', feature)
-    .gte('created_at', getJstDayStartIso());
+    .gte('created_at', getJstWeekStartIso());
 
   if (error) {
     throw new Error(error.message);
@@ -230,7 +221,7 @@ async function getEntitlement(
 ): Promise<UserEntitlementRow | null> {
   const { data, error } = await client
     .from('user_entitlements')
-    .select('role, ai_meal_daily_limit, ai_workout_daily_limit, ai_unlimited')
+    .select('role, plan, ai_weekly_limit, ai_unlimited')
     .eq('user_id', userId)
     .maybeSingle<UserEntitlementRow>();
 
@@ -261,8 +252,9 @@ async function printStatus(client: ReturnType<typeof createAdminClient>, user: A
   console.log(`id: ${user.id}`);
   console.log(`created_at: ${user.created_at ?? '-'}`);
   console.log(`onboarding: ${(profileCount ?? 0) > 0 ? 'completed' : 'will show'}`);
-  console.log(`ai meal usage today: ${mealCount}`);
-  console.log(`ai workout usage today: ${workoutCount}`);
+  console.log(`ai meal usage this week: ${mealCount}`);
+  console.log(`ai workout usage this week: ${workoutCount}`);
+  console.log(`ai total usage this week: ${mealCount + workoutCount}`);
   console.log(`entitlement: ${JSON.stringify(entitlement ?? 'default', null, 2)}`);
 }
 
@@ -296,9 +288,9 @@ async function setAiUnlimited(client: ReturnType<typeof createAdminClient>, user
     .upsert({
       user_id: userId,
       role: 'tester',
+      plan: 'pro',
+      ai_weekly_limit: 20,
       ai_unlimited: true,
-      ai_meal_daily_limit: null,
-      ai_workout_daily_limit: null,
       updated_at: new Date().toISOString(),
     });
 
@@ -319,17 +311,16 @@ async function setAiDefault(client: ReturnType<typeof createAdminClient>, userId
 }
 
 async function setAiLimit(client: ReturnType<typeof createAdminClient>, userId: string) {
-  const mealLimit = getLimit('meal');
-  const workoutLimit = getLimit('workout');
+  const weeklyLimit = getOptionalLimit('weekly', getOptionalLimit('limit', 20));
 
   const { error } = await client
     .from('user_entitlements')
     .upsert({
       user_id: userId,
       role: 'tester',
+      plan: 'pro',
       ai_unlimited: false,
-      ai_meal_daily_limit: mealLimit,
-      ai_workout_daily_limit: workoutLimit,
+      ai_weekly_limit: weeklyLimit,
       updated_at: new Date().toISOString(),
     });
 
@@ -350,13 +341,13 @@ async function main() {
       return;
 
     case 'reset-ai':
-      await deleteTodayAiUsage(client, user.id, getFeature());
-      console.log(`reset today's AI usage: ${email}`);
+      await deleteWeeklyAiUsage(client, user.id, getFeature());
+      console.log(`reset this week's AI usage: ${email}`);
       return;
 
     case 'fill-ai':
-      await fillTodayAiUsage(client, user.id, getFeature(), getOptionalLimit('limit', DEFAULT_LIMIT));
-      console.log(`filled today's AI usage: ${email}`);
+      await fillWeeklyAiUsage(client, user.id, getFeature(), getOptionalLimit('limit', DEFAULT_LIMIT));
+      console.log(`filled this week's AI usage: ${email}`);
       return;
 
     case 'show-onboarding':
