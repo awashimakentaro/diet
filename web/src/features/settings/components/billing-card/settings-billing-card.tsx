@@ -3,6 +3,7 @@
 import { CreditCard, ExternalLink, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import type { JSX } from 'react';
+import { useState } from 'react';
 import useSWR from 'swr';
 
 import { paths } from '@/config/paths';
@@ -12,6 +13,8 @@ import { startBillingPortal } from '../../api/start-billing-portal';
 
 export function SettingsBillingCard(): JSX.Element {
   const { data, isLoading, error } = useSWR('/settings/billing-entitlement', getBillingEntitlement);
+  const [billingAction, setBillingAction] = useState<'checkout' | 'portal' | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
   const isPro = data?.plan === 'pro';
   const weeklyLimit = data?.aiWeeklyLimit ?? 5;
   const weeklyUsed = data?.aiWeeklyUsed ?? 0;
@@ -34,14 +37,38 @@ export function SettingsBillingCard(): JSX.Element {
     }).format(new Date(data.currentPeriodEnd))
     : null;
 
+  function getCurrentReturnPath(): string {
+    if (typeof window === 'undefined') {
+      return '/app/settings';
+    }
+
+    return `${window.location.pathname}${window.location.search}`;
+  }
+
   async function handleCheckout(): Promise<void> {
-    const url = await startBillingCheckout();
-    window.location.assign(url);
+    setActionError(null);
+    setBillingAction('checkout');
+
+    try {
+      const url = await startBillingCheckout(getCurrentReturnPath());
+      window.location.assign(url);
+    } catch (checkoutError) {
+      setBillingAction(null);
+      setActionError(checkoutError instanceof Error ? checkoutError.message : 'Checkoutを開始できませんでした。');
+    }
   }
 
   async function handlePortal(): Promise<void> {
-    const url = await startBillingPortal();
-    window.location.assign(url);
+    setActionError(null);
+    setBillingAction('portal');
+
+    try {
+      const url = await startBillingPortal(getCurrentReturnPath());
+      window.location.assign(url);
+    } catch (portalError) {
+      setBillingAction(null);
+      setActionError(portalError instanceof Error ? portalError.message : 'Customer Portalを開始できませんでした。');
+    }
   }
 
   return (
@@ -117,16 +144,32 @@ export function SettingsBillingCard(): JSX.Element {
           </p>
         ) : null}
 
+        {actionError ? (
+          <p className="settings-screen__feedback settings-screen__feedback--error">
+            {actionError}
+          </p>
+        ) : null}
+
         {isPro ? (
-          <button className="settings-screen__account-button" onClick={() => { void handlePortal(); }} type="button">
+          <button
+            className="settings-screen__account-button"
+            disabled={billingAction !== null}
+            onClick={() => { void handlePortal(); }}
+            type="button"
+          >
             <CreditCard size={16} strokeWidth={2.2} />
-            <span>課金管理を開く</span>
+            <span>{billingAction === 'portal' ? '課金管理へ移動中...' : '課金管理を開く'}</span>
             <ExternalLink size={15} strokeWidth={2.1} />
           </button>
         ) : (
-          <button className="settings-screen__primary-button" onClick={() => { void handleCheckout(); }} type="button">
+          <button
+            className="settings-screen__primary-button"
+            disabled={billingAction !== null}
+            onClick={() => { void handleCheckout(); }}
+            type="button"
+          >
             <Sparkles size={16} strokeWidth={2.2} />
-            <span>Proにアップグレード</span>
+            <span>{billingAction === 'checkout' ? 'Checkoutへ移動中...' : 'Proにアップグレード'}</span>
           </button>
         )}
       </div>

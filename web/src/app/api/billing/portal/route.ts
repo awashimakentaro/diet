@@ -7,6 +7,18 @@ type EntitlementRow = {
   stripe_customer_id: string | null;
 };
 
+function resolveReturnPath(value: unknown): string {
+  if (typeof value !== 'string' || !value.startsWith('/app')) {
+    return '/app/settings';
+  }
+
+  if (value.startsWith('//') || value.includes('://')) {
+    return '/app/settings';
+  }
+
+  return value;
+}
+
 export async function POST(request: Request) {
   try {
     const authorization = request.headers.get('authorization');
@@ -50,9 +62,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: '課金情報がまだありません。' }, { status: 404 });
     }
 
+    const body = await request.json().catch(() => ({})) as { returnTo?: unknown };
+    const returnPath = resolveReturnPath(body.returnTo);
+
     const session = await createStripePortalSession({
       customerId: entitlement.stripe_customer_id,
-      returnUrl: `${appUrl}/app/settings`,
+      returnUrl: `${appUrl}${returnPath}`,
     });
 
     return NextResponse.json({ url: session.url });

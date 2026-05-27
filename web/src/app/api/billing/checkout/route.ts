@@ -2,6 +2,23 @@ import { NextResponse } from 'next/server';
 
 import { createStripeCheckoutSession } from '@/lib/stripe-api';
 
+function resolveReturnPath(value: unknown): string {
+  if (typeof value !== 'string' || !value.startsWith('/app')) {
+    return '/app/settings';
+  }
+
+  if (value.startsWith('//') || value.includes('://')) {
+    return '/app/settings';
+  }
+
+  return value;
+}
+
+function appendBillingStatus(path: string, status: 'success' | 'cancelled'): string {
+  const separator = path.includes('?') ? '&' : '?';
+  return `${path}${separator}billing=${status}`;
+}
+
 export async function POST(request: Request) {
   try {
     const authorization = request.headers.get('authorization');
@@ -33,12 +50,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'ログイン状態を確認できません。' }, { status: 401 });
     }
 
+    const body = await request.json().catch(() => ({})) as { returnTo?: unknown };
+    const returnPath = resolveReturnPath(body.returnTo);
+
     const session = await createStripeCheckoutSession({
       customerEmail: data.user.email,
       priceId,
       userId: data.user.id,
-      successUrl: `${appUrl}/app/settings?billing=success`,
-      cancelUrl: `${appUrl}/app/settings?billing=cancelled`,
+      successUrl: `${appUrl}${appendBillingStatus(returnPath, 'success')}`,
+      cancelUrl: `${appUrl}${appendBillingStatus(returnPath, 'cancelled')}`,
     });
 
     return NextResponse.json({ url: session.url });

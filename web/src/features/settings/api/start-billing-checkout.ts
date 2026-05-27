@@ -1,6 +1,6 @@
 import { getSupabaseBrowserClient } from '@/lib/supabase';
 
-export async function startBillingCheckout(): Promise<string> {
+export async function startBillingCheckout(returnTo = '/app/settings'): Promise<string> {
   const supabase = getSupabaseBrowserClient();
   const { data } = await supabase.auth.getSession();
   const token = data.session?.access_token;
@@ -13,7 +13,9 @@ export async function startBillingCheckout(): Promise<string> {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
     },
+    body: JSON.stringify({ returnTo }),
   });
   const payload = await response.json() as { url?: string; message?: string };
 
