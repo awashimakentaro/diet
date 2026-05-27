@@ -28,6 +28,48 @@ const LIVE_COMMENT_LANES_DATA = Array.from({ length: LIVE_COMMENT_LANES }, (_, l
   LIVE_COMMENTS.filter((_, commentIndex) => commentIndex % LIVE_COMMENT_LANES === laneIndex)
 ));
 
+const PFC_ITEMS = [
+  {
+    label: 'P',
+    title: 'Protein',
+    body: 'たんぱく質。筋肉や体の材料になり、減量中も増量中もまず不足させたくない栄養素です。',
+  },
+  {
+    label: 'F',
+    title: 'Fat',
+    body: '脂質。ホルモンや体調維持に関わるため、ただ削ればいいものではありません。',
+  },
+  {
+    label: 'C',
+    title: 'Carbohydrate',
+    body: '炭水化物。日常生活やトレーニングの燃料になるため、動く日は特に判断材料になります。',
+  },
+] as const;
+
+const DIET_PRINCIPLES = [
+  {
+    title: '体重は収支で動く',
+    body: '減量では摂取を消費より少なく、増量では摂取を消費より多くするのが基本です。',
+  },
+  {
+    title: 'カロリーだけでは足りない',
+    body: '同じ kcal でも、PFC の配分で満腹感、筋肉量、トレーニングの調子は変わります。',
+  },
+  {
+    title: '続けられる記録が勝つ',
+    body: '完璧な入力より、食事・体重・ワークアウトを途切れず残せることを優先します。',
+  },
+] as const;
+
+const TRACKING_ITEMS = [
+  '食事の摂取カロリー',
+  'PFC バランス',
+  '体重推移',
+  '筋トレメニュー',
+  'その他ワークアウト',
+  '1日のカロリー収支',
+] as const;
+
 function buildLiveCommentLaneStyle(index: number, commentCount: number): CSSProperties {
   return {
     '--comment-delay': `${2.2 + index * 1.4}s`,
@@ -56,11 +98,11 @@ export function LandingPageScreen(): JSX.Element {
           <div className="landing-screen__hero-copy">
             <p className="landing-screen__eyebrow">AI FOOD LOG / TRAINING LIFE</p>
             <h1>
-              NO MORE
-              <span>面倒な食事管理。</span>
+              PFCで
+              <span>食事管理を迷わない。</span>
             </h1>
             <p className="landing-screen__lead">
-              写真から記録して、PFC とトレーニングの流れだけ見る。細かい入力に時間を使わないための食事管理アプリ。
+              PFC Tracker は、食事・体重・筋トレ・ワークアウトをまとめて記録し、今日のカロリー収支と栄養バランスを見える化するアプリです。
             </p>
 
             <div className="landing-screen__hero-actions">
@@ -116,6 +158,71 @@ export function LandingPageScreen(): JSX.Element {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="landing-screen__section landing-screen__section--education">
+        <div className="landing-screen__section-head">
+          <p className="landing-screen__eyebrow">WHAT IS PFC</p>
+          <h2>
+            PFCとは、
+            <span>体づくりの基本になる3つの栄養素。</span>
+          </h2>
+          <p>
+            PFC は Protein / Fat / Carbohydrate の略です。Diet では「何 kcal 食べたか」だけでなく、
+            その kcal が何から来ているかを見ることで、減量・増量・維持の判断がしやすくなります。
+          </p>
+        </div>
+
+        <div className="landing-screen__pfc-grid">
+          {PFC_ITEMS.map((item) => (
+            <article className="landing-screen__pfc-item" key={item.label}>
+              <strong>{item.label}</strong>
+              <div>
+                <h3>{item.title}</h3>
+                <p>{item.body}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="landing-screen__section landing-screen__section--principle">
+        <div className="landing-screen__section-head">
+          <p className="landing-screen__eyebrow">DIET PRINCIPLE</p>
+          <h2>
+            Dietで大事なのは、
+            <span>摂取・消費・継続。</span>
+          </h2>
+        </div>
+
+        <div className="landing-screen__principle-grid">
+          {DIET_PRINCIPLES.map((item) => (
+            <article className="landing-screen__principle-item" key={item.title}>
+              <h3>{item.title}</h3>
+              <p>{item.body}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="landing-screen__section landing-screen__section--product">
+        <div className="landing-screen__product-copy">
+          <p className="landing-screen__eyebrow">WHY THIS APP</p>
+          <h2>
+            痩せるためだけじゃなく、
+            <span>判断するための記録。</span>
+          </h2>
+          <p>
+            写真やテキストから食事を残し、保存メニューやワークアウトを再利用する。
+            Home では摂取カロリーから基礎代謝とトレーニング消費を引いた、今日の収支を確認できます。
+          </p>
+        </div>
+
+        <div className="landing-screen__tracking-list" aria-label="PFC Tracker で記録できるもの">
+          {TRACKING_ITEMS.map((item) => (
+            <span key={item}>{item}</span>
+          ))}
         </div>
       </section>
 
