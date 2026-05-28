@@ -194,6 +194,7 @@ export function useOnboardingScreen({
         heightCm,
         currentWeightKg,
         targetWeightKg,
+        targetDays,
         gender,
         activityLevel,
       });

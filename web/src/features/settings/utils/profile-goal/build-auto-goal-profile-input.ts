@@ -9,6 +9,7 @@ export type AutoGoalProfileInput = {
   heightCm: number;
   currentWeightKg: number;
   targetWeightKg: number;
+  targetDays: number;
   gender: Gender;
   activityLevel: ActivityLevel;
 };
@@ -32,12 +33,15 @@ export function buildAutoGoalProfileInput({
   const heightCm = Number(values.heightCm);
   const currentWeightKg = Number(values.currentWeightKg);
   const targetWeightKg = Number(values.targetWeightKg);
+  const targetDays = Number(values.targetDays);
 
   if (
     Number.isNaN(age)
     || Number.isNaN(heightCm)
     || Number.isNaN(currentWeightKg)
     || Number.isNaN(targetWeightKg)
+    || Number.isNaN(targetDays)
+    || targetDays <= 0
   ) {
     return {
       ok: false,
@@ -52,6 +56,7 @@ export function buildAutoGoalProfileInput({
       heightCm,
       currentWeightKg,
       targetWeightKg,
+      targetDays,
       gender,
       activityLevel,
     },

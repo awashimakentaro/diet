@@ -2,4 +2,4 @@
  * calculateGoalFromProfile を外部公開する。
  */
 
-export { calculateGoalFromProfile } from './calculate-goal-from-profile';
+export { calculateGoalFromProfile, type CalculatedGoal } from './calculate-goal-from-profile';

@@ -4,7 +4,7 @@
 
 import { getSupabaseBrowserClient } from '@/lib/supabase';
 
-import type { WorkoutIntensity, WorkoutKind } from '../types';
+import type { WorkoutExercise, WorkoutIntensity, WorkoutKind } from '../types';
 
 type UpdateWorkoutLogParams = {
   logId: string;
@@ -14,6 +14,7 @@ type UpdateWorkoutLogParams = {
   intensity: WorkoutIntensity;
   burnedKcal: number;
   note: string;
+  exercises: WorkoutExercise[];
 };
 
 export async function updateWorkoutLog({
@@ -24,6 +25,7 @@ export async function updateWorkoutLog({
   intensity,
   burnedKcal,
   note,
+  exercises,
 }: UpdateWorkoutLogParams): Promise<void> {
   const client = getSupabaseBrowserClient();
   const { data: userData, error: userError } = await client.auth.getUser();
@@ -43,7 +45,11 @@ export async function updateWorkoutLog({
     .update({
       workout_kind: kind,
       menu_name: name,
-      exercise_name: name,
+      exercise_name: exercises[0]?.exerciseName ?? name,
+      sets: exercises[0]?.sets ?? 1,
+      reps: exercises[0]?.reps ?? 1,
+      weight_kg: exercises[0]?.weightKg ?? 0,
+      exercises,
       duration_minutes: durationMinutes,
       intensity,
       burned_kcal: burnedKcal,

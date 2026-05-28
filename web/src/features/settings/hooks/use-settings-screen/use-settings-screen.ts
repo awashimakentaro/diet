@@ -12,7 +12,7 @@ import { getSettingsGoal } from '../../api/get-settings-goal';
 import { getUserProfile } from '../../api/get-user-profile';
 import { saveSettingsGoal } from '../../api/save-settings-goal';
 import { saveUserProfile } from '../../api/save-user-profile';
-import { calculateGoalFromProfile } from '../../utils/calculate-goal-from-profile';
+import { calculateGoalFromProfile, type CalculatedGoal } from '../../utils/calculate-goal-from-profile';
 import { useManualGoalForm } from '../use-manual-goal-form';
 import { useNotificationSettings } from '../use-notification-settings';
 import { useProfileGoalForm } from '../use-profile-goal-form';
@@ -25,9 +25,10 @@ import type {
   ProfileValues,
   SettingsSaveAction,
   SettingsSaveStatus,
+  SettingsValidationErrors,
   ReminderSlot,
 } from '../../types';
-import { buildManualGoalPayload } from '../../utils/manual-goal';
+import type { ManualGoalPayload } from '../../utils/manual-goal';
 import {
   buildAutoGoalProfileInput,
   buildProfilePayload,
@@ -50,13 +51,14 @@ export type UseSettingsScreenResult = {
   activeSaveAction: SettingsSaveAction;
   saveStatus: SettingsSaveStatus;
   isLoading: boolean;
+  autoGoalPreview: CalculatedGoal | null;
+  validationErrors: SettingsValidationErrors;
+  validationFocusRequest: number;
   handleManualTargetChange: (field: keyof ManualTargetValues, value: string) => void;
   handleProfileValueChange: (field: keyof ProfileValues, value: string) => void;
   handleGenderChange: (value: Gender) => void;
   handleActivityChange: (value: ActivityLevel) => void;
-  handleManualTargetSubmit: () => void;
   handleSaveProfile: () => void;
-  handleRunAutoCalculate: () => void;
   handleToggleNotificationEnabled: () => void;
   handleSelectReminder: (value: ReminderSlot) => void;
   handleSaveNotification: () => void;
@@ -77,6 +79,108 @@ function buildManualTargetsFromGoal(goal: {
   };
 }
 
+function toOptionalNumber(value: string): number | null {
+  if (value.trim().length === 0) {
+    return null;
+  }
+
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function buildAutoMacros(targetKcal: number, currentWeightKg: number): Pick<ManualGoalPayload, 'protein' | 'fat' | 'carbs'> {
+  const protein = Math.round(currentWeightKg * 2);
+  const fat = Math.round((targetKcal * 0.25) / 9);
+  const carbs = Math.max(0, Math.round((targetKcal - protein * 4 - fat * 9) / 4));
+
+  return { protein, fat, carbs };
+}
+
+function buildGoalPayloadFromInputs(
+  values: ManualTargetValues,
+  currentWeightKg: number,
+): ManualGoalPayload | null {
+  const kcal = toOptionalNumber(values.kcal);
+
+  if (kcal === null) {
+    return null;
+  }
+
+  const autoMacros = buildAutoMacros(kcal, currentWeightKg);
+  const protein = toOptionalNumber(values.protein) ?? autoMacros.protein;
+  const fat = toOptionalNumber(values.fat) ?? autoMacros.fat;
+  const carbs = toOptionalNumber(values.carbs) ?? autoMacros.carbs;
+
+  if (![kcal, protein, fat, carbs].every(Number.isFinite)) {
+    return null;
+  }
+
+  return { kcal, protein, fat, carbs };
+}
+
+const EMPTY_VALIDATION_ERRORS: SettingsValidationErrors = {
+  profile: {},
+  manualTargets: {},
+};
+
+function isMissing(value: string): boolean {
+  return value.trim().length === 0;
+}
+
+function isInvalidNumber(value: string): boolean {
+  return value.trim().length > 0 && !Number.isFinite(Number(value));
+}
+
+function buildSettingsValidationErrors(
+  profileValues: ProfileValues,
+  manualTargets: ManualTargetValues,
+): SettingsValidationErrors {
+  const profile: SettingsValidationErrors['profile'] = {};
+  const manualTargetErrors: SettingsValidationErrors['manualTargets'] = {};
+  const requiredProfileFields: Array<{
+    field: keyof ProfileValues;
+    label: string;
+  }> = [
+    { field: 'age', label: '年齢' },
+    { field: 'heightCm', label: '身長' },
+    { field: 'currentWeightKg', label: '現在の体重' },
+    { field: 'targetWeightKg', label: '目標の体重' },
+    { field: 'targetDays', label: '目標達成日数' },
+  ];
+
+  requiredProfileFields.forEach(({ field, label }) => {
+    if (isMissing(profileValues[field])) {
+      profile[field] = `${label}を入力してください`;
+      return;
+    }
+
+    if (isInvalidNumber(profileValues[field])) {
+      profile[field] = '数値で入力してください';
+    }
+  });
+
+  if (isMissing(manualTargets.kcal)) {
+    manualTargetErrors.kcal = '食事で1日に摂取したいカロリーを入力してください';
+  } else if (isInvalidNumber(manualTargets.kcal)) {
+    manualTargetErrors.kcal = '数値で入力してください';
+  }
+
+  (['protein', 'fat', 'carbs'] as Array<keyof ManualTargetValues>).forEach((field) => {
+    if (isInvalidNumber(manualTargets[field])) {
+      manualTargetErrors[field] = '数値で入力してください';
+    }
+  });
+
+  return {
+    profile,
+    manualTargets: manualTargetErrors,
+  };
+}
+
+function hasValidationErrors(errors: SettingsValidationErrors): boolean {
+  return Object.keys(errors.profile).length > 0 || Object.keys(errors.manualTargets).length > 0;
+}
+
 export function useSettingsScreen(): UseSettingsScreenResult {
   const { user, signOut } = useWebAuth();
   const manualGoal = useManualGoalForm();
@@ -85,6 +189,9 @@ export function useSettingsScreen(): UseSettingsScreenResult {
   const saveState = useSettingsSaveStatus();
   const account = useSettingsAccount({ email: user?.email, signOut });
   const [isLoading, setIsLoading] = useState(true);
+  const [autoGoalPreview, setAutoGoalPreview] = useState<CalculatedGoal | null>(null);
+  const [validationErrors, setValidationErrors] = useState<SettingsValidationErrors>(EMPTY_VALIDATION_ERRORS);
+  const [validationFocusRequest, setValidationFocusRequest] = useState(0);
   const { setManualTargets } = manualGoal;
   const { setActivityLevel, setGender, setProfileValues } = profileGoal;
 
@@ -141,37 +248,37 @@ export function useSettingsScreen(): UseSettingsScreenResult {
     };
   }, [setActivityLevel, setGender, setManualTargets, setProfileValues, user?.email, user?.id]);
 
-  function handleManualTargetSubmit(): void {
-    const result = buildManualGoalPayload(manualGoal.manualTargets);
+  function handleProfileValueChange(field: keyof ProfileValues, value: string): void {
+    profileGoal.handleProfileValueChange(field, value);
+    setValidationErrors((current) => {
+      const profile = { ...current.profile };
+      delete profile[field];
 
-    if (!result.ok) {
-      saveState.markSaveError('manual-goal');
-      return;
-    }
+      return { ...current, profile };
+    });
+  }
 
-    void saveState.runSaveAction('manual-goal', async () => {
-      await saveSettingsGoal(result.payload);
+  function handleManualTargetChange(field: keyof ManualTargetValues, value: string): void {
+    manualGoal.handleManualTargetChange(field, value);
+    setValidationErrors((current) => {
+      const manualTargets = { ...current.manualTargets };
+      delete manualTargets[field];
+
+      return { ...current, manualTargets };
     });
   }
 
   function handleSaveProfile(): void {
-    const result = buildProfilePayload({
-      values: profileGoal.profileValues,
-      gender: profileGoal.gender,
-      activityLevel: profileGoal.activityLevel,
-    });
+    const errors = buildSettingsValidationErrors(profileGoal.profileValues, manualGoal.manualTargets);
 
-    if (!result.ok) {
+    setValidationErrors(errors);
+
+    if (hasValidationErrors(errors)) {
+      setValidationFocusRequest((current) => current + 1);
       saveState.markSaveError('profile');
       return;
     }
 
-    void saveState.runSaveAction('profile', async () => {
-      await saveUserProfile(result.payload);
-    });
-  }
-
-  function handleRunAutoCalculate(): void {
     const inputResult = buildAutoGoalProfileInput({
       values: profileGoal.profileValues,
       gender: profileGoal.gender,
@@ -184,27 +291,32 @@ export function useSettingsScreen(): UseSettingsScreenResult {
     });
 
     if (!inputResult.ok || !profileResult.ok) {
-      saveState.markSaveError('auto-goal');
+      saveState.markSaveError('profile');
       return;
     }
 
-    const goal = calculateGoalFromProfile(inputResult.input);
+    const calculatedGoal = calculateGoalFromProfile(inputResult.input);
+    const payload = buildGoalPayloadFromInputs(
+      manualGoal.manualTargets,
+      inputResult.input.currentWeightKg,
+    );
 
+    if (payload === null) {
+      saveState.markSaveError('profile');
+      return;
+    }
+
+    setAutoGoalPreview(calculatedGoal);
     manualGoal.setManualTargets({
-      kcal: String(goal.kcal),
-      protein: String(goal.protein),
-      fat: String(goal.fat),
-      carbs: String(goal.carbs),
+      kcal: String(payload.kcal),
+      protein: String(payload.protein),
+      fat: String(payload.fat),
+      carbs: String(payload.carbs),
     });
 
-    void saveState.runSaveAction('auto-goal', async () => {
+    void saveState.runSaveAction('profile', async () => {
       await saveUserProfile(profileResult.payload);
-      await saveSettingsGoal({
-        kcal: goal.kcal,
-        protein: goal.protein,
-        fat: goal.fat,
-        carbs: goal.carbs,
-      });
+      await saveSettingsGoal(payload);
     });
   }
 
@@ -231,13 +343,14 @@ export function useSettingsScreen(): UseSettingsScreenResult {
     activeSaveAction: saveState.activeSaveAction,
     saveStatus: saveState.saveStatus,
     isLoading,
-    handleManualTargetChange: manualGoal.handleManualTargetChange,
-    handleProfileValueChange: profileGoal.handleProfileValueChange,
+    autoGoalPreview,
+    validationErrors,
+    validationFocusRequest,
+    handleManualTargetChange,
+    handleProfileValueChange,
     handleGenderChange: profileGoal.handleGenderChange,
     handleActivityChange: profileGoal.handleActivityChange,
-    handleManualTargetSubmit,
     handleSaveProfile,
-    handleRunAutoCalculate,
     handleToggleNotificationEnabled: notification.handleToggleNotificationEnabled,
     handleSelectReminder: notification.handleSelectReminder,
     handleSaveNotification,

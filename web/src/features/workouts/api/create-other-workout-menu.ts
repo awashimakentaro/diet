@@ -44,6 +44,7 @@ export async function createOtherWorkoutMenu({
         sets: 1,
         reps: 1,
         weightKg: 0,
+        durationMinutes,
       },
     ],
     duration_minutes: durationMinutes,

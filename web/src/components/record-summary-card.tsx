@@ -25,15 +25,17 @@ export type NutritionSummary = {
 type RecordSummaryCardProps = {
   summary: NutritionSummary;
   action?: ReactNode;
+  eyebrow?: string;
+  showGoalKcal?: boolean;
 };
 
 export function RecordSummaryCard({
   summary,
   action = null,
+  eyebrow = '栄養状況',
+  showGoalKcal = true,
 }: RecordSummaryCardProps): JSX.Element {
   const reduceMotion = useReducedMotion();
-  const remainingKcal = Math.max(summary.goalKcal - summary.kcal, 0);
-
   return (
     <motion.section
       animate={{ opacity: 1, y: 0 }}
@@ -49,14 +51,11 @@ export function RecordSummaryCard({
         <div className="record-screen__summary-content">
           <div className="record-screen__summary-head">
             <div>
-              <p className="record-screen__eyebrow">栄養状況</p>
+              <p className="record-screen__eyebrow">{eyebrow}</p>
               <div className="record-screen__headline">
                 <strong>{summary.kcal}</strong>
-                <span>/ {summary.goalKcal} kcal</span>
+                {showGoalKcal ? <span>/ {summary.goalKcal} kcal</span> : <span>kcal</span>}
               </div>
-              <p className="record-screen__summary-note">
-                目標まであと {remainingKcal} kcal
-              </p>
             </div>
             {action !== null ? (
               <div className="record-screen__summary-action">

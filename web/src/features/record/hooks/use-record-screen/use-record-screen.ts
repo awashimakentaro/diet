@@ -3,8 +3,10 @@
  */
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useFieldArray, useWatch, type FieldArrayWithId } from 'react-hook-form';
 import type { MealFormValues as RecordFormValues } from '@/features/shared/meal-editor/schemas';
+import { paths } from '@/config/paths';
 import { usePromptAttachments } from '@/features/shared/meal-editor/hooks/use-prompt-attachments';
 import { createEmptyRecordItem } from '../../utils/create-empty-record-item';
 import { useRecordDraftTotals } from './use-record-draft-totals';
@@ -70,6 +72,7 @@ export type UseRecordScreenResult = {
 };
 
 export function useRecordScreen(): UseRecordScreenResult {
+  const router = useRouter();
   const form = useRecordForm();
   const [workspaceMode, setWorkspaceMode] = useState<WorkspaceMode>('idle');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -115,6 +118,9 @@ export function useRecordScreen(): UseRecordScreenResult {
     setDraftOriginalText,
     setWorkspaceMode,
     setFeedback,
+    navigateToSavedMeal: ({ mealId, recordedDate }) => {
+      router.push(`${paths.app.history.getHref()}?view=foods&date=${encodeURIComponent(recordedDate)}&mealId=${encodeURIComponent(mealId)}`);
+    },
   });
 
   function handlePhotoRecord(): void {

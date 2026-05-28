@@ -157,7 +157,7 @@ export function OnboardingPageScreen({
 
             <div className="onboarding-screen__cta-row onboarding-screen__cta-row--split">
               <button
-                className="onboarding-screen__primary-button"
+                className={guideOnly ? 'onboarding-screen__primary-button onboarding-screen__return-button' : 'onboarding-screen__primary-button'}
                 onClick={guideOnly ? handleSkip : () => setStep('profile')}
                 type="button"
               >

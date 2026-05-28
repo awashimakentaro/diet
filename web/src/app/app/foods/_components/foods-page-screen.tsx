@@ -27,14 +27,17 @@ export function FoodsPageScreen(): JSX.Element {
     feedbackTone,
     savingEntryId,
     activeWorkoutMenuId,
+    activeWorkoutMenuAction,
     editingWorkoutMenu,
     workoutMenuEditorValues,
+    workoutMenuEditorValidation,
     editingEntry,
     editingForm,
     editingItemFields,
     editingDraftTotals,
     isSavingEdit,
     isSavingWorkoutMenuEdit,
+    isEstimatingWorkoutMenuEdit,
     handleSelectLibraryView,
     handleSearchChange,
     handleOpenEditor,
@@ -48,6 +51,10 @@ export function FoodsPageScreen(): JSX.Element {
     handleOpenWorkoutMenuEditor,
     handleCloseWorkoutMenuEditor,
     handleWorkoutMenuEditorValueChange,
+    handleWorkoutMenuEditorExerciseChange,
+    handleAddWorkoutMenuEditorExercise,
+    handleRemoveWorkoutMenuEditorExercise,
+    handleEstimateWorkoutMenuEditor,
     handleSaveWorkoutMenuEditor,
     handleReuseWorkoutMenu,
   } = useFoodsScreen();
@@ -129,7 +136,7 @@ export function FoodsPageScreen(): JSX.Element {
                     }}
                   >
                     <WorkoutMenuLibraryCard
-                      isSaving={activeWorkoutMenuId === menu.id}
+                      activeAction={activeWorkoutMenuId === menu.id ? activeWorkoutMenuAction : null}
                       menu={menu}
                       onDelete={(menuId) => {
                         void handleDeleteWorkoutMenu(menuId);
@@ -200,13 +207,21 @@ export function FoodsPageScreen(): JSX.Element {
       {editingWorkoutMenu !== null ? (
         <WorkoutLogEditorPanel
           isSaving={isSavingWorkoutMenuEdit}
+          isEstimating={isEstimatingWorkoutMenuEdit}
           onChange={handleWorkoutMenuEditorValueChange}
+          onExerciseChange={handleWorkoutMenuEditorExerciseChange}
+          onAddExercise={handleAddWorkoutMenuEditorExercise}
+          onRemoveExercise={handleRemoveWorkoutMenuEditorExercise}
+          onEstimate={() => {
+            void handleEstimateWorkoutMenuEditor();
+          }}
           onClose={handleCloseWorkoutMenuEditor}
           onSave={() => {
             void handleSaveWorkoutMenuEditor();
           }}
           title="筋トレメニューを編集"
           values={workoutMenuEditorValues}
+          validation={workoutMenuEditorValidation}
         />
       ) : null}
     </div>

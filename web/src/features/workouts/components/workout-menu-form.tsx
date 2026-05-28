@@ -60,33 +60,34 @@ export function WorkoutMenuForm({
         <p className="workouts-screen__eyebrow">Workout Menu</p>
         <h2 className="workouts-screen__section-title">筋トレメニュー作成</h2>
         <span className="workouts-screen__section-copy">
-          体重、セット数、回数、重量をもとにAIが消費カロリーを推定し、そのまま今日の記録に追加します。
+          体重、セット数、回数、重量、種目ごとの時間をもとにAIが消費カロリーを推定し、そのまま今日の記録に追加します。
         </span>
       </div>
 
-      {aiLimit.isReached ? (
-        <section className="workouts-screen__ai-limit-card" aria-live="polite">
-          <Ban size={22} strokeWidth={2.2} />
-          <div>
-            <p className="workouts-screen__eyebrow">AI LIMIT</p>
-            <h3>今日のAI推定はもう使えません</h3>
-            <p>
-              無料プランのAI利用は食事・筋トレを合わせて週{aiLimit.limit}回までです。次の月曜0:00に回数が復活します。
-            </p>
-            <span>その他ワークアウトは引き続き使えます。ProにするとAI利用上限が週20回になります。</span>
-          </div>
-        </section>
-      ) : isSaving ? (
+      {isSaving ? (
         <section aria-busy="true" aria-live="polite" className="workouts-screen__ai-loading">
           <div className="record-screen__loading-spinner" />
           <div className="workouts-screen__ai-loading-copy">
             <p className="workouts-screen__eyebrow">analyzing</p>
             <h3>解析中です</h3>
-            <p>入力された種目、セット数、回数、重量とプロフィールの体重をもとに消費カロリーを推定しています。</p>
+            <p>入力された種目、セット数、回数、重量、時間とプロフィールの体重をもとに消費カロリーを推定しています。</p>
           </div>
         </section>
       ) : (
         <>
+        {aiLimit.isReached ? (
+        <section className="workouts-screen__ai-limit-card workouts-screen__ai-limit-card--compact" aria-live="polite">
+          <Ban size={22} strokeWidth={2.2} />
+          <div>
+            <p className="workouts-screen__eyebrow">AI LIMIT</p>
+            <h3>AI推定は上限に達しています</h3>
+            <p>
+              次の月曜0:00までAI推定を使う筋トレ追加は止まります。保存済みメニューの再利用とその他ワークアウトの手動記録は使えます。
+            </p>
+            <span>現在 {aiLimit.used} / {aiLimit.limit} 回</span>
+          </div>
+        </section>
+        ) : null}
           <div className="workouts-screen__form-grid">
             <label className="workouts-screen__field workouts-screen__field--wide">
               <span>メニュー名</span>
@@ -119,12 +120,12 @@ export function WorkoutMenuForm({
                     />
                   </label>
                   <label className="workouts-screen__field">
-                    <span>セット数</span>
+                    <span>重量 kg</span>
                     <input
-                      inputMode="numeric"
-                      onChange={(event) => onExerciseValueChange(index, 'sets', event.target.value)}
+                      inputMode="decimal"
+                      onChange={(event) => onExerciseValueChange(index, 'weightKg', event.target.value)}
                       type="text"
-                      value={exercise.sets}
+                      value={exercise.weightKg}
                     />
                   </label>
                   <label className="workouts-screen__field">
@@ -137,12 +138,21 @@ export function WorkoutMenuForm({
                     />
                   </label>
                   <label className="workouts-screen__field">
-                    <span>重量 kg</span>
+                    <span>セット数</span>
                     <input
-                      inputMode="decimal"
-                      onChange={(event) => onExerciseValueChange(index, 'weightKg', event.target.value)}
+                      inputMode="numeric"
+                      onChange={(event) => onExerciseValueChange(index, 'sets', event.target.value)}
                       type="text"
-                      value={exercise.weightKg}
+                      value={exercise.sets}
+                    />
+                  </label>
+                  <label className="workouts-screen__field">
+                    <span>1セットの分数</span>
+                    <input
+                      inputMode="numeric"
+                      onChange={(event) => onExerciseValueChange(index, 'durationMinutes', event.target.value)}
+                      type="text"
+                      value={exercise.durationMinutes}
                     />
                   </label>
                 </div>
@@ -160,9 +170,9 @@ export function WorkoutMenuForm({
             <textarea onChange={createChangeHandler('note')} rows={3} value={values.note} />
           </label>
 
-          <button className="workouts-screen__primary-button" onClick={handleLogToday} type="button">
+          <button className="workouts-screen__primary-button" disabled={aiLimit.isReached} onClick={handleLogToday} type="button">
             <Sparkles size={16} strokeWidth={2.2} />
-            <span>今日の記録に追加</span>
+            <span>{aiLimit.isReached ? 'AI上限に達しています' : '今日の記録に追加'}</span>
             <Dumbbell size={16} strokeWidth={2.2} />
           </button>
         </>

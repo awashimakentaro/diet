@@ -35,7 +35,12 @@ export const saveRecordMeal: RecordMealRepository = {
       source,
     });
 
-    const { error } = await client.from('meals').insert(payload);
+    let savedMealId: string | null = null;
+    const { data: insertedMeal, error } = await client
+      .from('meals')
+      .insert(payload)
+      .select('id')
+      .single<{ id: string }>();
 
     if (error) {
       const fallbackPayload = {
@@ -46,11 +51,19 @@ export const saveRecordMeal: RecordMealRepository = {
         menu_name: payload.menu_name,
         timestamp: payload.timestamp,
       };
-      const { error: fallbackError } = await client.from('meals').insert(fallbackPayload);
+      const { data: fallbackMeal, error: fallbackError } = await client
+        .from('meals')
+        .insert(fallbackPayload)
+        .select('id')
+        .single<{ id: string }>();
 
       if (fallbackError) {
         throw new Error(fallbackError.message);
       }
+
+      savedMealId = fallbackMeal.id;
+    } else {
+      savedMealId = insertedMeal.id;
     }
 
     try {
@@ -64,5 +77,7 @@ export const saveRecordMeal: RecordMealRepository = {
     } catch {
       // Retention cleanup failure should not block meal save.
     }
+
+    return { mealId: savedMealId };
   },
 };

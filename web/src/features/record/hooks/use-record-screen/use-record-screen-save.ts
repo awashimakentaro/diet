@@ -28,6 +28,7 @@ type UseRecordScreenSaveParams = {
   setDraftOriginalText: (value: string) => void;
   setWorkspaceMode: (value: WorkspaceMode) => void;
   setFeedback: (feedback: { message: string | null; tone: FeedbackTone }) => void;
+  navigateToSavedMeal?: (params: { mealId: string; recordedDate: string }) => void;
   mealRepository?: RecordMealRepository;
 };
 
@@ -50,6 +51,7 @@ export function useRecordScreenSave({
   setDraftOriginalText,
   setWorkspaceMode,
   setFeedback,
+  navigateToSavedMeal,
   mealRepository = saveRecordMeal,
 }: UseRecordScreenSaveParams): {
   handleConfirmDraft: () => Promise<void>;
@@ -69,7 +71,7 @@ export function useRecordScreenSave({
     setIsSaving(true);
 
     try {
-      await mealRepository.saveMeal({
+      const result = await mealRepository.saveMeal({
         values,
         originalText: draftOriginalText,
         source: resolveRecordSaveSource(workspaceMode),
@@ -83,6 +85,12 @@ export function useRecordScreenSave({
       setDraftOriginalText(nextState.nextDraftOriginalText);
       setWorkspaceMode(nextState.nextWorkspaceMode);
       setFeedback(nextState.feedback);
+      if (navigateToSavedMeal !== undefined) {
+        navigateToSavedMeal({
+          mealId: result.mealId,
+          recordedDate: values.recordedDate,
+        });
+      }
     } catch (error) {
       Sentry.withScope((scope) => {
         scope.setTag('feature', 'record');

@@ -27,15 +27,18 @@ import type { NutritionSummary } from '@/components/record-summary-card';
 import { formatDateKey, getTodayKey, parseDateKey } from '@/lib/web-date';
 
 import { listCurrentGoal } from '../../../settings/api/list-current-goal';
+import { getUserProfile } from '../../../settings/api/get-user-profile';
 import { listDailySummary } from '../../../summary/api/list-daily-summary';
 import { recomputeDailySummaryForDateKey } from '../../../summary/api/recompute-daily-summary';
 import { buildNutritionSummary } from '../../../summary/build-nutrition-summary';
 import { deleteWorkoutLog } from '../../../workouts/api/delete-workout-log';
 import { listTodayWorkoutLogs } from '../../../workouts/api/list-today-workout-logs';
+import { requestWorkoutCalorieEstimate } from '../../../workouts/api/request-workout-calorie-estimate';
 import { saveWorkoutLogAsMenu } from '../../../workouts/api/save-workout-log-as-menu';
 import { updateWorkoutLog } from '../../../workouts/api/update-workout-log';
-import type { WorkoutLogEditorValues } from '../../../workouts/components/workout-log-editor-panel';
-import type { WorkoutLog } from '../../../workouts/types';
+import type { WorkoutLogEditorValidationState, WorkoutLogEditorValues } from '../../../workouts/components/workout-log-editor-panel';
+import type { WorkoutExerciseFormValues, WorkoutLog } from '../../../workouts/types';
+import { buildWorkoutEditorExercises } from '../../../workouts/utils/build-workout-editor-exercises';
 import { deleteHistoryMeal } from '../../api/delete-history-meal';
 import { listHistoryMeals } from '../../api/list-history-meals';
 import { saveHistoryMealToFoods } from '../../api/save-history-meal-to-foods';
@@ -65,6 +68,7 @@ export type UseHistoryScreenResult = {
   selectedDateValue: string;
   selectedDateLabel: string;
   activeView: 'foods' | 'workouts';
+  focusMealId: string | null;
   feedbackMessage: string | null;
   feedbackTone: 'info' | 'error';
   editingMeal: WebMeal | null;
@@ -74,7 +78,9 @@ export type UseHistoryScreenResult = {
   savingWorkoutLogId: string | null;
   editingWorkoutLog: WorkoutLog | null;
   workoutEditorValues: WorkoutLogEditorValues;
+  workoutEditorValidation: WorkoutLogEditorValidationState;
   isSavingWorkoutEdit: boolean;
+  isEstimatingWorkoutEdit: boolean;
   savedMealIds: string[];
   badgeCount: number;
   workoutBurnedKcal: number;
@@ -94,6 +100,10 @@ export type UseHistoryScreenResult = {
   handleOpenEditWorkoutLog: (log: WorkoutLog) => void;
   handleCloseEditWorkoutLog: () => void;
   handleWorkoutEditorValueChange: (field: keyof WorkoutLogEditorValues, value: string) => void;
+  handleWorkoutEditorExerciseChange: (index: number, field: keyof WorkoutExerciseFormValues, value: string) => void;
+  handleAddWorkoutEditorExercise: () => void;
+  handleRemoveWorkoutEditorExercise: (index: number) => void;
+  handleEstimateWorkoutEdit: () => Promise<void>;
   handleUpdateWorkoutLog: () => Promise<void>;
   handleSaveWorkoutLog: (log: WorkoutLog) => void;
   isLoading: boolean;
@@ -106,11 +116,72 @@ const DEFAULT_WORKOUT_EDITOR_VALUES: WorkoutLogEditorValues = {
   intensity: 'normal',
   burnedKcal: '',
   note: '',
+  exercises: [
+    {
+      exerciseName: '',
+      sets: '3',
+      reps: '10',
+      weightKg: '0',
+      durationMinutes: '1',
+    },
+  ],
 };
+
+const EMPTY_WORKOUT_EXERCISE: WorkoutExerciseFormValues = {
+  exerciseName: '',
+  sets: '3',
+  reps: '10',
+  weightKg: '0',
+  durationMinutes: '1',
+};
+
+function isPositiveInput(value: string): boolean {
+  const numberValue = Number(value);
+
+  return value.trim().length > 0 && Number.isFinite(numberValue) && numberValue > 0;
+}
+
+function buildWorkoutEditorInvalidKeys(values: WorkoutLogEditorValues): string[] {
+  const invalidKeys: string[] = [];
+
+  if (values.name.trim().length === 0) {
+    invalidKeys.push('name');
+  }
+
+  if (!isPositiveInput(values.burnedKcal)) {
+    invalidKeys.push('burnedKcal');
+  }
+
+  values.exercises.forEach((exercise, index) => {
+    if (exercise.exerciseName.trim().length === 0) {
+      invalidKeys.push(`exercise.${index}.exerciseName`);
+    }
+
+    if (!isPositiveInput(exercise.weightKg)) {
+      invalidKeys.push(`exercise.${index}.weightKg`);
+    }
+
+    if (!isPositiveInput(exercise.reps)) {
+      invalidKeys.push(`exercise.${index}.reps`);
+    }
+
+    if (!isPositiveInput(exercise.sets)) {
+      invalidKeys.push(`exercise.${index}.sets`);
+    }
+
+    if (!isPositiveInput(exercise.durationMinutes)) {
+      invalidKeys.push(`exercise.${index}.durationMinutes`);
+    }
+  });
+
+  return invalidKeys;
+}
 
 export function useHistoryScreen(): UseHistoryScreenResult {
   const searchParams = useSearchParams();
   const initialView = searchParams.get('view') === 'workouts' ? 'workouts' : 'foods';
+  const initialDate = searchParams.get('date');
+  const focusMealId = searchParams.get('mealId');
   const [activeView, setActiveView] = useState<'foods' | 'workouts'>(initialView);
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
   const [feedbackTone, setFeedbackTone] = useState<'info' | 'error'>('info');
@@ -121,9 +192,15 @@ export function useHistoryScreen(): UseHistoryScreenResult {
   const [savingWorkoutLogId, setSavingWorkoutLogId] = useState<string | null>(null);
   const [editingWorkoutLogId, setEditingWorkoutLogId] = useState<string | null>(null);
   const [workoutEditorValues, setWorkoutEditorValues] = useState<WorkoutLogEditorValues>(DEFAULT_WORKOUT_EDITOR_VALUES);
+  const [workoutEditorValidation, setWorkoutEditorValidation] = useState<WorkoutLogEditorValidationState>({
+    invalidKeys: [],
+    focusKey: null,
+    requestId: 0,
+  });
   const [isSavingWorkoutEdit, setIsSavingWorkoutEdit] = useState(false);
+  const [isEstimatingWorkoutEdit, setIsEstimatingWorkoutEdit] = useState(false);
   const [savedMealIds, setSavedMealIds] = useState<string[]>([]);
-  const [selectedDateKey, setSelectedDateKey] = useState(getTodayKey());
+  const [selectedDateKey, setSelectedDateKey] = useState(initialDate?.trim() ? initialDate : getTodayKey());
   const { data, mutate, isLoading: isMealsLoading } = useSWR(
     `/history/meals/${selectedDateKey}`,
     () => listHistoryMeals(selectedDateKey),
@@ -138,6 +215,11 @@ export function useHistoryScreen(): UseHistoryScreenResult {
   const { data: goal, isLoading: isGoalLoading } = useSWR(
     '/settings/current-goal',
     () => listCurrentGoal(),
+  );
+  const { data: profile = null, isLoading: isProfileLoading } = useSWR(
+    '/settings/user-profile',
+    () => getUserProfile(),
+    { fallbackData: null },
   );
   const { data: workoutLogsData, mutate: mutateWorkoutLogs, isLoading: isWorkoutLogsLoading } = useSWR(
     `/workouts/logs/${selectedDateKey}`,
@@ -312,20 +394,116 @@ export function useHistoryScreen(): UseHistoryScreenResult {
       intensity: log.intensity,
       burnedKcal: String(Math.round(log.burnedKcal)),
       note: log.note,
+      exercises: log.exercises.map((exercise) => ({
+        exerciseName: exercise.exerciseName,
+        sets: String(exercise.sets),
+        reps: String(exercise.reps),
+        weightKg: String(exercise.weightKg),
+        durationMinutes: String(Math.max(1, Math.round(exercise.durationMinutes / Math.max(1, exercise.sets)))),
+      })),
     });
+    setWorkoutEditorValidation({ invalidKeys: [], focusKey: null, requestId: 0 });
     clearFeedback();
   }
 
   function handleCloseEditWorkoutLog(): void {
     setEditingWorkoutLogId(null);
     setWorkoutEditorValues(DEFAULT_WORKOUT_EDITOR_VALUES);
+    setWorkoutEditorValidation({ invalidKeys: [], focusKey: null, requestId: 0 });
   }
 
   function handleWorkoutEditorValueChange(field: keyof WorkoutLogEditorValues, value: string): void {
+    setWorkoutEditorValidation({ invalidKeys: [], focusKey: null, requestId: 0 });
     setWorkoutEditorValues((current) => ({
       ...current,
       [field]: value,
     }));
+  }
+
+  function handleWorkoutEditorExerciseChange(
+    index: number,
+    field: keyof WorkoutExerciseFormValues,
+    value: string,
+  ): void {
+    setWorkoutEditorValidation({ invalidKeys: [], focusKey: null, requestId: 0 });
+    setWorkoutEditorValues((current) => ({
+      ...current,
+      exercises: current.exercises.map((exercise, exerciseIndex) => (
+        exerciseIndex === index ? { ...exercise, [field]: value } : exercise
+      )),
+    }));
+  }
+
+  function handleAddWorkoutEditorExercise(): void {
+    setWorkoutEditorValidation({ invalidKeys: [], focusKey: null, requestId: 0 });
+    setWorkoutEditorValues((current) => ({
+      ...current,
+      exercises: current.exercises.concat({ ...EMPTY_WORKOUT_EXERCISE }),
+    }));
+  }
+
+  function handleRemoveWorkoutEditorExercise(index: number): void {
+    setWorkoutEditorValidation({ invalidKeys: [], focusKey: null, requestId: 0 });
+    setWorkoutEditorValues((current) => {
+      if (current.exercises.length <= 1) {
+        return current;
+      }
+
+      return {
+        ...current,
+        exercises: current.exercises.filter((_, exerciseIndex) => exerciseIndex !== index),
+      };
+    });
+  }
+
+  async function handleEstimateWorkoutEdit(): Promise<void> {
+    const currentWeightKg = Number(profile?.current_weight_kg);
+    const age = Number(profile?.age);
+    const heightCm = Number(profile?.height_cm);
+    const exercises = buildWorkoutEditorExercises(workoutEditorValues.exercises);
+
+    if (
+      workoutEditorValues.name.trim().length === 0
+      || exercises === null
+      || !Number.isFinite(currentWeightKg)
+      || currentWeightKg <= 0
+    ) {
+      applyFeedback({ message: 'ワークアウト名、体重、種目を確認してください。', tone: 'error' });
+      return;
+    }
+
+    setIsEstimatingWorkoutEdit(true);
+
+    try {
+      const estimate = await requestWorkoutCalorieEstimate({
+        menuName: workoutEditorValues.name.trim(),
+        exercises,
+        durationMinutes: null,
+        intensity: 'hard',
+        currentWeightKg,
+        age: Number.isFinite(age) && age > 0 ? age : null,
+        gender: profile?.gender ?? null,
+        heightCm: Number.isFinite(heightCm) && heightCm > 0 ? heightCm : null,
+        chargeUsage: false,
+      });
+
+      if (estimate.source !== 'openai') {
+        throw new Error('AI推定を取得できませんでした。OpenAI設定を確認してから再計算してください。');
+      }
+
+      setWorkoutEditorValues((current) => ({
+        ...current,
+        burnedKcal: String(Math.round(estimate.burnedKcal)),
+      }));
+      applyFeedback({ message: 'AIで消費カロリーを再計算しました。', tone: 'info' });
+    } catch (error) {
+      applyFeedback({
+        message: error instanceof Error ? error.message : 'AI推定に失敗しました。',
+        tone: 'error',
+      });
+    } finally {
+      setIsEstimatingWorkoutEdit(false);
+    }
   }
 
   async function handleUpdateWorkoutLog(): Promise<void> {
@@ -333,11 +511,37 @@ export function useHistoryScreen(): UseHistoryScreenResult {
       return;
     }
 
-    const durationMinutes = Number(workoutEditorValues.durationMinutes);
+    const invalidKeys = buildWorkoutEditorInvalidKeys(workoutEditorValues);
+
+    if (invalidKeys.length > 0) {
+      setWorkoutEditorValidation((current) => ({
+        invalidKeys,
+        focusKey: invalidKeys[0] ?? null,
+        requestId: current.requestId + 1,
+      }));
+      applyFeedback({ message: '入力が足りない項目があります。', tone: 'error' });
+      return;
+    }
+
     const burnedKcal = Number(workoutEditorValues.burnedKcal);
+    const exercises = workoutEditorValues.kind === 'strength'
+      ? buildWorkoutEditorExercises(workoutEditorValues.exercises)
+      : [
+        {
+          exerciseName: workoutEditorValues.name.trim(),
+          sets: 1,
+          reps: 1,
+          weightKg: 0,
+          durationMinutes: Number(workoutEditorValues.durationMinutes),
+        },
+      ];
+    const durationMinutes = exercises === null
+      ? Number(workoutEditorValues.durationMinutes)
+      : exercises.reduce((sum, exercise) => sum + exercise.durationMinutes, 0);
 
     if (
       workoutEditorValues.name.trim().length === 0
+      || exercises === null
       || !Number.isFinite(durationMinutes)
       || durationMinutes <= 0
       || !Number.isFinite(burnedKcal)
@@ -358,6 +562,7 @@ export function useHistoryScreen(): UseHistoryScreenResult {
         intensity: workoutEditorValues.intensity,
         burnedKcal,
         note: workoutEditorValues.note.trim(),
+        exercises,
       });
       await mutateWorkoutLogs();
       await recomputeDailySummaryForDateKey(selectedDateKey);
@@ -417,6 +622,7 @@ export function useHistoryScreen(): UseHistoryScreenResult {
     selectedDateValue: selectedDateKey,
     selectedDateLabel,
     activeView,
+    focusMealId,
     feedbackMessage,
     feedbackTone,
     editingMeal,
@@ -426,7 +632,9 @@ export function useHistoryScreen(): UseHistoryScreenResult {
     savingWorkoutLogId,
     editingWorkoutLog,
     workoutEditorValues,
+    workoutEditorValidation,
     isSavingWorkoutEdit,
+    isEstimatingWorkoutEdit,
     savedMealIds,
     badgeCount: meals.length,
     workoutBurnedKcal,
@@ -443,8 +651,12 @@ export function useHistoryScreen(): UseHistoryScreenResult {
     handleOpenEditWorkoutLog,
     handleCloseEditWorkoutLog,
     handleWorkoutEditorValueChange,
+    handleWorkoutEditorExerciseChange,
+    handleAddWorkoutEditorExercise,
+    handleRemoveWorkoutEditorExercise,
+    handleEstimateWorkoutEdit,
     handleUpdateWorkoutLog,
     handleSaveWorkoutLog,
-    isLoading: isMealsLoading || isSummaryLoading || isGoalLoading || isWorkoutLogsLoading,
+    isLoading: isMealsLoading || isSummaryLoading || isGoalLoading || isWorkoutLogsLoading || isProfileLoading,
   };
 }

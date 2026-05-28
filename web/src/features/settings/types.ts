@@ -25,3 +25,7 @@ export type Gender = 'male' | 'female';
 export type SettingsSaveAction = 'manual-goal' | 'profile' | 'auto-goal' | 'notification' | null;
 export type SettingsSaveStatus = 'idle' | 'saving' | 'success' | 'error';
 export type ReminderSlot = 'morning' | 'noon' | 'evening' | 'night';
+export type SettingsValidationErrors = {
+  profile: Partial<Record<keyof ProfileValues, string>>;
+  manualTargets: Partial<Record<keyof ManualTargetValues, string>>;
+};

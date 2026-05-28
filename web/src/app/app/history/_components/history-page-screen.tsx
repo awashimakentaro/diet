@@ -6,6 +6,7 @@
  */
 
 import { motion, useReducedMotion } from 'framer-motion';
+import { useEffect, useRef } from 'react';
 import type { JSX } from 'react';
 
 import { AppTopBar } from '@/components/app-top-bar';
@@ -27,6 +28,7 @@ export function HistoryPageScreen(): JSX.Element {
     selectedDateValue,
     selectedDateLabel,
     activeView,
+    focusMealId,
     feedbackMessage,
     feedbackTone,
     editingMeal,
@@ -36,7 +38,9 @@ export function HistoryPageScreen(): JSX.Element {
     savingWorkoutLogId,
     editingWorkoutLog,
     workoutEditorValues,
+    workoutEditorValidation,
     isSavingWorkoutEdit,
+    isEstimatingWorkoutEdit,
     savedMealIds,
     workoutBurnedKcal,
     handleSelectView,
@@ -52,12 +56,28 @@ export function HistoryPageScreen(): JSX.Element {
     handleOpenEditWorkoutLog,
     handleCloseEditWorkoutLog,
     handleWorkoutEditorValueChange,
+    handleWorkoutEditorExerciseChange,
+    handleAddWorkoutEditorExercise,
+    handleRemoveWorkoutEditorExercise,
+    handleEstimateWorkoutEdit,
     handleUpdateWorkoutLog,
     handleSaveWorkoutLog,
   } = useHistoryScreen();
   const sectionTransition = reduceMotion
     ? { duration: 0 }
     : { duration: 0.45, ease: 'easeOut' as const };
+  const mealRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  useEffect(() => {
+    if (focusMealId === null || activeView !== 'foods') {
+      return;
+    }
+
+    mealRefs.current[focusMealId]?.scrollIntoView({
+      behavior: reduceMotion ? 'auto' : 'smooth',
+      block: 'center',
+    });
+  }, [activeView, focusMealId, reduceMotion]);
 
   return (
     <div className="history-screen">
@@ -146,8 +166,12 @@ export function HistoryPageScreen(): JSX.Element {
                     meals.map((meal, index) => (
                       <motion.div
                         animate={{ opacity: 1, y: 0 }}
+                        className={focusMealId === meal.id ? 'history-screen__focus-target' : undefined}
                         initial={{ opacity: 0, y: 18 }}
                         key={meal.id}
+                        ref={(element) => {
+                          mealRefs.current[meal.id] = element;
+                        }}
                         transition={{
                           ...sectionTransition,
                           delay: reduceMotion ? 0 : 0.18 + index * 0.03,
@@ -212,12 +236,20 @@ export function HistoryPageScreen(): JSX.Element {
       {editingWorkoutLog !== null ? (
         <WorkoutLogEditorPanel
           isSaving={isSavingWorkoutEdit}
+          isEstimating={isEstimatingWorkoutEdit}
           onChange={handleWorkoutEditorValueChange}
+          onExerciseChange={handleWorkoutEditorExerciseChange}
+          onAddExercise={handleAddWorkoutEditorExercise}
+          onRemoveExercise={handleRemoveWorkoutEditorExercise}
+          onEstimate={() => {
+            void handleEstimateWorkoutEdit();
+          }}
           onClose={handleCloseEditWorkoutLog}
           onSave={() => {
             void handleUpdateWorkoutLog();
           }}
           values={workoutEditorValues}
+          validation={workoutEditorValidation}
         />
       ) : null}
     </div>

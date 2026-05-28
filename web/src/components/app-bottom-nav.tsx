@@ -20,8 +20,8 @@ export function AppBottomNav({
     { href: paths.app.root.getHref(), label: 'ホーム', icon: House, activeStroke: 2.2 },
     { href: paths.app.record.getHref(), label: '食事記録', icon: Utensils, activeStroke: 2.2 },
     { href: paths.app.workouts.getHref(), label: '筋トレ記録', icon: Dumbbell, activeStroke: 2 },
-    { href: paths.app.foods.getHref(), label: 'メニュー', icon: Search, activeStroke: 2 },
     { href: paths.app.history.getHref(), label: '履歴', icon: Clock3, activeStroke: 2 },
+    { href: paths.app.foods.getHref(), label: 'メニュー', icon: Search, activeStroke: 2 },
     { href: paths.app.settings.getHref(), label: '設定', icon: Settings, activeStroke: 2 },
   ] as const;
 

@@ -45,6 +45,7 @@ export async function createOtherWorkoutLog({
         sets: 1,
         reps: 1,
         weightKg: 0,
+        durationMinutes,
       },
     ],
     duration_minutes: durationMinutes,

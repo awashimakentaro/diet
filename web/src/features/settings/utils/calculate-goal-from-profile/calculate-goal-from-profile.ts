@@ -10,22 +10,32 @@ type CalculateGoalFromProfileParams = {
   heightCm: number;
   currentWeightKg: number;
   targetWeightKg: number;
+  targetDays: number;
   gender: Gender;
   activityLevel: ActivityLevel;
 };
 
-type CalculatedGoal = {
+export type CalculatedGoal = {
   kcal: number;
   protein: number;
   fat: number;
   carbs: number;
+  bmr: number;
+  estimatedDailyBurnKcal: number;
+  dailyCalorieAdjustment: number;
+  warning: string | null;
 };
+
+const CALORIES_PER_WEIGHT_KG = 7700;
+const FAT_RATIO = 0.25;
+const PROTEIN_GRAMS_PER_WEIGHT_KG = 2;
 
 export function calculateGoalFromProfile({
   age,
   heightCm,
   currentWeightKg,
   targetWeightKg,
+  targetDays,
   gender,
   activityLevel,
 }: CalculateGoalFromProfileParams): CalculatedGoal {
@@ -37,25 +47,27 @@ export function calculateGoalFromProfile({
     moderate: 1.55,
     high: 1.75,
   };
-  const tdee = bmr * multipliers[activityLevel];
-
-  let targetKcal = tdee;
-  if (targetWeightKg < currentWeightKg) {
-    targetKcal -= 500;
-  } else if (targetWeightKg > currentWeightKg) {
-    targetKcal += 300;
-  }
-
-  targetKcal = Math.round(targetKcal);
-
-  const protein = Math.round(currentWeightKg * 2.0);
-  const fat = Math.round((targetKcal * 0.25) / 9);
-  const carbs = Math.round((targetKcal - protein * 4 - fat * 9) / 4);
+  const estimatedDailyBurnKcal = Math.round(bmr * multipliers[activityLevel]);
+  const weightDiffKg = targetWeightKg - currentWeightKg;
+  const dailyCalorieAdjustment = Math.round((weightDiffKg * CALORIES_PER_WEIGHT_KG) / targetDays);
+  const minimumKcal = gender === 'male' ? 1500 : 1200;
+  const calculatedTargetKcal = estimatedDailyBurnKcal + dailyCalorieAdjustment;
+  const targetKcal = Math.max(minimumKcal, Math.round(calculatedTargetKcal));
+  const protein = Math.round(currentWeightKg * PROTEIN_GRAMS_PER_WEIGHT_KG);
+  const fat = Math.round((targetKcal * FAT_RATIO) / 9);
+  const carbs = Math.max(0, Math.round((targetKcal - protein * 4 - fat * 9) / 4));
+  const warning = calculatedTargetKcal < minimumKcal
+    ? `目標達成日数が短いため、最低摂取カロリー ${minimumKcal} kcal に補正しました。`
+    : null;
 
   return {
     kcal: targetKcal,
     protein,
     fat,
     carbs,
+    bmr: Math.round(bmr),
+    estimatedDailyBurnKcal,
+    dailyCalorieAdjustment,
+    warning,
   };
 }

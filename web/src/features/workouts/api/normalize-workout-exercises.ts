@@ -9,6 +9,7 @@ type LegacyExerciseValues = {
   sets: number;
   reps: number;
   weightKg: number;
+  durationMinutes?: number;
 };
 
 type RawWorkoutExercise = {
@@ -16,6 +17,7 @@ type RawWorkoutExercise = {
   sets?: unknown;
   reps?: unknown;
   weightKg?: unknown;
+  durationMinutes?: unknown;
 };
 
 function isRawWorkoutExercise(value: unknown): value is RawWorkoutExercise {
@@ -31,6 +33,7 @@ function toWorkoutExercise(value: unknown): WorkoutExercise | null {
   const sets = Number(value.sets);
   const reps = Number(value.reps);
   const weightKg = Number(value.weightKg);
+  const durationMinutes = Number(value.durationMinutes);
 
   if (
     exerciseName.length === 0
@@ -46,6 +49,7 @@ function toWorkoutExercise(value: unknown): WorkoutExercise | null {
     sets,
     reps,
     weightKg,
+    durationMinutes: Number.isFinite(durationMinutes) && durationMinutes > 0 ? durationMinutes : 10,
   };
 }
 
@@ -63,5 +67,8 @@ export function normalizeWorkoutExercises(
     }
   }
 
-  return [legacy];
+  return [{
+    ...legacy,
+    durationMinutes: legacy.durationMinutes ?? 10,
+  }];
 }

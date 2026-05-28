@@ -17,10 +17,12 @@ import { getUserProfile } from '../settings/api/get-user-profile';
 import { listTodayWorkoutLogs } from '../workouts/api/list-today-workout-logs';
 import type { WorkoutLog } from '../workouts/types';
 import { buildDailyEnergySummary } from './utils/build-daily-energy-summary';
+import { buildHomeGoalOverview } from './utils/build-home-goal-overview';
 
 export type UseHomeScreenResult = {
   summary: NutritionSummary;
   dailyEnergy: ReturnType<typeof buildDailyEnergySummary>;
+  goalOverview: ReturnType<typeof buildHomeGoalOverview>;
   todayWorkoutLogs: WorkoutLog[];
   todayWorkoutBurnedKcal: number;
   isLoading: boolean;
@@ -51,12 +53,19 @@ export function useHomeScreen(): UseHomeScreenResult {
     },
   );
   const todayWorkoutBurnedKcal = todayWorkoutLogs.reduce((sum, log) => sum + log.burnedKcal, 0);
+  const todayIntakeKcal = todaySummary?.totals.kcal ?? 0;
 
   return {
     summary: buildNutritionSummary(todaySummary ?? null, goal ?? null),
     dailyEnergy: buildDailyEnergySummary(
       profile,
-      todaySummary?.totals.kcal ?? 0,
+      todayIntakeKcal,
+      todayWorkoutBurnedKcal,
+    ),
+    goalOverview: buildHomeGoalOverview(
+      profile,
+      goal ?? null,
+      todayIntakeKcal,
       todayWorkoutBurnedKcal,
     ),
     todayWorkoutLogs,

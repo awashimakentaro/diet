@@ -11,7 +11,7 @@ import type { WorkoutMenu } from '../types';
 
 type WorkoutMenuLibraryCardProps = {
   menu: WorkoutMenu;
-  isSaving: boolean;
+  activeAction: 'delete' | 'reuse' | null;
   onDelete: (menuId: string) => void;
   onEdit: (menu: WorkoutMenu) => void;
   onReuse: (menu: WorkoutMenu) => void;
@@ -25,11 +25,15 @@ const INTENSITY_LABELS = {
 
 export function WorkoutMenuLibraryCard({
   menu,
-  isSaving,
+  activeAction,
   onDelete,
   onEdit,
   onReuse,
 }: WorkoutMenuLibraryCardProps): JSX.Element {
+  const isDeleting = activeAction === 'delete';
+  const isReusing = activeAction === 'reuse';
+  const isBusy = activeAction !== null;
+
   return (
     <article className="food-card workout-menu-library-card">
       <div className="food-card__row">
@@ -57,7 +61,7 @@ export function WorkoutMenuLibraryCard({
           <button
             aria-label="筋トレメニューを編集"
             className="food-card__btn food-card__btn--edit"
-            disabled={isSaving}
+            disabled={isBusy}
             onClick={() => onEdit(menu)}
             type="button"
           >
@@ -66,19 +70,19 @@ export function WorkoutMenuLibraryCard({
           <button
             aria-label="筋トレメニューを削除"
             className="food-card__btn food-card__btn--delete"
-            disabled={isSaving}
+            disabled={isBusy}
             onClick={() => onDelete(menu.id)}
             type="button"
           >
-            <Trash2 size={13} strokeWidth={2} />
+            {isDeleting ? <span className="food-card__spinner" /> : <Trash2 size={13} strokeWidth={2} />}
           </button>
           <button
             className="food-card__btn food-card__btn--reuse"
-            disabled={isSaving}
+            disabled={isBusy}
             onClick={() => onReuse(menu)}
             type="button"
           >
-            {isSaving ? (
+            {isReusing ? (
               <>
                 <span className="food-card__spinner" />
                 <span>追加中...</span>

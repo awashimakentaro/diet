@@ -11,10 +11,15 @@ export const workoutCalorieEstimateRequestSchema = z.object({
     sets: z.number().positive(),
     reps: z.number().positive(),
     weightKg: z.number().nonnegative(),
+    durationMinutes: z.number().positive(),
   })).min(1),
-  durationMinutes: z.number().positive(),
+  durationMinutes: z.number().positive().nullable().optional(),
   intensity: z.enum(['light', 'normal', 'hard']),
   currentWeightKg: z.number().positive(),
+  age: z.number().positive().nullable().optional(),
+  gender: z.string().nullable().optional(),
+  heightCm: z.number().positive().nullable().optional(),
+  chargeUsage: z.boolean().optional(),
 });
 
 export const workoutCalorieEstimateResponseSchema = z.object({

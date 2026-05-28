@@ -10,6 +10,7 @@ export type WorkoutExerciseFormValues = {
   sets: string;
   reps: string;
   weightKg: string;
+  durationMinutes: string;
 };
 
 export type WorkoutExercise = {
@@ -17,6 +18,7 @@ export type WorkoutExercise = {
   sets: number;
   reps: number;
   weightKg: number;
+  durationMinutes: number;
 };
 
 export type WorkoutMenuFormValues = {

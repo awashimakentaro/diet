@@ -12,13 +12,13 @@ import { type JSX } from 'react';
 
 import { AppTopBar } from '@/components/app-top-bar';
 import { DailyEnergyCard } from '@/features/home/components/daily-energy-card';
+import { HomeGoalOverviewCard } from '@/features/home/components/home-goal-overview-card';
 import { useHomeScreen } from '@/features/home/use-home-screen';
-import { TodayWorkoutLogList } from '@/features/workouts/components/today-workout-log-list';
 import { RecordSummaryCard } from '@/components/record-summary-card';
 import { paths } from '@/config/paths';
 
 export function HomePageScreen(): JSX.Element {
-  const { summary, dailyEnergy, todayWorkoutLogs, todayWorkoutBurnedKcal } = useHomeScreen();
+  const { summary, goalOverview } = useHomeScreen();
   const reduceMotion = useReducedMotion();
   const sectionTransition = reduceMotion
     ? { duration: 0 }
@@ -40,30 +40,31 @@ export function HomePageScreen(): JSX.Element {
             initial={{ opacity: 0, y: 18 }}
             transition={sectionTransition}
           >
-            <RecordSummaryCard
-              action={(
-                <Link className="home-screen__record-link" href={paths.app.record.getHref()}>
-                  <Camera aria-hidden="true" size={19} strokeWidth={2.5} />
-                  記録する
-                </Link>
-              )}
-              summary={summary}
-            />
-            <div className="home-screen__side-stack">
-              <TodayWorkoutLogList
-                activeLogId={null}
-                burnedKcal={todayWorkoutBurnedKcal}
-                logs={todayWorkoutLogs}
-                onDeleteLog={() => undefined}
-                showLogs={false}
+            <div className="home-screen__primary-stack">
+              <RecordSummaryCard
+                action={(
+                  <Link className="home-screen__record-link" href={paths.app.record.getHref()}>
+                    <Camera aria-hidden="true" size={19} strokeWidth={2.5} />
+                    記録する
+                  </Link>
+                )}
+                eyebrow="今日の食事進捗"
+                showGoalKcal={false}
+                summary={summary}
               />
               <DailyEnergyCard
-                balanceKcal={dailyEnergy.balanceKcal}
-                bmr={dailyEnergy.bmr}
-                intakeKcal={dailyEnergy.intakeKcal}
-                isProfileReady={dailyEnergy.isProfileReady}
-                workoutKcal={dailyEnergy.workoutKcal}
+                balanceKcal={goalOverview.balanceKcal}
+                bmr={goalOverview.bmr}
+                direction={goalOverview.direction}
+                intakeKcal={goalOverview.intakeKcal}
+                isProfileReady={goalOverview.isProfileReady}
+                requiredDailyGapKcal={goalOverview.requiredDailyGapKcal}
+                targetIntakeKcal={goalOverview.targetIntakeKcal}
+                workoutKcal={goalOverview.workoutKcal}
               />
+            </div>
+            <div className="home-screen__side-stack">
+              <HomeGoalOverviewCard overview={goalOverview} />
             </div>
           </motion.section>
       </motion.main>

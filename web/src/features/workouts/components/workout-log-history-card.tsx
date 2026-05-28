@@ -28,7 +28,7 @@ export function WorkoutLogHistoryCard({
   const detailRowsSource = log.kind === 'other'
     ? [log.note || log.exercises[0]?.exerciseName || log.name]
     : log.exercises.slice(0, 3).map((exercise) => (
-      `${exercise.exerciseName} ${exercise.sets}set x ${exercise.reps}rep ${exercise.weightKg}kg`
+      `${exercise.exerciseName} ${exercise.sets}set x ${exercise.reps}rep ${exercise.weightKg}kg / ${exercise.durationMinutes}分`
     ));
   const detailRows = detailRowsSource.length > 0 ? detailRowsSource : [log.name];
 

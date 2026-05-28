@@ -60,6 +60,7 @@ export function WorkoutMenuList({
                       <span>{exercise.sets} sets</span>
                       <span>{exercise.reps} reps</span>
                       <span>{exercise.weightKg} kg</span>
+                      <span>{exercise.durationMinutes} min</span>
                     </div>
                   ))}
                 </div>

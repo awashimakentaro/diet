@@ -43,6 +43,7 @@ export function mapWorkoutMenuRow(row: WorkoutMenuRow): WorkoutMenu {
       sets: row.sets,
       reps: row.reps,
       weightKg: Number(row.weight_kg),
+      durationMinutes: row.duration_minutes,
     }),
     durationMinutes: row.duration_minutes,
     intensity: toWorkoutIntensity(row.intensity),

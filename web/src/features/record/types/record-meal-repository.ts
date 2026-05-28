@@ -10,6 +10,10 @@ export type SaveRecordMealParams = {
   source: 'text' | 'manual';
 };
 
+export type SaveRecordMealResult = {
+  mealId: string;
+};
+
 export type RecordMealRepository = {
-  saveMeal: (params: SaveRecordMealParams) => Promise<void>;
+  saveMeal: (params: SaveRecordMealParams) => Promise<SaveRecordMealResult>;
 };

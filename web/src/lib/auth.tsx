@@ -1,3 +1,7 @@
+/* 【責務】
+ * Supabase 認証状態の取得とログイン操作を提供する。
+ */
+
 "use client";
 
 import useSWR from "swr";
@@ -6,8 +10,67 @@ import { getSupabaseBrowserClient } from "./supabase";
 import type { User } from '@supabase/supabase-js';
 const supabase = getSupabaseBrowserClient();
 
+function getCachedSupabaseUser(): User | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  for (let index = 0; index < window.localStorage.length; index += 1) {
+    const key = window.localStorage.key(index);
+
+    if (key === null || !key.startsWith('sb-') || !key.endsWith('-auth-token')) {
+      continue;
+    }
+
+    const rawValue = window.localStorage.getItem(key);
+
+    if (rawValue === null) {
+      continue;
+    }
+
+    try {
+      const parsed = JSON.parse(rawValue) as { user?: User };
+
+      if (parsed.user) {
+        return parsed.user;
+      }
+    } catch {
+      return null;
+    }
+  }
+
+  return null;
+}
+
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T | null> {
+  return Promise.race([
+    promise,
+    new Promise<null>((resolve) => {
+      window.setTimeout(() => resolve(null), timeoutMs);
+    }),
+  ]);
+}
+
 export const getUser = async () => {
-  const { data, error } = await supabase.auth.getUser();
+  const cachedUser = getCachedSupabaseUser();
+
+  if (cachedUser !== null) {
+    return cachedUser;
+  }
+
+  const sessionResult = await withTimeout(supabase.auth.getSession(), 2500);
+
+  if (sessionResult?.data.session?.user) {
+    return sessionResult.data.session.user;
+  }
+
+  const userResult = await withTimeout(supabase.auth.getUser(), 2500);
+
+  if (userResult === null) {
+    return null;
+  }
+
+  const { data, error } = userResult;
   if (error) {
     throw new Error(error.message);
   }

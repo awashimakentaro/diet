@@ -2017,6 +2017,13 @@ input {
   box-shadow: 0 18px 30px rgba(206, 255, 41, 0.18);
 }
 
+.onboarding-screen__return-button {
+  justify-self: end;
+  margin-top: 10px;
+  min-height: 46px;
+  padding: 0 18px;
+}
+
 .onboarding-screen__primary-button:disabled {
   opacity: 0.7;
 }
@@ -3843,6 +3850,12 @@ input {
   align-content: start;
 }
 
+.home-screen__primary-stack {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+
 .home-screen__action-card {
   display: grid;
   gap: 18px;
@@ -4346,6 +4359,29 @@ input {
   gap: 16px;
 }
 
+.home-screen__energy-message {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid rgba(206, 255, 41, 0.22);
+  border-radius: 20px;
+  background: rgba(206, 255, 41, 0.08);
+}
+
+.home-screen__energy-message span {
+  color: #ceff29;
+  font-size: 1.05rem;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.home-screen__energy-message strong {
+  color: rgba(223, 230, 216, 0.78);
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
 .home-screen__energy-total {
   display: flex;
   align-items: center;
@@ -4379,6 +4415,72 @@ input {
   font-size: 0.74rem;
   font-weight: 800;
   text-align: center;
+}
+
+.home-screen__goal-card {
+  gap: 18px;
+}
+
+.home-screen__goal-groups {
+  display: grid;
+  gap: 14px;
+}
+
+.home-screen__goal-group {
+  display: grid;
+  gap: 8px;
+}
+
+.home-screen__goal-group > p {
+  margin: 0;
+  color: rgba(223, 230, 216, 0.58);
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.home-screen__goal-group--calculated {
+  padding: 12px;
+  border: 1px solid rgba(223, 230, 216, 0.1);
+  border-radius: 20px;
+  background: rgba(223, 230, 216, 0.04);
+}
+
+.home-screen__goal-group--tracking {
+  padding: 12px;
+  border: 1px solid rgba(206, 255, 41, 0.2);
+  border-radius: 20px;
+  background: rgba(206, 255, 41, 0.07);
+}
+
+.home-screen__goal-metric-list {
+  display: grid;
+  gap: 10px;
+}
+
+.home-screen__goal-metric {
+  display: grid;
+  grid-template-columns: minmax(7.4rem, 0.8fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  min-height: 62px;
+  padding: 12px 14px;
+  border: 1px solid rgba(223, 230, 216, 0.1);
+  border-radius: 18px;
+  background: rgba(223, 230, 216, 0.07);
+}
+
+.home-screen__goal-metric span {
+  color: rgba(223, 230, 216, 0.64);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.home-screen__goal-metric strong {
+  color: #dfe6d8;
+  font-size: clamp(0.98rem, 1.8vw, 1.22rem);
+  line-height: 1.15;
+  font-weight: 900;
 }
 
 .home-screen .app-top-bar {
@@ -4676,6 +4778,11 @@ input {
   line-height: 1.6;
 }
 
+.workout-log-editor__ai-loading {
+  min-height: 190px;
+  border-radius: 18px;
+}
+
 .workouts-screen__ai-limit-card {
   display: grid;
   grid-template-columns: 22px minmax(0, 1fr);
@@ -4710,6 +4817,21 @@ input {
   font-size: 0.9rem;
   font-weight: 800;
   line-height: 1.65;
+}
+
+.workouts-screen__ai-limit-card--compact {
+  padding: 14px;
+  border-color: rgba(251, 191, 36, 0.28);
+  background: rgba(251, 191, 36, 0.08);
+}
+
+.workouts-screen__ai-limit-card--compact h3 {
+  font-size: 1rem;
+}
+
+.workouts-screen__ai-limit-card--compact p,
+.workouts-screen__ai-limit-card--compact span {
+  font-size: 0.82rem;
 }
 
 .workouts-screen__split-actions {
@@ -6033,6 +6155,11 @@ input {
   box-shadow: inset 0 1px 0 rgba(223, 230, 216, 0.06), 0 18px 40px rgba(0, 0, 0, 0.14);
 }
 
+.history-screen__focus-target .history-screen__card {
+  border-color: rgba(206, 255, 41, 0.62);
+  box-shadow: 0 0 0 3px rgba(206, 255, 41, 0.16), 0 20px 42px rgba(0, 0, 0, 0.26);
+}
+
 .history-screen__card-head {
   display: flex;
   align-items: flex-start;
@@ -6323,6 +6450,51 @@ input {
   letter-spacing: 0.12em;
 }
 
+.settings-screen__step-heading,
+.settings-screen__side-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.settings-screen__step-heading {
+  padding: 4px 2px 0;
+}
+
+.settings-screen__step-heading span,
+.settings-screen__side-heading span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 24px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: #101828;
+  color: #ceff29;
+  font-size: 0.68rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.settings-screen__step-heading strong,
+.settings-screen__side-heading strong {
+  color: #dfe6d8;
+  font-size: 0.94rem;
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+.settings-screen__side-heading {
+  padding: 0 8px;
+}
+
+.settings-screen__side-heading span {
+  background: rgba(206, 255, 41, 0.14);
+  color: var(--gym-lime);
+}
+
 .settings-screen__card {
   display: grid;
   gap: 20px;
@@ -6345,11 +6517,26 @@ input {
   gap: 8px;
 }
 
+.settings-screen__metric-field {
+  position: relative;
+}
+
 .settings-screen__metric-field span:first-child {
   color: #99a1af;
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.08em;
+}
+
+.settings-screen__required-badge {
+  justify-self: start;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  font-size: 0.66rem;
+  font-weight: 900;
+  line-height: 1;
 }
 
 .settings-screen__metric-input,
@@ -6455,6 +6642,14 @@ input {
   letter-spacing: 0;
 }
 
+.profile-section__description {
+  margin: -4px 0 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.6;
+  font-weight: 700;
+}
+
 .profile-fields {
   display: grid;
   gap: 10px;
@@ -6469,6 +6664,13 @@ input {
   border-radius: 16px;
   background: var(--slate-50);
   transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.profile-field--error,
+.settings-screen__metric-field--error .settings-screen__metric-input input {
+  border-color: rgba(239, 68, 68, 0.7);
+  background: rgba(239, 68, 68, 0.08);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
 }
 
 .profile-field:focus-within {
@@ -6487,10 +6689,24 @@ input {
 }
 
 .profile-field__label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
   color: var(--slate-500);
   font-size: 13px;
   font-weight: 600;
-  #e8ece4-space: nowrap;
+}
+
+.profile-field__label em {
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  font-size: 0.66rem;
+  font-style: normal;
+  font-weight: 900;
+  line-height: 1;
 }
 
 .profile-field__input-wrapper {
@@ -6523,6 +6739,15 @@ input {
   font-size: 12px;
   font-weight: 700;
   min-width: 24px;
+}
+
+.profile-field__error {
+  grid-column: 2 / -1;
+  margin: -2px 0 0;
+  color: #f87171;
+  font-size: 0.76rem;
+  font-weight: 800;
+  line-height: 1.45;
 }
 
 /* Activity Level */
@@ -6631,6 +6856,43 @@ input {
 .profile-actions__btn--save:hover {
   box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
   transform: translateY(-1px);
+}
+
+.profile-auto-preview {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid rgba(206, 255, 41, 0.2);
+  border-radius: 18px;
+  background: rgba(206, 255, 41, 0.08);
+}
+
+.profile-auto-preview div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.profile-auto-preview span {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.profile-auto-preview strong {
+  color: var(--text);
+  font-size: 0.98rem;
+  font-weight: 900;
+}
+
+.profile-auto-preview p {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #b45309;
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1.6;
 }
 
 
@@ -7488,6 +7750,20 @@ input {
   box-shadow: 0 0 0 4px rgba(206, 255, 41, 0.2);
 }
 
+.workouts-screen__field--error input,
+.workouts-screen__field--error textarea,
+.workouts-screen__field--error input:focus,
+.workouts-screen__field--error textarea:focus {
+  border-color: rgba(248, 113, 113, 0.82);
+  background: rgba(127, 29, 29, 0.24);
+  color: #fee2e2;
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.18);
+}
+
+.workouts-screen__field--error span:first-child {
+  color: #fecaca;
+}
+
 .record-screen__prompt-submit,
 .workouts-screen__primary-button,
 .settings-screen__primary-button,
@@ -7622,6 +7898,11 @@ input {
   .landing-screen__section--product,
   .landing-screen__tracking-list {
     grid-template-columns: 1fr;
+  }
+
+  .home-screen__goal-metric {
+    grid-template-columns: 1fr;
+    gap: 5px;
   }
 
   .landing-screen__section--product {
@@ -8183,7 +8464,8 @@ input {
   .record-screen__split-fields,
   .record-screen__macro-edit-grid,
   .settings-screen__target-grid,
-  .profile-actions {
+  .profile-actions,
+  .profile-auto-preview {
     grid-template-columns: 1fr;
   }
 
@@ -8374,6 +8656,17 @@ input {
   color: #dfe6d8;
 }
 
+.settings-screen__step-heading strong,
+.settings-screen__side-heading strong {
+  color: #dfe6d8;
+}
+
+.settings-screen__step-heading span,
+.settings-screen__side-heading span {
+  background: rgba(206, 255, 41, 0.14);
+  color: var(--gym-lime);
+}
+
 .record-screen__eyebrow,
 .home-screen__eyebrow,
 .workouts-screen__eyebrow,
@@ -8443,6 +8736,63 @@ input {
   background: rgba(223, 230, 216, 0.08);
   color: #dfe6d8;
   box-shadow: none;
+}
+
+.settings-screen__metric-input input:focus,
+.settings-screen__profile-input input:focus,
+.profile-field:focus-within {
+  border-color: rgba(206, 255, 41, 0.48);
+  background: rgba(223, 230, 216, 0.1);
+  color: #dfe6d8;
+  box-shadow: 0 0 0 3px rgba(206, 255, 41, 0.16);
+}
+
+.profile-field--error,
+.profile-field--error:focus-within,
+.settings-screen__metric-field--error .settings-screen__metric-input input,
+.settings-screen__metric-field--error .settings-screen__metric-input input:focus {
+  border-color: rgba(248, 113, 113, 0.78);
+  background: rgba(127, 29, 29, 0.28);
+  color: #fee2e2;
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.18);
+}
+
+.profile-field--error .profile-field__label,
+.settings-screen__metric-field--error span:first-child {
+  color: #fecaca;
+}
+
+.profile-activity__btn:hover {
+  border-color: rgba(206, 255, 41, 0.38);
+  background: rgba(223, 230, 216, 0.12);
+  color: #dfe6d8;
+  box-shadow: 0 0 0 3px rgba(206, 255, 41, 0.1);
+}
+
+.profile-activity__btn--active:hover {
+  border-color: rgba(206, 255, 41, 0.58);
+  background: rgba(206, 255, 41, 0.18);
+  color: var(--gym-lime);
+}
+
+.profile-auto-preview {
+  border-color: rgba(206, 255, 41, 0.32);
+  background: rgba(206, 255, 41, 0.12);
+}
+
+.profile-auto-preview div {
+  padding: 10px;
+  border: 1px solid rgba(223, 230, 216, 0.1);
+  border-radius: 14px;
+  background: rgba(8, 13, 8, 0.42);
+}
+
+.profile-auto-preview span {
+  color: rgba(223, 230, 216, 0.68);
+}
+
+.profile-auto-preview strong {
+  color: #f4f8ef;
 }
 
 .record-screen__prompt-input::placeholder,

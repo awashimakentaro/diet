@@ -30,6 +30,7 @@ describe('buildAutoGoalProfileInput', () => {
         heightCm: 160,
         currentWeightKg: 55,
         targetWeightKg: 52,
+        targetDays: 60,
         gender: 'female',
         activityLevel: 'high',
       },

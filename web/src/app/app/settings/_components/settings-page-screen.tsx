@@ -12,8 +12,8 @@ import { useRouter } from 'next/navigation';
 import { AppTopBar } from '@/components/app-top-bar';
 import { paths } from '@/config/paths';
 import { SettingsAccountCard } from '@/features/settings/components/account-card';
+import { SettingsAccountProfileCard } from '@/features/settings/components/account-profile-card';
 import { SettingsBillingCard } from '@/features/settings/components/billing-card';
-import { SettingsManualTargetCard } from '@/features/settings/components/manual-target-card';
 import { SettingsProfileCard } from '@/features/settings/components/profile-card';
 import { useSettingsScreen } from '@/features/settings/hooks';
 
@@ -31,13 +31,14 @@ export function SettingsPageScreen(): JSX.Element {
     isSigningOut,
     activeSaveAction,
     saveStatus,
+    autoGoalPreview,
+    validationErrors,
+    validationFocusRequest,
     handleManualTargetChange,
     handleProfileValueChange,
     handleGenderChange,
     handleActivityChange,
-    handleManualTargetSubmit,
     handleSaveProfile,
-    handleRunAutoCalculate,
     handleSignOut,
   } = useSettingsScreen();
   const sectionTransition = reduceMotion
@@ -61,35 +62,28 @@ export function SettingsPageScreen(): JSX.Element {
             initial={{ opacity: 0, y: 20 }}
             transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.06 }}
           >
+            <div className="settings-screen__side-heading">
+              <span>プラン</span>
+              <strong>利用状況</strong>
+            </div>
+
             <motion.div
               animate={{ opacity: 1, y: 0 }}
               initial={{ opacity: 0, y: 14 }}
               transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.1 }}
             >
-              <SettingsManualTargetCard
-                isSaved={activeSaveAction === 'manual-goal' && saveStatus === 'success'}
-                isSaving={activeSaveAction === 'manual-goal' && isSaving}
-                onChange={handleManualTargetChange}
-                onSubmit={handleManualTargetSubmit}
-                values={manualTargets}
-              />
-            </motion.div>
-
-            <motion.div
-              animate={{ opacity: 1, y: 0 }}
-              initial={{ opacity: 0, y: 14 }}
-              transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.14 }}
-            >
               <SettingsProfileCard
                 activityLevel={activityLevel}
                 gender={gender}
-                isSavedAuto={activeSaveAction === 'auto-goal' && saveStatus === 'success'}
+                manualTargets={manualTargets}
                 isSavedProfile={activeSaveAction === 'profile' && saveStatus === 'success'}
-                isSavingAuto={activeSaveAction === 'auto-goal' && isSaving}
                 isSavingProfile={activeSaveAction === 'profile' && isSaving}
+                autoGoalPreview={autoGoalPreview}
+                validationErrors={validationErrors}
+                validationFocusRequest={validationFocusRequest}
                 onActivityChange={handleActivityChange}
                 onGenderChange={handleGenderChange}
-                onRunAutoCalculate={handleRunAutoCalculate}
+                onManualTargetChange={handleManualTargetChange}
                 onSaveProfile={handleSaveProfile}
                 onValueChange={handleProfileValueChange}
                 values={profileValues}
@@ -111,10 +105,29 @@ export function SettingsPageScreen(): JSX.Element {
               <SettingsBillingCard />
             </motion.div>
 
+            <div className="settings-screen__side-heading">
+              <span>アカウント</span>
+              <strong>表示とログイン</strong>
+            </div>
+
             <motion.div
               animate={{ opacity: 1, y: 0 }}
               initial={{ opacity: 0, y: 14 }}
               transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.18 }}
+            >
+              <SettingsAccountProfileCard
+                isSaved={activeSaveAction === 'profile' && saveStatus === 'success'}
+                isSaving={activeSaveAction === 'profile' && isSaving}
+                onChange={handleProfileValueChange}
+                onSubmit={handleSaveProfile}
+                values={profileValues}
+              />
+            </motion.div>
+
+            <motion.div
+              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 14 }}
+              transition={{ ...sectionTransition, delay: reduceMotion ? 0 : 0.22 }}
             >
               <SettingsAccountCard
                 email={accountEmail}

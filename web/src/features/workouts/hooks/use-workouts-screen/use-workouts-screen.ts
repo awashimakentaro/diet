@@ -71,6 +71,7 @@ const DEFAULT_FORM_VALUES: WorkoutMenuFormValues = {
       sets: '3',
       reps: '10',
       weightKg: '0',
+      durationMinutes: '1',
     },
   ],
   durationMinutes: '30',
@@ -151,6 +152,7 @@ export function useWorkoutsScreen(): UseWorkoutsScreenResult {
           sets: '3',
           reps: '10',
           weightKg: '0',
+          durationMinutes: '1',
         },
       ],
     }));
@@ -184,6 +186,8 @@ export function useWorkoutsScreen(): UseWorkoutsScreenResult {
     try {
       const profile = await getUserProfile();
       const currentWeightKg = Number(profile?.current_weight_kg);
+      const age = Number(profile?.age);
+      const heightCm = Number(profile?.height_cm);
 
       if (!Number.isFinite(currentWeightKg) || currentWeightKg <= 0) {
         throw new Error('プロフィールに現在の体重を保存してください。');
@@ -195,7 +199,14 @@ export function useWorkoutsScreen(): UseWorkoutsScreenResult {
         durationMinutes: result.payload.durationMinutes,
         intensity: result.payload.intensity,
         currentWeightKg,
+        age: Number.isFinite(age) && age > 0 ? age : null,
+        gender: profile?.gender ?? null,
+        heightCm: Number.isFinite(heightCm) && heightCm > 0 ? heightCm : null,
       });
+
+      if (estimate.source !== 'openai') {
+        throw new Error('AI推定を取得できませんでした。OpenAI設定を確認してください。');
+      }
 
       await createWorkoutMenu({
         ...result.payload,
@@ -233,6 +244,8 @@ export function useWorkoutsScreen(): UseWorkoutsScreenResult {
     try {
       const profile = await getUserProfile();
       const currentWeightKg = Number(profile?.current_weight_kg);
+      const age = Number(profile?.age);
+      const heightCm = Number(profile?.height_cm);
 
       if (!Number.isFinite(currentWeightKg) || currentWeightKg <= 0) {
         throw new Error('プロフィールに現在の体重を保存してください。');
@@ -244,7 +257,14 @@ export function useWorkoutsScreen(): UseWorkoutsScreenResult {
         durationMinutes: result.payload.durationMinutes,
         intensity: result.payload.intensity,
         currentWeightKg,
+        age: Number.isFinite(age) && age > 0 ? age : null,
+        gender: profile?.gender ?? null,
+        heightCm: Number.isFinite(heightCm) && heightCm > 0 ? heightCm : null,
       });
+
+      if (estimate.source !== 'openai') {
+        throw new Error('AI推定を取得できませんでした。OpenAI設定を確認してください。');
+      }
 
       await createWorkoutLog({
         ...result.payload,

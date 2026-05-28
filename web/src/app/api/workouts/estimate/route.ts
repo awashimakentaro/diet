@@ -12,7 +12,9 @@ export async function POST(request: Request): Promise<Response> {
   try {
     const payload = await request.json();
     const parsed = workoutCalorieEstimateRequestSchema.parse(payload);
-    await consumeAiUsageLimit(request, 'workout');
+    if (parsed.chargeUsage !== false) {
+      await consumeAiUsageLimit(request, 'workout');
+    }
     const estimate = await estimateWorkoutCalories(parsed);
 
     return NextResponse.json(estimate);
